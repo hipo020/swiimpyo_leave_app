@@ -3167,6 +3167,187 @@
       }
     }
 
+
+    /************************************************************
+     * 모바일 상단/다가오는 쉼 확정 패치
+     ************************************************************/
+    .mobile-upcoming-card {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        display: grid !important;
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 12px !important;
+      }
+
+      .brand {
+        display: grid !important;
+        grid-template-columns: 48px minmax(0, 1fr);
+        align-items: center;
+        gap: 11px !important;
+      }
+
+      .brand-mark {
+        width: 48px !important;
+        min-width: 48px !important;
+        max-width: 48px !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        flex: 0 0 48px !important;
+        aspect-ratio: 1 / 1 !important;
+        border-radius: 18px !important;
+        padding: 0 !important;
+        overflow: hidden;
+        display: grid !important;
+        place-items: center !important;
+        line-height: 1 !important;
+        font-size: 20px !important;
+      }
+
+      .brand h1 {
+        font-size: 27px !important;
+        line-height: 1.05;
+      }
+
+      .brand p {
+        max-width: 270px !important;
+        margin-top: 5px;
+        font-size: 12.5px !important;
+        line-height: 1.35 !important;
+      }
+
+      .topbar-actions {
+        display: grid !important;
+        grid-template-columns: 1fr;
+        width: 100%;
+        gap: 7px !important;
+      }
+
+      .today-chip {
+        display: none !important;
+      }
+
+      .user-chip {
+        width: 100%;
+        max-width: 100% !important;
+        height: 42px !important;
+        justify-content: space-between;
+        padding: 0 8px 0 16px !important;
+        border-radius: 999px !important;
+      }
+
+      .user-chip span {
+        min-width: 0;
+        font-size: 13px !important;
+      }
+
+      .logout-btn {
+        flex: 0 0 auto;
+        height: 30px !important;
+        min-width: 68px !important;
+        font-size: 11px !important;
+      }
+
+      .sync-status {
+        padding-left: 4px;
+        font-size: 11px !important;
+      }
+
+      .mobile-upcoming-card {
+        display: none;
+        margin: 0 0 14px;
+        padding: 16px;
+        border-radius: 24px;
+        background: rgba(255,255,255,.9);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(227,238,247,.95);
+      }
+
+      body.has-upcoming-leaves .mobile-upcoming-card {
+        display: block !important;
+      }
+
+      .mobile-upcoming-card h3 {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin: 0 0 11px;
+        color: var(--navy);
+        font-size: 16px;
+        letter-spacing: -0.04em;
+      }
+
+      .mobile-upcoming-card h3 span {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 850;
+      }
+
+      body.has-upcoming-leaves .side .upcoming-card {
+        display: none !important;
+      }
+
+      body:not(.has-upcoming-leaves) .mobile-upcoming-card {
+        display: none !important;
+      }
+
+      body:not(.has-upcoming-leaves) .side .upcoming-card {
+        display: block !important;
+      }
+
+      .main-grid,
+      .main-grid.report-mode {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .brand {
+        grid-template-columns: 44px minmax(0, 1fr);
+      }
+
+      .brand-mark {
+        width: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+        border-radius: 17px !important;
+        font-size: 19px !important;
+      }
+
+      .brand h1 {
+        font-size: 25px !important;
+      }
+
+      .brand p {
+        font-size: 12px !important;
+      }
+    }
+
+
+    @media (max-width: 720px) {
+      .bottom-sheet,
+      #sheet {
+        left: 50% !important;
+        right: auto !important;
+        width: min(430px, calc(100vw - 18px)) !important;
+        max-width: calc(100vw - 18px) !important;
+        transform: translate3d(-50%, 110%, 0) !important;
+      }
+
+      .bottom-sheet.active,
+      #sheet.active {
+        transform: translate3d(-50%, 0, 0) !important;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -3385,7 +3566,7 @@
           </div>
         </section>
 
-        <section class="side-card">
+        <section class="side-card upcoming-card">
           <h3>다가오는 쉼</h3>
           <div class="list" id="upcomingList"></div>
         </section>
@@ -4172,12 +4353,17 @@
 
       document.body.classList.toggle("has-upcoming-leaves", upcoming.length > 0);
 
+      const desktopList = $("#upcomingList");
+      const mobileList = $("#mobileUpcomingList");
+      const emptyHtml = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
+
       if (!upcoming.length) {
-        $("#upcomingList").innerHTML = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
+        if (desktopList) desktopList.innerHTML = emptyHtml;
+        if (mobileList) mobileList.innerHTML = "";
         return;
       }
 
-      $("#upcomingList").innerHTML = upcoming.map(l => {
+      const itemHtml = upcoming.map(l => {
         const type = getType(l.type);
         const reason = l.reason || "사유 없음";
         const dateText = l.startDate === l.endDate
@@ -4199,13 +4385,16 @@
         `;
       }).join("");
 
-      $("#upcomingList").querySelectorAll(".edit-btn").forEach(btn => {
+      if (desktopList) desktopList.innerHTML = itemHtml;
+      if (mobileList) mobileList.innerHTML = itemHtml;
+
+      document.querySelectorAll("#upcomingList .edit-btn, #mobileUpcomingList .edit-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           openEditSheet(btn.dataset.id);
         });
       });
 
-      $("#upcomingList").querySelectorAll(".delete-btn").forEach(btn => {
+      document.querySelectorAll("#upcomingList .delete-btn, #mobileUpcomingList .delete-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
           await persist();
@@ -4630,29 +4819,7 @@
 
 
     function syncMobileUpcomingPlacement() {
-      const mainGrid = document.querySelector(".main-grid");
-      const calendarView = document.querySelector(".calendar-view");
-      const side = document.querySelector(".side");
-      const upcomingCard = document.querySelector(".upcoming-card");
-      const recommendCard = document.querySelector(".simple-recommend-card");
-      if (!mainGrid || !calendarView || !side || !upcomingCard || !recommendCard) return;
-
-      const isMobile = window.matchMedia("(max-width: 720px)").matches;
-      const hasUpcoming = document.body.classList.contains("has-upcoming-leaves");
-
-      if (isMobile && hasUpcoming) {
-        if (upcomingCard.parentElement !== mainGrid || upcomingCard.nextElementSibling !== calendarView) {
-          mainGrid.insertBefore(upcomingCard, calendarView);
-        }
-      } else {
-        if (upcomingCard.parentElement !== side) {
-          side.appendChild(upcomingCard);
-        }
-      }
-
-      if (recommendCard.parentElement !== side && !isMobile) {
-        side.insertBefore(recommendCard, side.firstChild);
-      }
+      // 모바일 다가오는 쉼은 별도 카드에 렌더링합니다.
     }
 
     function renderAll() {
