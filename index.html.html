@@ -3424,6 +3424,511 @@
       }
     }
 
+
+    /************************************************************
+     * 추가 모바일 최적화 패치
+     ************************************************************/
+    @media (max-width: 720px) {
+      .hero {
+        gap: 10px !important;
+        margin-bottom: 10px !important;
+      }
+
+      .dashboard {
+        order: 1 !important;
+        padding: 10px !important;
+        gap: 6px !important;
+        border-radius: 24px !important;
+      }
+
+      .stat-card {
+        min-height: 84px !important;
+        padding: 12px 9px !important;
+        border-radius: 18px !important;
+      }
+
+      .stat-label {
+        font-size: 11px !important;
+      }
+
+      .stat-value {
+        margin-top: 8px !important;
+        font-size: clamp(18px, 6vw, 28px) !important;
+        gap: 2px !important;
+      }
+
+      .stat-unit {
+        font-size: 11px !important;
+      }
+
+      .settings-btn {
+        min-height: 44px !important;
+        height: 44px !important;
+        margin-top: 8px !important;
+        border-radius: 14px !important;
+      }
+
+      .mini-panel {
+        order: 2 !important;
+        padding: 14px !important;
+        border-radius: 20px !important;
+      }
+
+      .mini-panel::after {
+        display: none !important;
+      }
+
+      .mini-panel h2 {
+        font-size: 16px !important;
+        line-height: 1.28 !important;
+      }
+
+      .mini-panel p {
+        margin-top: 4px !important;
+        font-size: 11px !important;
+        line-height: 1.4 !important;
+      }
+
+      .quick-row {
+        margin-top: 10px !important;
+        gap: 6px !important;
+      }
+
+      .quick-pill {
+        padding: 7px 10px !important;
+        font-size: 11px !important;
+      }
+
+      .mobile-upcoming-card {
+        margin-bottom: 10px !important;
+        padding: 14px !important;
+      }
+
+      .mobile-upcoming-card h3 {
+        margin-bottom: 9px !important;
+        font-size: 15px !important;
+      }
+
+      .mobile-upcoming-card .leave-item {
+        padding: 8px !important;
+        border-radius: 16px !important;
+      }
+
+      .mobile-upcoming-card .leave-meta span {
+        max-width: 135px !important;
+      }
+
+      .leave-preview {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+        margin-top: 14px !important;
+        padding: 10px !important;
+        border-radius: 18px !important;
+      }
+
+      .preview-box {
+        min-height: auto !important;
+        padding: 9px 6px !important;
+        border-radius: 14px !important;
+        gap: 4px !important;
+        text-align: center !important;
+      }
+
+      .preview-box span {
+        font-size: 10px !important;
+      }
+
+      .preview-box strong {
+        font-size: 14px !important;
+        line-height: 1.15 !important;
+      }
+
+      .preview-note {
+        font-size: 11px !important;
+        line-height: 1.4 !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .dashboard {
+        gap: 5px !important;
+      }
+
+      .stat-card {
+        min-height: 78px !important;
+        padding: 10px 7px !important;
+      }
+
+      .stat-value {
+        font-size: 24px !important;
+      }
+
+      .quick-pill {
+        font-size: 10px !important;
+        padding: 6px 8px !important;
+      }
+
+      .preview-box strong {
+        font-size: 13px !important;
+      }
+    }
+
+
+    /************************************************************
+     * 모바일 초경량 추가 패치
+     ************************************************************/
+    .mini-panel-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mini-panel-toggle,
+    .recommend-toggle {
+      display: none;
+      flex: 0 0 auto;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+      color: var(--navy-soft);
+      font-size: 11px;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.85);
+    }
+
+    .mini-panel-body,
+    .simple-rec-extra {
+      overflow: hidden;
+    }
+
+    .date-field-wrap {
+      position: relative;
+      display: block;
+      min-width: 0;
+    }
+
+    .date-field-wrap .date-field {
+      padding-right: 42px;
+    }
+
+    .date-field-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--navy-soft);
+      font-size: 16px;
+      line-height: 1;
+      pointer-events: none;
+      opacity: .9;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    @media (max-width: 720px) {
+      .mini-panel-toggle,
+      .recommend-toggle {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .mini-panel.mobile-collapsed .mini-panel-body {
+        max-height: 0;
+        opacity: 0;
+        margin-top: 0;
+      }
+
+      .mini-panel .mini-panel-body {
+        max-height: 120px;
+        opacity: 1;
+        margin-top: 8px;
+        transition: max-height .24s var(--ease), opacity .18s var(--ease), margin-top .24s var(--ease);
+      }
+
+      .simple-recommend-card.mobile-collapsed .simple-rec-extra {
+        max-height: 0;
+        opacity: 0;
+        margin-top: 0;
+      }
+
+      .simple-recommend-card .simple-rec-extra {
+        max-height: 220px;
+        opacity: 1;
+        margin-top: 8px;
+        transition: max-height .24s var(--ease), opacity .18s var(--ease), margin-top .24s var(--ease);
+      }
+
+      .simple-recommend-card {
+        padding: 14px !important;
+        border-radius: 22px !important;
+      }
+
+      .simple-rec-head {
+        margin-bottom: 7px !important;
+      }
+
+      .rec-conversion {
+        margin: 6px 0 !important;
+      }
+
+      .simple-rec-result {
+        margin: 6px 0 0 !important;
+      }
+
+      .recommend-toggle {
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      .date-input-row {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+      }
+
+      .date-field-wrap {
+        overflow: hidden;
+        border-radius: 16px;
+      }
+
+      .date-field {
+        min-height: 46px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .date-input-row {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+
+    /************************************************************
+     * 완전 모바일 최적화 + PC 공통 개선
+     ************************************************************/
+    .settings-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .settings-icon {
+      line-height: 1;
+    }
+
+    .settings-label {
+      display: none;
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    @media (max-width: 980px) {
+      .settings-label {
+        display: inline;
+      }
+    }
+
+    .mobile-day-summary {
+      position: fixed;
+      left: 50%;
+      bottom: max(84px, calc(env(safe-area-inset-bottom) + 82px));
+      z-index: 38;
+      display: none;
+      width: min(430px, calc(100vw - 20px));
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 18px 48px rgba(16,42,67,.18);
+      border: 1px solid rgba(227,238,247,.95);
+      transform: translate(-50%, 14px);
+      opacity: 0;
+      transition: opacity .2s var(--ease), transform .2s var(--ease);
+      backdrop-filter: blur(16px);
+    }
+
+    .mobile-day-summary.active {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .mobile-day-summary-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .mobile-day-summary-head strong {
+      display: block;
+      color: var(--navy);
+      font-size: 16px;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .mobile-day-summary-head span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .mobile-summary-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 13px;
+      background: #F5F9FC;
+      color: var(--navy-soft);
+      font-size: 20px;
+      font-weight: 950;
+    }
+
+    .mobile-day-summary-list {
+      display: grid;
+      gap: 7px;
+      max-height: 190px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .mobile-day-summary .leave-item {
+      padding: 8px;
+      border-radius: 16px;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+    }
+
+    .mobile-day-summary .leave-date {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+    }
+
+    .mobile-summary-add {
+      width: 100%;
+      min-height: 42px;
+      margin-top: 10px;
+      border-radius: 16px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    @media (min-width: 721px) {
+      .mobile-day-summary {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body:not(.has-recommendations) .simple-recommend-card {
+        display: none !important;
+      }
+
+      .app {
+        padding-bottom: 108px !important;
+      }
+
+      .fab {
+        bottom: max(28px, calc(env(safe-area-inset-bottom) + 24px)) !important;
+      }
+
+      .bottom-sheet {
+        padding-bottom: max(18px, env(safe-area-inset-bottom)) !important;
+      }
+
+      .bottom-sheet .form-section {
+        margin-top: 14px !important;
+      }
+
+      .bottom-sheet .form-section label.title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 8px !important;
+        font-size: 12px !important;
+      }
+
+      .bottom-sheet {
+        counter-reset: leaveStep;
+      }
+
+      .bottom-sheet .form-section label.title::before {
+        counter-increment: leaveStep;
+        content: counter(leaveStep);
+        width: 20px;
+        height: 20px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--sky);
+        color: var(--navy);
+        font-size: 11px;
+        font-weight: 950;
+      }
+
+      .sheet-head {
+        margin-bottom: 10px !important;
+      }
+
+      .sheet-head p,
+      #sheetSub {
+        display: none;
+      }
+
+      .type-btn,
+      .reason-tag {
+        min-height: 40px !important;
+      }
+
+      .reason-tags {
+        gap: 7px !important;
+      }
+
+      .sheet-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        padding-top: 10px;
+        margin-top: 16px !important;
+        background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.96) 22%);
+      }
+
+      .date-field-wrap .date-field {
+        appearance: none;
+        -webkit-appearance: none;
+      }
+    }
+
+    @media (min-width: 721px) {
+      .date-field-wrap .date-field {
+        padding-right: 44px;
+      }
+
+      .leave-preview {
+        margin-top: 16px;
+      }
+
+      .preview-box {
+        min-height: 68px;
+      }
+    }
+
+
   </style>
 </head>
 <body class="auth-mode">
@@ -3473,16 +3978,23 @@
           <div class="stat-label">잔여 연차</div>
           <div class="stat-value"><span id="remainLeave">0.00</span><span class="stat-unit">일</span></div>
         </article>
-        <button class="settings-btn" id="openSettings" aria-label="연차 설정">⚙</button>
+        <button class="settings-btn" id="openSettings" aria-label="연차 설정"><span class="settings-icon">⚙</span><span class="settings-label">연차 설정</span></button>
       </div>
 
-      <aside class="mini-panel">
-        <h2>오늘도 무리하지 말고, 쉼표 하나.</h2>
-        <p>연차, 반차, 반반차는 자동 차감하고 경조사/공가/기타 휴가는 기록만 남겨요.</p>
-        <div class="quick-row">
-          <span class="quick-pill">연차 -1</span>
-          <span class="quick-pill">반차 -0.5</span>
-          <span class="quick-pill">반반차 -0.25</span>
+      <aside class="mini-panel" id="miniPanel">
+        <div class="mini-panel-top">
+          <div>
+            <h2>오늘도 무리하지 말고, 쉼표 하나.</h2>
+            <p>연차, 반차, 반반차는 자동 차감하고 경조사/공가/기타 휴가는 기록만 남겨요.</p>
+          </div>
+          <button class="mini-panel-toggle" id="toggleMiniPanel" type="button" aria-expanded="false">펼치기</button>
+        </div>
+        <div class="mini-panel-body" id="miniPanelBody">
+          <div class="quick-row">
+            <span class="quick-pill">연차 -1</span>
+            <span class="quick-pill">반차 -0.5</span>
+            <span class="quick-pill">반반차 -0.25</span>
+          </div>
         </div>
       </aside>
     </section>
@@ -3609,7 +4121,7 @@
       </section>
 
       <aside class="side">
-        <section class="side-card recommend-card simple-recommend-card">
+        <section class="side-card recommend-card simple-recommend-card" id="recommendCard">
           <div class="simple-rec-head">
             <h3>스마트 연차 추천</h3>
             <span id="recommendCount">0/0</span>
@@ -3627,24 +4139,29 @@
             </div>
           </div>
 
-          <div class="simple-rec-flow">
-            <div>
-              <span>쉼 시작</span>
-              <strong id="recommendStartDate">-</strong>
-            </div>
-            <div>
-              <span>쉼 종료</span>
-              <strong id="recommendEndDate">-</strong>
-            </div>
-          </div>
-
           <p class="simple-rec-result" id="recommendText">추천을 확인하는 중이에요.</p>
-          <p class="simple-rec-desc" id="recommendDesc">오늘 이후 6개월 안의 징검다리 휴일을 찾아 추천해요.</p>
 
-          <div class="recommend-nav">
-            <button id="prevRec">이전</button>
-            <button id="nextRec">다음</button>
+          <div class="simple-rec-extra" id="recommendExtra">
+            <div class="simple-rec-flow">
+              <div>
+                <span>쉼 시작</span>
+                <strong id="recommendStartDate">-</strong>
+              </div>
+              <div>
+                <span>쉼 종료</span>
+                <strong id="recommendEndDate">-</strong>
+              </div>
+            </div>
+
+            <p class="simple-rec-desc" id="recommendDesc">오늘 이후 6개월 안의 평일 공휴일 징검다리를 찾아 추천해요.</p>
+
+            <div class="recommend-nav">
+              <button id="prevRec">이전</button>
+              <button id="nextRec">다음</button>
+            </div>
           </div>
+
+          <button class="recommend-toggle" id="toggleRecommendCard" type="button" aria-expanded="false">자세히 보기</button>
         </section>
 
         <section class="side-card upcoming-card">
@@ -3658,6 +4175,18 @@
   <button class="fab" id="fab" aria-label="휴가 등록">+</button>
 
   <div class="overlay" id="overlay"></div>
+
+  <section class="mobile-day-summary" id="mobileDaySummary" aria-live="polite" aria-label="선택한 날짜의 쉼 요약">
+    <div class="mobile-day-summary-head">
+      <div>
+        <strong id="mobileDaySummaryTitle">선택한 날짜</strong>
+        <span id="mobileDaySummarySub">등록된 쉼을 확인해요.</span>
+      </div>
+      <button class="mobile-summary-close" id="closeDaySummary" type="button" aria-label="요약 닫기">×</button>
+    </div>
+    <div class="mobile-day-summary-list" id="mobileDaySummaryList"></div>
+    <button class="mobile-summary-add" id="addLeaveFromSummary" type="button">이 날짜에 쉼 추가</button>
+  </section>
 
   <section class="bottom-sheet" id="sheet" aria-modal="true" role="dialog">
     <div class="handle"></div>
@@ -3673,8 +4202,14 @@
     <div class="form-section">
       <label class="title">날짜 선택</label>
       <div class="date-input-row">
-        <input class="date-field" type="date" id="startDate" />
-        <input class="date-field" type="date" id="endDate" />
+        <label class="date-field-wrap" aria-label="시작 날짜">
+          <input class="date-field" type="date" id="startDate" />
+          <span class="date-field-icon" aria-hidden="true">📅</span>
+        </label>
+        <label class="date-field-wrap" aria-label="종료 날짜">
+          <input class="date-field" type="date" id="endDate" />
+          <span class="date-field-icon" aria-hidden="true">📅</span>
+        </label>
       </div>
     </div>
 
@@ -3696,15 +4231,15 @@
 
     <section class="leave-preview" id="leavePreview" aria-live="polite">
       <div class="preview-box">
-        <span>이번 차감</span>
+        <span>차감</span>
         <strong id="previewAmount">0일</strong>
       </div>
       <div class="preview-box">
-        <span>현재 잔여</span>
+        <span>현재</span>
         <strong id="previewBefore">0일</strong>
       </div>
       <div class="preview-box primary">
-        <span>저장 후 잔여</span>
+        <span>저장 후</span>
         <strong id="previewAfter">0일</strong>
       </div>
       <p class="preview-note" id="previewNote">주말과 공휴일은 자동으로 제외해서 계산해요.</p>
@@ -4507,8 +5042,11 @@
         return "";
       }
 
+      const baseLabel = isMobileViewport()
+        ? `${type.icon} ${getCompactLeaveTypeLabel(leave.type)}`
+        : `${type.icon} ${type.label}`;
       const duration = leaveDurationLabel(leave);
-      return duration ? `${type.icon} ${type.label} ${duration}` : `${type.icon} ${type.label}`;
+      return duration && !isMobileViewport() ? `${baseLabel} ${duration}` : baseLabel;
     }
 
     function calendarEventClass(leave, iso) {
@@ -4586,7 +5124,14 @@
       });
 
       calendarEl.querySelectorAll(".day:not(.empty)").forEach(day => {
-        day.addEventListener("click", () => openSheet(day.dataset.date));
+        day.addEventListener("click", () => {
+          const dateISO = day.dataset.date;
+          if (isMobileViewport() && leavesForDate(dateISO).length) {
+            openDaySummary(dateISO);
+          } else {
+            openSheet(dateISO);
+          }
+        });
       });
     }
 
@@ -4596,6 +5141,80 @@
       return includeYear ? `${d.getFullYear()}년 ${base}` : base;
     }
 
+    let mobileSummaryDateISO = null;
+
+    function closeDaySummary() {
+      const summary = document.getElementById("mobileDaySummary");
+      if (!summary) return;
+      summary.classList.remove("active");
+      mobileSummaryDateISO = null;
+    }
+
+    function openDaySummary(dateISO) {
+      const summary = document.getElementById("mobileDaySummary");
+      const title = document.getElementById("mobileDaySummaryTitle");
+      const sub = document.getElementById("mobileDaySummarySub");
+      const list = document.getElementById("mobileDaySummaryList");
+
+      if (!summary || !title || !sub || !list) return;
+
+      const leaves = leavesForDate(dateISO);
+      if (!leaves.length) {
+        openSheet(dateISO);
+        return;
+      }
+
+      mobileSummaryDateISO = dateISO;
+      title.textContent = formatKoreanDate(dateISO, true);
+      sub.textContent = `${leaves.length}개의 쉼이 등록되어 있어요.`;
+
+      list.innerHTML = leaves.map(l => {
+        const type = getType(l.type);
+        const reason = l.reason || "사유 없음";
+        const dateText = l.startDate === l.endDate
+          ? formatKoreanDate(l.startDate)
+          : `${formatKoreanDate(l.startDate)} ~ ${formatKoreanDate(l.endDate)}`;
+
+        return `
+          <div class="leave-item">
+            <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
+            <div class="leave-meta">
+              <strong>${type.icon} ${type.label}</strong>
+              <span>${dateText} · ${reason}</span>
+            </div>
+            <div class="leave-actions">
+              <button class="edit-btn" data-id="${l.id}" aria-label="수정">✎</button>
+              <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      list.querySelectorAll(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          closeDaySummary();
+          openEditSheet(btn.dataset.id);
+        });
+      });
+
+      list.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await runStorageAction(
+            () => storage.deleteLeave(btn.dataset.id),
+            "휴가 삭제 중 오류가 발생했어요."
+          );
+          state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
+          renderAll();
+          const stillHasLeaves = leavesForDate(dateISO).length;
+          if (stillHasLeaves) openDaySummary(dateISO);
+          else closeDaySummary();
+          showToast("삭제했어요.");
+        });
+      });
+
+      summary.classList.add("active");
+    }
+
     function renderUpcoming() {
       const nowISO = toISO(today);
       const futureLeaves = state.leaves
@@ -4603,26 +5222,17 @@
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
         .slice(0, 6);
 
-      const recentLeaves = state.leaves
-        .slice()
-        .sort((a, b) => b.startDate.localeCompare(a.startDate))
-        .slice(0, 3);
-
-      const mobileItems = futureLeaves.length ? futureLeaves : recentLeaves;
       const hasFuture = futureLeaves.length > 0;
-      const hasAnyLeave = state.leaves.length > 0;
 
       document.body.classList.toggle("has-upcoming-leaves", hasFuture);
-      document.body.classList.toggle("show-mobile-upcoming", hasAnyLeave);
+      document.body.classList.toggle("show-mobile-upcoming", hasFuture);
 
       const desktopList = document.getElementById("upcomingList");
       const mobileList = document.getElementById("mobileUpcomingList");
       const mobileTitle = document.getElementById("mobileUpcomingTitle");
 
       if (mobileTitle) {
-        mobileTitle.innerHTML = hasFuture
-          ? `다가오는 쉼 <span>먼저 확인하기</span>`
-          : `최근 등록한 쉼 <span>다가오는 일정은 아직 없어요</span>`;
+        mobileTitle.innerHTML = `다가오는 쉼 <span>먼저 확인하기</span>`;
       }
 
       const emptyHtml = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
@@ -4656,7 +5266,7 @@
       }
 
       if (mobileList) {
-        mobileList.innerHTML = hasAnyLeave ? makeItemHtml(mobileItems) : "";
+        mobileList.innerHTML = hasFuture ? makeItemHtml(futureLeaves) : "";
       }
 
       document.querySelectorAll("#upcomingList .edit-btn, #mobileUpcomingList .edit-btn").forEach(btn => {
@@ -4667,11 +5277,8 @@
 
       document.querySelectorAll("#upcomingList .delete-btn, #mobileUpcomingList .delete-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
-          await runStorageAction(
-            () => storage.deleteLeave(btn.dataset.id),
-            "휴가 삭제 중 오류가 발생했어요."
-          );
           state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
+          await persist();
           renderAll();
           showToast("삭제했어요.");
         });
@@ -4707,12 +5314,60 @@
       return d > today && d <= end;
     }
 
-    function pushUniqueRecommendation(target, rec, seen) {
-      const key = rec.leaveDates.join(",");
-      if (!seen.has(key) && rec.leaveDates.every(isWithinRecommendationRange)) {
-        seen.add(key);
-        target.push(rec);
+    function isValidRecommendationLeaveDate(iso, holidayMap) {
+      const date = parseISO(iso);
+      return isWithinRecommendationRange(iso) && isWeekday(date) && !holidayMap[iso];
+    }
+
+    function getRecommendationRangeDates(leaveDates, holidayMap) {
+      const sortedLeaveDates = leaveDates.slice().sort();
+      const firstLeave = parseISO(sortedLeaveDates[0]);
+      const lastLeave = parseISO(sortedLeaveDates[sortedLeaveDates.length - 1]);
+
+      let start = new Date(firstLeave);
+      let prev = addDays(start, -1);
+      while (isRestDay(prev, holidayMap)) {
+        start = new Date(prev);
+        prev = addDays(prev, -1);
       }
+
+      let end = new Date(lastLeave);
+      let next = addDays(end, 1);
+      while (isRestDay(next, holidayMap)) {
+        end = new Date(next);
+        next = addDays(next, 1);
+      }
+
+      return { start, end };
+    }
+
+    function hasWeekdayHolidayInRestRange(rec, holidayMap) {
+      if (!rec || !Array.isArray(rec.leaveDates) || !rec.leaveDates.length) return false;
+
+      const leaveDateSet = new Set(rec.leaveDates);
+      const { start, end } = getRecommendationRangeDates(rec.leaveDates, holidayMap);
+
+      for (let d = new Date(start); d <= end; d = addDays(d, 1)) {
+        const iso = toISO(d);
+        if (!leaveDateSet.has(iso) && isWeekday(d) && holidayMap[iso]) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function pushUniqueRecommendation(target, rec, seen) {
+      const holidayMap = getHolidayMap();
+      const leaveDates = Array.isArray(rec.leaveDates) ? rec.leaveDates.slice().sort() : [];
+      const key = leaveDates.join(",");
+
+      if (!key || seen.has(key)) return;
+      if (!leaveDates.every(iso => isValidRecommendationLeaveDate(iso, holidayMap))) return;
+      if (!hasWeekdayHolidayInRestRange(rec, holidayMap)) return;
+
+      seen.add(key);
+      target.push(Object.assign({}, rec, { leaveDates }));
     }
 
     function buildRecommendations() {
@@ -4720,81 +5375,97 @@
       const sixMonthsLater = addMonths(today, 6);
       const recs = [];
       const seen = new Set();
-      const maxLeaveDays = 4;
 
-      // 공휴일 DB를 기준으로 오늘 이후 6개월 안의 효율 좋은 연차 조합을 자동 계산합니다.
+      // 1) 오늘 이후 6개월 안의 '평일 공휴일을 포함한 3일 이상 쉼' 추천
+      //    단순히 금요일/월요일에 연차를 붙여 주말과 3일 쉬는 경우는 제외합니다.
       for (let d = addDays(today, 1); d <= sixMonthsLater; d = addDays(d, 1)) {
-        if (!isWeekday(d) || holidayMap[toISO(d)]) continue;
+        if (!isWeekday(d)) continue;
 
-        for (let useCount = 1; useCount <= maxLeaveDays; useCount++) {
-          const leaveDates = [];
-          let cursor = new Date(d);
-          let isValidRange = true;
+        const iso = toISO(d);
+        if (holidayMap[iso]) continue;
 
-          while (leaveDates.length < useCount) {
-            const iso = toISO(cursor);
-            if (cursor > sixMonthsLater || !isWeekday(cursor) || holidayMap[iso]) {
-              isValidRange = false;
-              break;
-            }
-            leaveDates.push(iso);
-            cursor = addDays(cursor, 1);
-          }
+        const { start: blockStart, end: blockEnd } = getRecommendationRangeDates([iso], holidayMap);
+        const totalDays = countContinuousDays(blockStart, blockEnd);
 
-          if (!isValidRange || !leaveDates.length) continue;
+        if (totalDays < 3) continue;
 
-          const firstLeave = parseISO(leaveDates[0]);
-          const lastLeave = parseISO(leaveDates[leaveDates.length - 1]);
-
-          let blockStart = new Date(firstLeave);
-          let prev = addDays(blockStart, -1);
-          let hasBeforeRest = false;
-          while (isRestDay(prev, holidayMap)) {
-            hasBeforeRest = true;
-            blockStart = new Date(prev);
-            prev = addDays(prev, -1);
-          }
-
-          let blockEnd = new Date(lastLeave);
-          let next = addDays(blockEnd, 1);
-          let hasAfterRest = false;
-          while (isRestDay(next, holidayMap)) {
-            hasAfterRest = true;
-            blockEnd = new Date(next);
-            next = addDays(next, 1);
-          }
-
-          const totalDays = countContinuousDays(blockStart, blockEnd);
-          const efficiency = totalDays / leaveDates.length;
-
-          if (!(hasBeforeRest || hasAfterRest)) continue;
-          if (totalDays < leaveDates.length + 2) continue;
-          if (efficiency < 1.5) continue;
-
-          const bridgeLabel = hasBeforeRest && hasAfterRest
-            ? "징검다리"
-            : hasBeforeRest
-              ? "연휴 뒤 연결"
-              : "연휴 앞 연결";
-
-          pushUniqueRecommendation(recs, {
-            title: `${formatKoreanDate(leaveDates[0], true)} ${bridgeLabel}`,
-            leaveDates,
-            result: `${leaveDates.length}개 사용으로 ${totalDays}일 쉼`,
-            desc: `${formatKoreanDate(toISO(blockStart), true)}부터 ${formatKoreanDate(toISO(blockEnd), false)}까지 이어지는 추천이에요.`,
-            score: Math.round(efficiency * 1000) + totalDays
-          }, seen);
-        }
+        pushUniqueRecommendation(recs, {
+          title: `${formatKoreanDate(iso, true)} 하루 쓰면`,
+          leaveDates: [iso],
+          result: `${totalDays}일 연속 쉼 가능`,
+          desc: `${formatKoreanDate(toISO(blockStart), true)}부터 ${formatKoreanDate(toISO(blockEnd), true)}까지 이어지는 평일 공휴일 징검다리예요.`
+        }, seen);
       }
+
+      // 2) 주요 명절/연휴 전후로 2~3일 연차를 붙이는 추천
+      const manualRecs = [
+        {
+          title: "2026년 설날 전후",
+          leaveDates: ["2026-02-19", "2026-02-20"],
+          result: "2일 사용으로 긴 설 연휴",
+          desc: "2/16~2/18 설날 연휴 뒤 2/19, 2/20을 쓰면 주말까지 포근하게 이어져요."
+        },
+        {
+          title: "2026년 추석 앞쪽",
+          leaveDates: ["2026-09-21", "2026-09-22", "2026-09-23"],
+          result: "3일 사용으로 긴 추석 쉼",
+          desc: "9/24~9/28 추석·대체공휴일 앞에 3일을 붙이면 9/19부터 9/28까지 연결돼요."
+        },
+        {
+          title: "2027년 설날 전후",
+          leaveDates: ["2027-02-10", "2027-02-11", "2027-02-12"],
+          result: "3일 사용으로 긴 겨울 쉼",
+          desc: "설 연휴와 주말 사이를 연결해 여유로운 겨울 휴가를 만들 수 있어요."
+        },
+        {
+          title: "2027년 5월 징검다리",
+          leaveDates: ["2027-05-14"],
+          result: "하루 사용으로 4일 연속 쉼 가능",
+          desc: "부처님오신날 다음 금요일에 연차를 쓰면 5/13부터 5/16까지 이어져요."
+        },
+        {
+          title: "2027년 추석 앞뒤",
+          leaveDates: ["2027-09-17"],
+          result: "하루 사용으로 추석 뒤 긴 쉼",
+          desc: "추석 연휴 뒤 금요일 하루를 붙이면 주말까지 자연스럽게 연결돼요."
+        },
+        {
+          title: "2027년 10월 공휴일 연결",
+          leaveDates: ["2027-10-05", "2027-10-06", "2027-10-07", "2027-10-08"],
+          result: "4일 사용으로 긴 가을 쉼",
+          desc: "개천절 대체휴일과 한글날 대체휴일 사이를 연결하는 가을 황금휴가예요."
+        },
+        {
+          title: "2027년 크리스마스 전후",
+          leaveDates: ["2027-12-24"],
+          result: "하루 사용으로 연말 4일 쉼",
+          desc: "성탄절과 대체공휴일 앞 금요일을 활용하면 연말 쉼이 길어져요."
+        },
+        {
+          title: "2028년 설날 전후",
+          leaveDates: ["2028-01-24", "2028-01-25"],
+          result: "2일 사용으로 긴 설 연휴",
+          desc: "설 연휴 앞 월·화에 연차를 붙이면 주말부터 설 연휴까지 길게 쉴 수 있어요."
+        },
+        {
+          title: "2028년 5월 가정의 달",
+          leaveDates: ["2028-05-03", "2028-05-04"],
+          result: "2일 사용으로 긴 5월 쉼",
+          desc: "부처님오신날과 어린이날 사이를 연결하면 가족과 보내는 미니 휴가가 완성돼요."
+        },
+        {
+          title: "2028년 10월 추석 연휴",
+          leaveDates: ["2028-10-06"],
+          result: "하루 사용으로 긴 가을 쉼",
+          desc: "추석·개천절 연휴 뒤 하루를 붙이면 한글날까지 이어지는 긴 휴식을 만들 수 있어요."
+        }
+      ];
+
+      manualRecs.forEach(rec => pushUniqueRecommendation(recs, rec, seen));
 
       recommendations = recs
         .filter(rec => rec.leaveDates.length && rec.leaveDates.every(isWithinRecommendationRange))
-        .sort((a, b) => {
-          const dateCompare = a.leaveDates[0].localeCompare(b.leaveDates[0]);
-          if (dateCompare) return dateCompare;
-          return b.score - a.score;
-        })
-        .slice(0, 24);
+        .sort((a, b) => a.leaveDates[0].localeCompare(b.leaveDates[0]));
 
       recIndex = 0;
     }
@@ -4834,22 +5505,7 @@
 
       const holidayMap = getHolidayMap();
       const leaveDates = rec.leaveDates.slice().sort();
-      const firstLeave = parseISO(leaveDates[0]);
-      const lastLeave = parseISO(leaveDates[leaveDates.length - 1]);
-
-      let start = new Date(firstLeave);
-      let prev = addDays(start, -1);
-      while (isRestDay(prev, holidayMap)) {
-        start = new Date(prev);
-        prev = addDays(prev, -1);
-      }
-
-      let end = new Date(lastLeave);
-      let next = addDays(end, 1);
-      while (isRestDay(next, holidayMap)) {
-        end = new Date(next);
-        next = addDays(next, 1);
-      }
+      const { start, end } = getRecommendationRangeDates(leaveDates, holidayMap);
 
       return {
         start: formatKoreanDate(toISO(start), true),
@@ -4860,15 +5516,87 @@
       };
     }
 
+    function isMobileViewport() {
+      return window.matchMedia("(max-width: 720px)").matches;
+    }
+
+    function getCompactLeaveTypeLabel(typeId) {
+      const map = {
+        annual: "연차",
+        amHalf: "오전",
+        pmHalf: "오후",
+        quarter: "반반",
+        etc: "기타"
+      };
+      return map[typeId] || getType(typeId).label;
+    }
+
+    function setMiniPanelExpanded(expanded) {
+      const panel = $("#miniPanel");
+      const btn = $("#toggleMiniPanel");
+      if (!panel || !btn) return;
+      if (!isMobileViewport()) {
+        panel.classList.remove("mobile-collapsed");
+        btn.style.display = "none";
+        btn.setAttribute("aria-expanded", "true");
+        btn.textContent = "펼치기";
+        return;
+      }
+      btn.style.display = "inline-flex";
+      panel.classList.toggle("mobile-collapsed", !expanded);
+      btn.setAttribute("aria-expanded", String(expanded));
+      btn.textContent = expanded ? "접기" : "펼치기";
+    }
+
+    function setRecommendationExpanded(expanded) {
+      const card = $("#recommendCard");
+      const btn = $("#toggleRecommendCard");
+      if (!card || !btn) return;
+      if (!isMobileViewport()) {
+        card.classList.remove("mobile-collapsed");
+        btn.style.display = "none";
+        btn.setAttribute("aria-expanded", "true");
+        btn.textContent = "자세히 보기";
+        return;
+      }
+      btn.style.display = "inline-flex";
+      card.classList.toggle("mobile-collapsed", !expanded);
+      btn.setAttribute("aria-expanded", String(expanded));
+      btn.textContent = expanded ? "간단히 보기" : "자세히 보기";
+    }
+
+    function syncMobilePanels() {
+      const miniPanel = $("#miniPanel");
+      const recommendCard = $("#recommendCard");
+      if (isMobileViewport()) {
+        if (miniPanel && !miniPanel.dataset.initialized) {
+          miniPanel.dataset.initialized = "true";
+          setMiniPanelExpanded(false);
+        } else if (miniPanel) {
+          setMiniPanelExpanded(!miniPanel.classList.contains("mobile-collapsed"));
+        }
+        if (recommendCard && !recommendCard.dataset.initialized) {
+          recommendCard.dataset.initialized = "true";
+          setRecommendationExpanded(false);
+        } else if (recommendCard) {
+          setRecommendationExpanded(!recommendCard.classList.contains("mobile-collapsed"));
+        }
+      } else {
+        setMiniPanelExpanded(true);
+        setRecommendationExpanded(true);
+      }
+    }
+
     function renderRecommendation() {
+      document.body.classList.toggle("has-recommendations", recommendations.length > 0);
       if (!recommendations.length) {
         $("#recommendCount").textContent = "0/0";
         $("#recommendUseDays").textContent = "-";
         $("#recommendRestDays").textContent = "-";
         $("#recommendStartDate").textContent = "-";
         $("#recommendEndDate").textContent = "-";
-        $("#recommendText").textContent = "6개월 안에 딱 맞는 추천이 없어요.";
-        $("#recommendDesc").textContent = "금요일 반차나 월요일 오전반차처럼 작은 쉼표를 먼저 예약해 보세요.";
+        $("#recommendText").textContent = "6개월 안에 평일 공휴일과 연결되는 추천이 없어요.";
+        $("#recommendDesc").textContent = "주말만 붙는 추천은 제외하고, 평일 빨간날을 활용한 징검다리만 보여줘요.";
         return;
       }
 
@@ -4911,6 +5639,7 @@
     }
 
     function showSheet() {
+      closeDaySummary();
       lastFocusedElement = document.activeElement;
       $("#overlay").classList.add("active");
       $("#sheet").classList.add("active");
@@ -5116,8 +5845,12 @@
       renderUpcoming();
       buildRecommendations();
       renderRecommendation();
+      syncMobilePanels();
       if (currentView === "report") renderReport();
       $("#todayChip").textContent = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 ${dayLabel[today.getDay()]}요일`;
+      if (mobileSummaryDateISO && !leavesForDate(mobileSummaryDateISO).length) {
+        closeDaySummary();
+      }
     }
 
 
@@ -5189,6 +5922,20 @@
 
       $("#fab").addEventListener("click", () => openSheet(toISO(today)));
       $("#closeSheet").addEventListener("click", closeSheet);
+      $("#toggleMiniPanel")?.addEventListener("click", () => {
+        const panel = $("#miniPanel");
+        setMiniPanelExpanded(panel.classList.contains("mobile-collapsed"));
+      });
+      $("#toggleRecommendCard")?.addEventListener("click", () => {
+        const card = $("#recommendCard");
+        setRecommendationExpanded(card.classList.contains("mobile-collapsed"));
+      });
+      $("#closeDaySummary")?.addEventListener("click", closeDaySummary);
+      $("#addLeaveFromSummary")?.addEventListener("click", () => {
+        const targetDate = mobileSummaryDateISO || toISO(today);
+        closeDaySummary();
+        openSheet(targetDate);
+      });
       $("#cancelEdit").addEventListener("click", cancelEdit);
       $("#saveLeave").addEventListener("click", saveLeave);
       $("#deleteForDate").addEventListener("click", deleteLeavesForCurrentRange);
@@ -5281,6 +6028,9 @@
 
     window.addEventListener("resize", () => {
       syncMobileUpcomingPlacement();
+      syncMobilePanels();
+      if (!isMobileViewport()) closeDaySummary();
+      renderCalendar();
     });
 
     init();
