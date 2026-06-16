@@ -2334,6 +2334,637 @@
       cursor: pointer;
     }
 
+
+    /************************************************************
+     * 모바일 최적화 레이아웃
+     ************************************************************/
+    @media (max-width: 720px) {
+      body {
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      .app {
+        width: 100%;
+        padding: 16px 14px 92px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .brand {
+        gap: 10px;
+      }
+
+      .brand-mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 17px;
+        font-size: 19px;
+      }
+
+      .brand h1 {
+        font-size: 23px;
+      }
+
+      .brand p {
+        max-width: 220px;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .topbar-actions {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+
+      .today-chip {
+        height: 34px;
+        padding: 0 12px;
+        font-size: 11px;
+      }
+
+      .user-chip {
+        max-width: calc(100vw - 28px);
+        height: 34px;
+        padding: 0 8px 0 12px;
+        font-size: 11px;
+      }
+
+      .logout-btn {
+        height: 26px;
+        min-width: 58px;
+        padding: 0 9px;
+        font-size: 10px;
+      }
+
+      .sync-status {
+        padding-left: 2px;
+        font-size: 10px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .dashboard {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .stat-card {
+        min-height: 96px;
+        padding: 14px 10px;
+        border-radius: 22px;
+      }
+
+      .stat-card .label {
+        font-size: 10px;
+      }
+
+      .stat-card strong {
+        margin-top: 7px;
+        font-size: 25px;
+      }
+
+      .stat-card small {
+        margin-top: 4px;
+        font-size: 10px;
+      }
+
+      .mini-panel {
+        padding: 16px;
+        border-radius: 24px;
+      }
+
+      .mini-panel h3 {
+        font-size: 15px;
+      }
+
+      .mini-panel p {
+        margin-top: 7px;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .settings-btn {
+        min-height: 42px;
+        margin-top: 12px;
+        border-radius: 16px;
+        font-size: 13px;
+      }
+
+      .view-tabs {
+        position: sticky;
+        top: 0;
+        z-index: 15;
+        margin: 0 -14px 12px;
+        padding: 10px 14px;
+        border-radius: 0;
+        background: rgba(250, 248, 244, .88);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 10px 24px rgba(35,52,74,.06);
+      }
+
+      .view-tab {
+        min-height: 40px;
+        border-radius: 16px;
+        font-size: 13px;
+      }
+
+      .main-grid,
+      .main-grid.report-mode {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .calendar-card,
+      .report-card {
+        padding: 16px;
+        border-radius: 26px;
+      }
+
+      .calendar-head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .month-title span {
+        font-size: 10px;
+      }
+
+      .month-title h2 {
+        font-size: 29px;
+      }
+
+      .nav-btns {
+        align-self: flex-start;
+        gap: 7px;
+      }
+
+      .nav-btns button {
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+      }
+
+      .weekdays {
+        gap: 4px;
+        margin-bottom: 4px;
+      }
+
+      .weekdays div {
+        min-height: 24px;
+        font-size: 10px;
+      }
+
+      .calendar {
+        gap: 4px;
+      }
+
+      .day {
+        min-height: 74px;
+        padding: 7px 4px;
+        border-radius: 16px;
+      }
+
+      .day-num {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 4px;
+        font-size: 11px;
+      }
+
+      .day.holiday .day-num::after {
+        width: 4px;
+        height: 4px;
+        right: 1px;
+        top: 2px;
+      }
+
+      .event-stack {
+        gap: 3px;
+      }
+
+      .event-pill {
+        min-height: 17px;
+        padding: 3px 3px;
+        border-radius: 9px;
+        font-size: 8.5px;
+        line-height: 1.05;
+        letter-spacing: -0.07em;
+        white-space: nowrap;
+      }
+
+      .event-pill.range-mid,
+      .event-pill.range-end {
+        height: 7px;
+        min-height: 7px;
+        margin-top: 7px;
+        border-radius: 999px;
+      }
+
+      .side {
+        order: 2;
+        gap: 12px;
+      }
+
+      .side-card,
+      .simple-recommend-card {
+        padding: 16px;
+        border-radius: 24px;
+      }
+
+      .simple-rec-head {
+        margin-bottom: 8px;
+      }
+
+      .simple-rec-head h3,
+      .side-card h3 {
+        font-size: 15px;
+      }
+
+      .simple-rec-head span {
+        font-size: 11px;
+      }
+
+      .rec-conversion {
+        gap: 6px;
+        margin: 8px 0;
+      }
+
+      .rec-number-box {
+        min-height: 58px;
+        padding: 9px 7px;
+        border-radius: 16px;
+      }
+
+      .rec-number-box span {
+        font-size: 10px;
+      }
+
+      .rec-number-box strong {
+        font-size: 20px;
+      }
+
+      .rec-arrow {
+        font-size: 14px;
+      }
+
+      .simple-rec-flow {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .simple-rec-flow div {
+        padding: 9px 10px;
+        border-radius: 15px;
+      }
+
+      .simple-rec-flow strong {
+        font-size: 12px;
+      }
+
+      .simple-rec-result {
+        padding: 8px 10px;
+        font-size: 12.5px !important;
+      }
+
+      .simple-rec-desc {
+        font-size: 10.8px !important;
+        line-height: 1.45;
+      }
+
+      .simple-recommend-card .recommend-nav {
+        margin-top: 10px;
+      }
+
+      .simple-recommend-card .recommend-nav button {
+        height: 34px;
+        border-radius: 13px;
+        font-size: 12px;
+      }
+
+      .leave-list {
+        gap: 8px;
+      }
+
+      .leave-item {
+        grid-template-columns: 40px minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 9px;
+        border-radius: 18px;
+      }
+
+      .leave-date {
+        width: 40px;
+        height: 40px;
+        border-radius: 15px;
+      }
+
+      .leave-date strong {
+        font-size: 16px;
+      }
+
+      .leave-date span {
+        font-size: 9px;
+      }
+
+      .leave-meta strong {
+        font-size: 12.5px;
+      }
+
+      .leave-meta span {
+        max-width: 150px;
+        font-size: 10.5px;
+      }
+
+      .leave-actions {
+        gap: 4px;
+      }
+
+      .edit-btn,
+      .delete-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 12px;
+      }
+
+      .report-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .report-head h2 {
+        font-size: 25px;
+      }
+
+      .report-back-btn {
+        width: 100%;
+        min-height: 38px;
+        border-radius: 15px;
+      }
+
+      .report-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .donut-card,
+      .report-summary-card,
+      .reason-report-card,
+      .monthly-report-card,
+      .remaining-suggestion-card,
+      .pattern-comment-card {
+        padding: 16px;
+        border-radius: 24px;
+      }
+
+      .donut-wrap {
+        width: 196px;
+        height: 196px;
+      }
+
+      .donut-svg {
+        width: 196px;
+        height: 196px;
+      }
+
+      .donut-center strong {
+        font-size: 28px;
+      }
+
+      .report-summary-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .summary-box {
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      .summary-box strong {
+        font-size: 19px;
+      }
+
+      .summary-box span {
+        font-size: 10.5px;
+      }
+
+      .reason-report-head {
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .reason-report-head h3,
+      .remaining-suggestion-card h3,
+      .pattern-comment-card h3 {
+        font-size: 16px;
+      }
+
+      .reason-row {
+        grid-template-columns: 72px 1fr 42px;
+        gap: 8px;
+      }
+
+      .reason-name {
+        font-size: 11px;
+      }
+
+      .reason-amount {
+        font-size: 11px;
+      }
+
+      .month-bars {
+        gap: 4px;
+        min-height: 108px;
+      }
+
+      .month-bar-item {
+        height: 108px;
+        gap: 5px;
+      }
+
+      .month-value {
+        display: none;
+      }
+
+      .month-label {
+        font-size: 9px;
+      }
+
+      .report-extra-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .remaining-suggestion-card p,
+      .pattern-comment-card p {
+        padding: 13px;
+        border-radius: 18px;
+        font-size: 12.5px;
+        line-height: 1.55;
+      }
+
+      .fab {
+        right: 18px;
+        bottom: 18px;
+        width: 58px;
+        height: 58px;
+        border-radius: 22px;
+        font-size: 28px;
+      }
+
+      .overlay {
+        backdrop-filter: blur(8px);
+      }
+
+      .bottom-sheet {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        width: auto;
+        max-height: calc(100dvh - 18px);
+        padding: 18px;
+        border-radius: 28px;
+        overflow-y: auto;
+      }
+
+      .sheet-head {
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .sheet-head h2,
+      .sheet-head h3,
+      #sheetTitle {
+        font-size: 22px;
+      }
+
+      .sheet-head p,
+      #sheetSub {
+        font-size: 12px;
+      }
+
+      .close-btn,
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+      }
+
+      .date-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .field label {
+        font-size: 11px;
+      }
+
+      .field input,
+      .field select,
+      .text-field {
+        min-height: 46px;
+        border-radius: 16px;
+        font-size: 14px;
+      }
+
+      .type-grid,
+      .reason-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .type-btn,
+      .reason-btn {
+        min-height: 42px;
+        border-radius: 16px;
+        font-size: 12px;
+      }
+
+      .sheet-actions,
+      body.editing-leave .sheet-actions {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .save-btn,
+      .clear-btn,
+      .cancel-edit-btn {
+        width: 100%;
+        min-height: 48px;
+        border-radius: 17px;
+      }
+
+      .modal {
+        width: calc(100vw - 16px);
+        padding: 18px;
+        border-radius: 28px;
+      }
+
+      .modal h3 {
+        font-size: 22px;
+      }
+
+      .toast {
+        left: 14px;
+        right: 14px;
+        bottom: 86px;
+        width: auto;
+        transform: translateY(20px);
+        text-align: center;
+      }
+
+      .toast.active {
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .dashboard {
+        gap: 6px;
+      }
+
+      .stat-card {
+        padding: 12px 7px;
+      }
+
+      .stat-card strong {
+        font-size: 22px;
+      }
+
+      .day {
+        min-height: 68px;
+        border-radius: 14px;
+      }
+
+      .event-pill {
+        font-size: 8px;
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+
+      .leave-meta span {
+        max-width: 118px;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
