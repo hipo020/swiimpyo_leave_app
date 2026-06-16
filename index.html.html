@@ -4332,6 +4332,44 @@
       }
     }
 
+
+    /************************************************************
+     * 날짜 선택창 클릭 영역 최종 보정
+     * - 날짜 입력칸을 누르면 picker 열림
+     * - 모달 다른 영역은 picker 열리지 않음
+     ************************************************************/
+    input[type="date"].date-field {
+      cursor: pointer !important;
+      position: relative !important;
+      z-index: 1 !important;
+      pointer-events: auto !important;
+      -webkit-appearance: auto !important;
+      appearance: auto !important;
+    }
+
+    input[type="date"].date-field::-webkit-calendar-picker-indicator {
+      position: static !important;
+      display: block !important;
+      width: 20px !important;
+      height: 20px !important;
+      margin-left: auto !important;
+      opacity: 1 !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+
+    .holiday-form label {
+      pointer-events: auto !important;
+    }
+
+    .holiday-form label span {
+      pointer-events: none !important;
+    }
+
+    .holiday-form input[type="date"] {
+      cursor: pointer !important;
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -6124,6 +6162,7 @@
       $("#overlay").classList.add("active");
       $("#sheet").classList.add("active");
       activeDialog = $("#sheet");
+      bindAllDatePickers();
       updateLeavePreview();
       focusFirstField(activeDialog, "#startDate");
     }
@@ -6397,6 +6436,7 @@
       activeDialog = $("#holidayModal");
       $("#holidayDateInput").value = toISO(today);
       $("#holidayNameInput").value = "";
+      bindAllDatePickers();
       renderHolidayManager();
       focusFirstField(activeDialog, "#holidayDateInput");
     }
@@ -6639,6 +6679,7 @@
       renderAll();
       setViewMode("calendar");
       bindAppEventsOnce();
+      bindAllDatePickers();
     }
 
 
