@@ -3072,6 +3072,101 @@
       }
     }
 
+
+    /************************************************************
+     * 모바일 수정 패치: 다가오는 쉼 조건부 위치 + 바텀시트 중앙 정렬
+     ************************************************************/
+    @media (max-width: 720px) {
+      body {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .main-grid,
+      .main-grid.report-mode {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .side {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      body.has-upcoming-leaves .main-grid > .upcoming-card {
+        order: 1 !important;
+      }
+
+      body.has-upcoming-leaves .calendar-view {
+        order: 2 !important;
+      }
+
+      body.has-upcoming-leaves .simple-recommend-card {
+        order: 3 !important;
+      }
+
+      body:not(.has-upcoming-leaves) .calendar-view {
+        order: 1 !important;
+      }
+
+      body:not(.has-upcoming-leaves) .simple-recommend-card {
+        order: 2 !important;
+      }
+
+      body:not(.has-upcoming-leaves) .upcoming-card {
+        order: 3 !important;
+      }
+
+      body.has-upcoming-leaves .upcoming-card h3::after {
+        content: " · 먼저 확인하기";
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      body:not(.has-upcoming-leaves) .upcoming-card h3::after {
+        content: "";
+      }
+
+      .bottom-sheet,
+      #sheet {
+        position: fixed !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: max(8px, env(safe-area-inset-bottom)) !important;
+        width: min(430px, calc(100vw - 16px)) !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 16px) !important;
+        transform: translate3d(-50%, 110%, 0) !important;
+        margin: 0 !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+      }
+
+      .bottom-sheet.active,
+      #sheet.active {
+        transform: translate3d(-50%, 0, 0) !important;
+      }
+
+      .bottom-sheet * {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .type-grid,
+      .reason-grid {
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      .type-btn,
+      .reason-btn {
+        min-width: 0;
+        white-space: normal;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -4533,6 +4628,33 @@
       showToast("선택한 날짜의 기록을 삭제했어요.");
     }
 
+
+    function syncMobileUpcomingPlacement() {
+      const mainGrid = document.querySelector(".main-grid");
+      const calendarView = document.querySelector(".calendar-view");
+      const side = document.querySelector(".side");
+      const upcomingCard = document.querySelector(".upcoming-card");
+      const recommendCard = document.querySelector(".simple-recommend-card");
+      if (!mainGrid || !calendarView || !side || !upcomingCard || !recommendCard) return;
+
+      const isMobile = window.matchMedia("(max-width: 720px)").matches;
+      const hasUpcoming = document.body.classList.contains("has-upcoming-leaves");
+
+      if (isMobile && hasUpcoming) {
+        if (upcomingCard.parentElement !== mainGrid || upcomingCard.nextElementSibling !== calendarView) {
+          mainGrid.insertBefore(upcomingCard, calendarView);
+        }
+      } else {
+        if (upcomingCard.parentElement !== side) {
+          side.appendChild(upcomingCard);
+        }
+      }
+
+      if (recommendCard.parentElement !== side && !isMobile) {
+        side.insertBefore(recommendCard, side.firstChild);
+      }
+    }
+
     function renderAll() {
       renderDashboard();
       renderCalendar();
@@ -4693,6 +4815,11 @@
       setViewMode("calendar");
       bindAppEventsOnce();
     }
+
+
+    window.addEventListener("resize", () => {
+      syncMobileUpcomingPlacement();
+    });
 
     init();
   </script>
