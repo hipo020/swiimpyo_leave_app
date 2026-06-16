@@ -3929,6 +3929,348 @@
     }
 
 
+
+    /************************************************************
+     * 최종 반영 패치: 모바일 압축 + 연차 설정 라벨 + 공휴일 관리
+     ************************************************************/
+    .holiday-manage-open {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 12px;
+      border-radius: 18px;
+      background: var(--sky-soft);
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.8);
+    }
+
+    .holiday-modal {
+      width: min(680px, calc(100% - 32px));
+      max-height: min(86vh, 760px);
+      overflow-y: auto;
+    }
+
+    .holiday-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .holiday-modal-head h2 {
+      margin: 0 0 7px;
+      font-size: 24px;
+      letter-spacing: -0.06em;
+    }
+
+    .holiday-modal-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .holiday-form {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr) 110px;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      border-radius: 24px;
+      background: #F8FCFF;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.72);
+    }
+
+    .holiday-form label {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .holiday-form label span {
+      color: var(--navy-soft);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .holiday-save-btn {
+      height: 50px;
+      border-radius: 18px;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 950;
+    }
+
+    .holiday-helper {
+      display: grid;
+      gap: 4px;
+      margin: 12px 0;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(212,235,249,.28);
+      color: var(--navy-soft);
+      font-size: 12px;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .holiday-helper strong {
+      color: var(--navy);
+      font-size: 12px;
+    }
+
+    .holiday-list-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 16px 0 10px;
+    }
+
+    .holiday-list-head h3 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.04em;
+    }
+
+    .holiday-refresh-btn {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 14px;
+      background: #F5FAFD;
+      color: var(--navy-soft);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .holiday-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .holiday-row {
+      display: grid;
+      grid-template-columns: 105px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(234,241,246,.95);
+    }
+
+    .holiday-row-date {
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .holiday-row-name {
+      min-width: 0;
+      color: var(--navy-soft);
+      font-size: 13px;
+      font-weight: 850;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .holiday-row-actions {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .holiday-edit-btn,
+    .holiday-delete-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .holiday-edit-btn {
+      background: var(--sky-soft);
+      color: var(--navy);
+    }
+
+    .holiday-delete-btn {
+      background: #FFF3F3;
+      color: #D95F5F;
+    }
+
+    .holiday-empty {
+      padding: 16px;
+      border-radius: 18px;
+      background: #F8FCFF;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .day-number {
+      position: relative;
+    }
+
+    .calendar .day.has-leaves .day-number::after {
+      content: "";
+      position: absolute;
+      right: 1px;
+      bottom: 1px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--sky-strong);
+      box-shadow: 0 0 0 2px #fff;
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        gap: 8px !important;
+        margin-bottom: 8px !important;
+      }
+
+      .dashboard {
+        padding: 8px !important;
+        gap: 5px !important;
+        border-radius: 22px !important;
+      }
+
+      .stat-card {
+        min-height: 66px !important;
+        padding: 9px 7px !important;
+        border-radius: 16px !important;
+        justify-content: center !important;
+        gap: 5px !important;
+      }
+
+      .stat-label {
+        font-size: 10px !important;
+        line-height: 1 !important;
+      }
+
+      .stat-value {
+        margin-top: 0 !important;
+        font-size: clamp(19px, 6vw, 24px) !important;
+        line-height: 1 !important;
+        gap: 2px !important;
+      }
+
+      .stat-unit {
+        font-size: 10px !important;
+      }
+
+      .settings-btn {
+        min-height: 40px !important;
+        height: 40px !important;
+        margin-top: 7px !important;
+        border-radius: 14px !important;
+        font-size: 13px !important;
+      }
+
+      .settings-btn .settings-label {
+        display: inline !important;
+        font-size: 13px !important;
+      }
+
+      .settings-btn .settings-icon {
+        font-size: 15px !important;
+      }
+
+      .mini-panel {
+        padding: 12px 13px !important;
+        border-radius: 18px !important;
+      }
+
+      .mini-panel h2 {
+        font-size: 15px !important;
+        line-height: 1.2 !important;
+      }
+
+      .mini-panel p {
+        margin-top: 3px !important;
+        font-size: 10.8px !important;
+        line-height: 1.38 !important;
+      }
+
+      .quick-row {
+        margin-top: 8px !important;
+        gap: 5px !important;
+      }
+
+      .quick-pill {
+        padding: 6px 8px !important;
+        font-size: 10px !important;
+      }
+
+      .day.has-leaves .day-number::after {
+        width: 5px;
+        height: 5px;
+        right: 0;
+        bottom: 0;
+      }
+
+      .event-pill {
+        min-height: 16px !important;
+        padding: 3px 2px !important;
+        font-size: 8px !important;
+      }
+
+      .holiday-form {
+        grid-template-columns: 1fr;
+        gap: 9px;
+        padding: 12px;
+      }
+
+      .holiday-modal {
+        width: calc(100vw - 18px);
+        max-height: calc(100dvh - 18px);
+        padding: 18px;
+      }
+
+      .holiday-row {
+        grid-template-columns: 86px minmax(0, 1fr) auto;
+        gap: 7px;
+        padding: 9px;
+      }
+
+      .holiday-row-date {
+        font-size: 11px;
+      }
+
+      .holiday-row-name {
+        font-size: 12px;
+      }
+
+      .holiday-edit-btn,
+      .holiday-delete-btn {
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .stat-card {
+        min-height: 62px !important;
+        padding: 8px 5px !important;
+      }
+
+      .stat-value {
+        font-size: 21px !important;
+      }
+
+      .mini-panel h2 {
+        font-size: 14px !important;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -4256,10 +4598,44 @@
     <h2>연차 설정</h2>
     <p>올해 사용할 수 있는 총 연차 개수를 입력해 주세요. 저장하면 대시보드에 바로 반영돼요.</p>
     <input class="date-field" id="totalInput" type="number" min="0" max="365" step="0.25" />
+    <button class="holiday-manage-open" id="openHolidayManager" type="button">공휴일 관리</button>
     <div class="modal-actions">
       <button class="ghost" id="closeSettings">닫기</button>
       <button class="solid" id="saveSettings">저장</button>
     </div>
+  </section>
+
+  <section class="modal holiday-modal" id="holidayModal" aria-modal="true" role="dialog">
+    <div class="holiday-modal-head">
+      <div>
+        <h2>공휴일 관리</h2>
+        <p>임시공휴일이나 회사에서 쉬는 날을 추가하고, 기존 공휴일 이름도 수정할 수 있어요.</p>
+      </div>
+      <button class="close-btn" id="closeHolidayModal" type="button" aria-label="공휴일 관리 닫기">×</button>
+    </div>
+
+    <div class="holiday-form">
+      <label>
+        <span>날짜</span>
+        <input class="date-field" id="holidayDateInput" type="date" />
+      </label>
+      <label>
+        <span>이름</span>
+        <input class="date-field" id="holidayNameInput" type="text" placeholder="예: 임시공휴일" />
+      </label>
+      <button class="solid holiday-save-btn" id="saveHoliday" type="button">추가/수정</button>
+    </div>
+
+    <div class="holiday-helper">
+      <strong>공휴일 데이터 기준</strong>
+      <span>Supabase holidays 테이블을 우선 사용하고, 불러오지 못할 때만 앱 안의 기본 데이터를 사용해요.</span>
+    </div>
+
+    <div class="holiday-list-head">
+      <h3>등록된 공휴일</h3>
+      <button class="ghost holiday-refresh-btn" id="refreshHolidays" type="button">새로고침</button>
+    </div>
+    <div class="holiday-list" id="holidayAdminList"></div>
   </section>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -4315,6 +4691,38 @@
       }
 
       holidayMapCache = Object.fromEntries((data || []).map(item => [item.date, item.name]));
+    }
+
+    async function listHolidaysFromSupabase() {
+      const { data, error } = await supabaseClient
+        .from("holidays")
+        .select("date,name,is_holiday,updated_at")
+        .order("date", { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    }
+
+    async function upsertHolidayToSupabase(date, name) {
+      const { error } = await supabaseClient
+        .from("holidays")
+        .upsert({
+          date,
+          name,
+          is_holiday: true,
+          updated_at: new Date().toISOString()
+        }, { onConflict: "date" });
+
+      if (error) throw error;
+    }
+
+    async function deleteHolidayFromSupabase(date) {
+      const { error } = await supabaseClient
+        .from("holidays")
+        .delete()
+        .eq("date", date);
+
+      if (error) throw error;
     }
 
     const storage = {
@@ -4713,6 +5121,7 @@
     function closeActiveDialog() {
       if ($("#sheet").classList.contains("active")) closeSheet();
       if ($("#settingsModal").classList.contains("active")) closeSettingsModal();
+      if ($("#holidayModal")?.classList.contains("active")) closeHolidayManager();
     }
 
     function handleDialogKeydown(event) {
@@ -5097,6 +5506,7 @@
           dow === 0 ? "sun" : "",
           dow === 6 ? "sat" : "",
           holidayName ? "holiday" : "",
+          list.length ? "has-leaves" : "",
           isTodayDate ? "today" : ""
         ].filter(Boolean).join(" ");
 
@@ -5839,6 +6249,116 @@
       // 모바일 다가오는 쉼은 별도 상단 카드에 렌더링합니다.
     }
 
+
+    async function renderHolidayManager() {
+      const list = $("#holidayAdminList");
+      if (!list) return;
+
+      list.innerHTML = `<div class="holiday-empty">공휴일 데이터를 불러오는 중이에요.</div>`;
+
+      try {
+        const rows = await listHolidaysFromSupabase();
+
+        if (!rows.length) {
+          list.innerHTML = `<div class="holiday-empty">등록된 공휴일이 없어요. 날짜와 이름을 입력해 첫 공휴일을 추가해 보세요.</div>`;
+          return;
+        }
+
+        list.innerHTML = rows.map(row => `
+          <div class="holiday-row">
+            <span class="holiday-row-date">${row.date}</span>
+            <span class="holiday-row-name">${row.name}${row.is_holiday ? "" : " · 비활성"}</span>
+            <span class="holiday-row-actions">
+              <button class="holiday-edit-btn" data-date="${row.date}" data-name="${row.name}" type="button" aria-label="공휴일 수정">✎</button>
+              <button class="holiday-delete-btn" data-date="${row.date}" type="button" aria-label="공휴일 삭제">×</button>
+            </span>
+          </div>
+        `).join("");
+
+        list.querySelectorAll(".holiday-edit-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            $("#holidayDateInput").value = btn.dataset.date;
+            $("#holidayNameInput").value = btn.dataset.name;
+            $("#holidayNameInput").focus();
+          });
+        });
+
+        list.querySelectorAll(".holiday-delete-btn").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const date = btn.dataset.date;
+            if (!confirm(`${date} 공휴일을 삭제할까요?`)) return;
+
+            await runStorageAction(
+              () => deleteHolidayFromSupabase(date),
+              "공휴일 삭제 중 오류가 발생했어요. Supabase 정책을 확인해 주세요."
+            );
+
+            await loadHolidaysFromSupabase();
+            renderCalendar();
+            buildRecommendations();
+            renderRecommendation();
+            await renderHolidayManager();
+            showToast("공휴일을 삭제했어요.");
+          });
+        });
+      } catch (error) {
+        console.error(error);
+        list.innerHTML = `<div class="holiday-empty">공휴일 목록을 불러오지 못했어요.<br>Supabase holidays 테이블 권한을 확인해 주세요.</div>`;
+      }
+    }
+
+    function openHolidayManager() {
+      closeSettingsModal();
+      lastFocusedElement = document.activeElement;
+      $("#overlay").classList.add("active");
+      $("#holidayModal").classList.add("active");
+      activeDialog = $("#holidayModal");
+      $("#holidayDateInput").value = toISO(today);
+      $("#holidayNameInput").value = "";
+      renderHolidayManager();
+      focusFirstField(activeDialog, "#holidayDateInput");
+    }
+
+    function closeHolidayManager() {
+      $("#holidayModal").classList.remove("active");
+      if (!$("#sheet").classList.contains("active") && !$("#settingsModal").classList.contains("active")) {
+        $("#overlay").classList.remove("active");
+        activeDialog = null;
+      }
+      if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+        lastFocusedElement.focus();
+      }
+    }
+
+    async function saveHolidayFromForm() {
+      const date = $("#holidayDateInput").value;
+      const name = $("#holidayNameInput").value.trim();
+
+      if (!date) {
+        showToast("공휴일 날짜를 선택해 주세요.");
+        return;
+      }
+
+      if (!name) {
+        showToast("공휴일 이름을 입력해 주세요.");
+        return;
+      }
+
+      await runStorageAction(
+        () => upsertHolidayToSupabase(date, name),
+        "공휴일 저장 중 오류가 발생했어요. Supabase 정책을 확인해 주세요."
+      );
+
+      await loadHolidaysFromSupabase();
+      renderCalendar();
+      buildRecommendations();
+      renderRecommendation();
+      await renderHolidayManager();
+      $("#holidayNameInput").value = "";
+      showToast("공휴일을 저장했어요.");
+    }
+
+
     function renderAll() {
       renderDashboard();
       renderCalendar();
@@ -5945,6 +6465,10 @@
 
       $("#openSettings").addEventListener("click", openSettings);
       $("#closeSettings").addEventListener("click", closeSettingsModal);
+      $("#openHolidayManager").addEventListener("click", openHolidayManager);
+      $("#closeHolidayModal").addEventListener("click", closeHolidayManager);
+      $("#saveHoliday").addEventListener("click", saveHolidayFromForm);
+      $("#refreshHolidays").addEventListener("click", renderHolidayManager);
 
       $("#saveSettings").addEventListener("click", async () => {
         const value = Number($("#totalInput").value);
@@ -5966,6 +6490,7 @@
       $("#overlay").addEventListener("click", () => {
         closeSheet();
         closeSettingsModal();
+        closeHolidayManager();
       });
 
       $("#prevRec").addEventListener("click", () => {
