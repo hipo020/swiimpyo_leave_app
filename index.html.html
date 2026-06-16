@@ -3169,7 +3169,7 @@
 
 
     /************************************************************
-     * 모바일 상단/다가오는 쉼 확정 패치
+     * 모바일 상단 레이아웃 + 다가오는 쉼 최종 패치
      ************************************************************/
     .mobile-upcoming-card {
       display: none;
@@ -3178,15 +3178,15 @@
     @media (max-width: 720px) {
       .topbar {
         display: grid !important;
-        grid-template-columns: 1fr;
-        align-items: start;
+        grid-template-columns: 1fr !important;
+        align-items: start !important;
         gap: 12px !important;
       }
 
       .brand {
         display: grid !important;
-        grid-template-columns: 48px minmax(0, 1fr);
-        align-items: center;
+        grid-template-columns: 48px minmax(0, 1fr) !important;
+        align-items: center !important;
         gap: 11px !important;
       }
 
@@ -3201,7 +3201,7 @@
         aspect-ratio: 1 / 1 !important;
         border-radius: 18px !important;
         padding: 0 !important;
-        overflow: hidden;
+        overflow: hidden !important;
         display: grid !important;
         place-items: center !important;
         line-height: 1 !important;
@@ -3210,20 +3210,20 @@
 
       .brand h1 {
         font-size: 27px !important;
-        line-height: 1.05;
+        line-height: 1.05 !important;
       }
 
       .brand p {
         max-width: 270px !important;
-        margin-top: 5px;
+        margin-top: 5px !important;
         font-size: 12.5px !important;
         line-height: 1.35 !important;
       }
 
       .topbar-actions {
         display: grid !important;
-        grid-template-columns: 1fr;
-        width: 100%;
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
         gap: 7px !important;
       }
 
@@ -3232,83 +3232,91 @@
       }
 
       .user-chip {
-        width: 100%;
+        width: 100% !important;
         max-width: 100% !important;
         height: 42px !important;
-        justify-content: space-between;
+        justify-content: space-between !important;
         padding: 0 8px 0 16px !important;
         border-radius: 999px !important;
       }
 
       .user-chip span {
-        min-width: 0;
+        min-width: 0 !important;
         font-size: 13px !important;
       }
 
       .logout-btn {
-        flex: 0 0 auto;
+        flex: 0 0 auto !important;
         height: 30px !important;
         min-width: 68px !important;
         font-size: 11px !important;
       }
 
       .sync-status {
-        padding-left: 4px;
+        padding-left: 4px !important;
         font-size: 11px !important;
       }
 
       .mobile-upcoming-card {
-        display: none;
-        margin: 0 0 14px;
-        padding: 16px;
-        border-radius: 24px;
-        background: rgba(255,255,255,.9);
-        box-shadow: var(--shadow-soft);
-        border: 1px solid rgba(227,238,247,.95);
+        display: none !important;
+        margin: 0 0 14px !important;
+        padding: 16px !important;
+        border-radius: 24px !important;
+        background: rgba(255,255,255,.92) !important;
+        box-shadow: var(--shadow-soft) !important;
+        border: 1px solid rgba(227,238,247,.95) !important;
       }
 
-      body.has-upcoming-leaves .mobile-upcoming-card {
+      body.show-mobile-upcoming .mobile-upcoming-card {
         display: block !important;
       }
 
       .mobile-upcoming-card h3 {
-        display: flex;
-        align-items: baseline;
-        gap: 6px;
-        margin: 0 0 11px;
-        color: var(--navy);
-        font-size: 16px;
-        letter-spacing: -0.04em;
+        display: flex !important;
+        align-items: baseline !important;
+        gap: 6px !important;
+        margin: 0 0 11px !important;
+        color: var(--navy) !important;
+        font-size: 16px !important;
+        letter-spacing: -0.04em !important;
       }
 
       .mobile-upcoming-card h3 span {
-        color: var(--muted);
-        font-size: 11px;
-        font-weight: 850;
+        color: var(--muted) !important;
+        font-size: 11px !important;
+        font-weight: 850 !important;
       }
 
-      body.has-upcoming-leaves .side .upcoming-card {
+      body.show-mobile-upcoming .side .upcoming-card {
         display: none !important;
       }
 
-      body:not(.has-upcoming-leaves) .mobile-upcoming-card {
-        display: none !important;
-      }
-
-      body:not(.has-upcoming-leaves) .side .upcoming-card {
+      body:not(.show-mobile-upcoming) .side .upcoming-card {
         display: block !important;
       }
 
-      .main-grid,
-      .main-grid.report-mode {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
+      .mobile-upcoming-card .leave-item {
+        grid-template-columns: 40px minmax(0, 1fr) auto !important;
+      }
+
+      .bottom-sheet,
+      #sheet {
+        left: 50% !important;
+        right: auto !important;
+        width: min(430px, calc(100vw - 18px)) !important;
+        max-width: calc(100vw - 18px) !important;
+        transform: translate3d(-50%, 110%, 0) !important;
+      }
+
+      .bottom-sheet.active,
+      #sheet.active {
+        transform: translate3d(-50%, 0, 0) !important;
       }
     }
 
     @media (max-width: 380px) {
       .brand {
-        grid-template-columns: 44px minmax(0, 1fr);
+        grid-template-columns: 44px minmax(0, 1fr) !important;
       }
 
       .brand-mark {
@@ -3328,53 +3336,6 @@
 
       .brand p {
         font-size: 12px !important;
-      }
-    }
-
-
-    @media (max-width: 720px) {
-      .bottom-sheet,
-      #sheet {
-        left: 50% !important;
-        right: auto !important;
-        width: min(430px, calc(100vw - 18px)) !important;
-        max-width: calc(100vw - 18px) !important;
-        transform: translate3d(-50%, 110%, 0) !important;
-      }
-
-      .bottom-sheet.active,
-      #sheet.active {
-        transform: translate3d(-50%, 0, 0) !important;
-      }
-    }
-
-
-    /************************************************************
-     * 다가오는 쉼 표시 복구 패치
-     ************************************************************/
-    @media (max-width: 720px) {
-      .side .upcoming-card {
-        display: block !important;
-      }
-
-      body.has-upcoming-leaves .side .upcoming-card {
-        display: block !important;
-      }
-
-      .mobile-upcoming-card {
-        display: none !important;
-      }
-
-      body.has-upcoming-leaves .mobile-upcoming-card {
-        display: block !important;
-      }
-
-      body:not(.has-upcoming-leaves) .mobile-upcoming-card {
-        display: none !important;
-      }
-
-      body.has-upcoming-leaves .mobile-upcoming-card + .main-grid {
-        margin-top: 0;
       }
     }
 
@@ -3445,6 +3406,11 @@
       <button class="view-tab active" id="calendarTab" type="button">캘린더</button>
       <button class="view-tab" id="reportTab" type="button">연차 리포트</button>
     </div>
+
+    <section class="mobile-upcoming-card" id="mobileUpcomingCard" aria-label="모바일 다가오는 쉼">
+      <h3 id="mobileUpcomingTitle">다가오는 쉼 <span>먼저 확인하기</span></h3>
+      <div class="list" id="mobileUpcomingList"></div>
+    </section>
 
     <main class="main-grid">
       <section class="calendar-card calendar-view active" id="calendarView">
@@ -4376,48 +4342,66 @@
 
     function renderUpcoming() {
       const nowISO = toISO(today);
-      const upcoming = state.leaves
+      const futureLeaves = state.leaves
         .filter(l => (l.endDate || l.startDate) >= nowISO)
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
         .slice(0, 6);
 
-      document.body.classList.toggle("has-upcoming-leaves", upcoming.length > 0);
+      const recentLeaves = state.leaves
+        .slice()
+        .sort((a, b) => b.startDate.localeCompare(a.startDate))
+        .slice(0, 3);
+
+      const mobileItems = futureLeaves.length ? futureLeaves : recentLeaves;
+      const hasFuture = futureLeaves.length > 0;
+      const hasAnyLeave = state.leaves.length > 0;
+
+      document.body.classList.toggle("has-upcoming-leaves", hasFuture);
+      document.body.classList.toggle("show-mobile-upcoming", hasAnyLeave);
 
       const desktopList = document.getElementById("upcomingList");
       const mobileList = document.getElementById("mobileUpcomingList");
+      const mobileTitle = document.getElementById("mobileUpcomingTitle");
+
+      if (mobileTitle) {
+        mobileTitle.innerHTML = hasFuture
+          ? `다가오는 쉼 <span>먼저 확인하기</span>`
+          : `최근 등록한 쉼 <span>다가오는 일정은 아직 없어요</span>`;
+      }
 
       const emptyHtml = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
 
-      if (!upcoming.length) {
-        if (desktopList) desktopList.innerHTML = emptyHtml;
-        if (mobileList) mobileList.innerHTML = "";
-        return;
+      function makeItemHtml(list) {
+        return list.map(l => {
+          const type = getType(l.type);
+          const reason = l.reason || "사유 없음";
+          const dateText = l.startDate === l.endDate
+            ? formatKoreanDate(l.startDate)
+            : `${formatKoreanDate(l.startDate)} ~ ${formatKoreanDate(l.endDate)}`;
+
+          return `
+            <div class="leave-item">
+              <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
+              <div class="leave-meta">
+                <strong>${type.icon} ${type.label}</strong>
+                <span>${dateText} · ${reason}</span>
+              </div>
+              <div class="leave-actions">
+                <button class="edit-btn" data-id="${l.id}" aria-label="수정">✎</button>
+                <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
+              </div>
+            </div>
+          `;
+        }).join("");
       }
 
-      const itemHtml = upcoming.map(l => {
-        const type = getType(l.type);
-        const reason = l.reason || "사유 없음";
-        const dateText = l.startDate === l.endDate
-          ? formatKoreanDate(l.startDate)
-          : `${formatKoreanDate(l.startDate)} ~ ${formatKoreanDate(l.endDate)}`;
+      if (desktopList) {
+        desktopList.innerHTML = hasFuture ? makeItemHtml(futureLeaves) : emptyHtml;
+      }
 
-        return `
-          <div class="leave-item">
-            <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
-            <div class="leave-meta">
-              <strong>${type.icon} ${type.label}</strong>
-              <span>${dateText} · ${reason}</span>
-            </div>
-            <div class="leave-actions">
-              <button class="edit-btn" data-id="${l.id}" aria-label="수정">✎</button>
-              <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      if (desktopList) desktopList.innerHTML = itemHtml;
-      if (mobileList) mobileList.innerHTML = itemHtml;
+      if (mobileList) {
+        mobileList.innerHTML = hasAnyLeave ? makeItemHtml(mobileItems) : "";
+      }
 
       document.querySelectorAll("#upcomingList .edit-btn, #mobileUpcomingList .edit-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -4850,7 +4834,7 @@
 
 
     function syncMobileUpcomingPlacement() {
-      // 모바일 다가오는 쉼은 별도 카드에 렌더링합니다.
+      // 모바일 다가오는 쉼은 별도 상단 카드에 렌더링합니다.
     }
 
     function renderAll() {
