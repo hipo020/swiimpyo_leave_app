@@ -2081,7 +2081,8 @@
         grid-template-columns: 1fr;
       }
 
-      .sheet-actions {
+      .sheet-actions,
+      body.editing-leave .sheet-actions {
         grid-template-columns: 1fr;
       }
 
@@ -2264,6 +2265,73 @@
       .user-chip {
         max-width: 100%;
       }
+    }
+
+
+    .leave-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .edit-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #F1F6FA;
+      color: var(--navy-soft);
+      font-size: 13px;
+      transition: var(--transition);
+    }
+
+    .edit-btn:hover {
+      transform: translateY(-1px);
+      background: var(--sky);
+      color: var(--navy);
+    }
+
+    .edit-mode-chip {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(212,235,249,.75);
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    body.editing-leave .edit-mode-chip {
+      display: inline-flex;
+    }
+
+    .cancel-edit-btn {
+      display: none;
+      height: 56px;
+      padding: 0 18px;
+      border-radius: 20px;
+      background: #F1F6FA;
+      color: var(--navy-soft);
+      font-weight: 950;
+    }
+
+    body.editing-leave .cancel-edit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.editing-leave .sheet-actions {
+      grid-template-columns: 1fr 1fr auto;
+    }
+
+    .event-pill {
+      cursor: pointer;
     }
 
   </style>
@@ -2500,9 +2568,10 @@
     <div class="handle"></div>
     <div class="sheet-head">
       <div>
-        <h2>휴가 등록</h2>
+        <h2 id="sheetTitle">휴가 등록</h2>
         <p id="sheetSub">날짜와 휴가 종류를 선택해 주세요.</p>
       </div>
+      <span class="edit-mode-chip">수정 중</span>
       <button class="close-btn" id="closeSheet" aria-label="닫기">×</button>
     </div>
 
@@ -2530,6 +2599,7 @@
     </div>
 
     <div class="sheet-actions">
+      <button class="cancel-edit-btn" id="cancelEdit">수정 취소</button>
       <button class="save-btn" id="saveLeave">등록 완료</button>
       <button class="clear-btn" id="deleteForDate">이 날짜 삭제</button>
     </div>
@@ -2816,6 +2886,7 @@
     let recommendations = [];
     let recIndex = 0;
     let currentView = "calendar";
+    let editingLeaveId = null;
 
     const $ = sel => document.querySelector(sel);
     const calendarEl = $("#calendar");
@@ -3231,7 +3302,7 @@
             ${holidayName ? `<span class="holiday-dot">♥</span><span class="holiday-name">${holidayName}</span>` : ""}
             <span class="events">
               ${list.slice(0, 2).map(l => {
-                return `<span class="${calendarEventClass(l, iso)}">${calendarEventLabel(l, iso)}</span>`;
+                return `<span class="${calendarEventClass(l, iso)}" data-edit-id="${l.id}">${calendarEventLabel(l, iso)}</span>`;
               }).join("")}
               ${list.length > 2 ? `<span class="event-pill">+${list.length - 2}</span>` : ""}
             </span>
@@ -3240,6 +3311,13 @@
       }
 
       calendarEl.innerHTML = cells.join("");
+
+      calendarEl.querySelectorAll("[data-edit-id]").forEach(eventEl => {
+        eventEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openEditSheet(eventEl.dataset.editId);
+        });
+      });
 
       calendarEl.querySelectorAll(".day:not(.empty)").forEach(day => {
         day.addEventListener("click", () => openSheet(day.dataset.date));
@@ -3278,10 +3356,19 @@
               <strong>${type.icon} ${type.label}</strong>
               <span>${dateText} · ${reason}</span>
             </div>
-            <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
+            <div class="leave-actions">
+              <button class="edit-btn" data-id="${l.id}" aria-label="수정">✎</button>
+              <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
+            </div>
           </div>
         `;
       }).join("");
+
+      $("#upcomingList").querySelectorAll(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          openEditSheet(btn.dataset.id);
+        });
+      });
 
       $("#upcomingList").querySelectorAll(".delete-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
@@ -3538,23 +3625,79 @@
       }
     }
 
-    function openSheet(dateISO = toISO(today)) {
+    function applySheetMode(mode = "create") {
+      const isEdit = mode === "edit";
+      document.body.classList.toggle("editing-leave", isEdit);
+      $("#sheetTitle").textContent = isEdit ? "휴가 수정" : "휴가 등록";
+      $("#saveLeave").textContent = isEdit ? "수정 완료" : "등록 완료";
+      $("#deleteForDate").textContent = isEdit ? "삭제하기" : "이 날짜 삭제";
+    }
+
+    function showSheet() {
+      $("#overlay").classList.add("active");
+      $("#sheet").classList.add("active");
+    }
+
+    function resetSheetState(dateISO = toISO(today)) {
+      editingLeaveId = null;
       selectedDateISO = dateISO;
+      selectedType = "annual";
       selectedReason = reasonOptions[0];
-      $("#customReason").value = "";
-      updateCustomReasonMotion();
+
       $("#startDate").value = dateISO;
       $("#endDate").value = dateISO;
+      $("#customReason").value = "";
       $("#sheetSub").textContent = `${formatKoreanDate(dateISO, true)}의 쉼을 기록해요.`;
       $("#deleteForDate").style.display = leavesForDate(dateISO).length ? "block" : "none";
 
-      $("#overlay").classList.add("active");
-      $("#sheet").classList.add("active");
+      applySheetMode("create");
+      renderTypeButtons();
+      renderReasonTags();
+      updateCustomReasonMotion();
+    }
+
+    function openSheet(dateISO = toISO(today)) {
+      resetSheetState(dateISO);
+      showSheet();
+    }
+
+    function openEditSheet(leaveId) {
+      const leave = state.leaves.find(l => l.id === leaveId);
+      if (!leave) {
+        showToast("수정할 일정을 찾지 못했어요.");
+        return;
+      }
+
+      editingLeaveId = leave.id;
+      selectedDateISO = leave.startDate;
+      selectedType = leave.type || "annual";
+
+      const reason = leave.reason || reasonOptions[0];
+      const isPresetReason = reasonOptions.includes(reason);
+      selectedReason = isPresetReason ? reason : "직접 입력";
+
+      $("#startDate").value = leave.startDate;
+      $("#endDate").value = leave.endDate || leave.startDate;
+      $("#customReason").value = isPresetReason ? "" : reason;
+      $("#sheetSub").textContent = `${formatKoreanDate(leave.startDate, true)}의 쉼을 수정해요.`;
+      $("#deleteForDate").style.display = "block";
+
+      applySheetMode("edit");
+      renderTypeButtons();
+      renderReasonTags();
+      updateCustomReasonMotion();
+      showSheet();
     }
 
     function closeSheet() {
       $("#overlay").classList.remove("active");
       $("#sheet").classList.remove("active");
+    }
+
+    function cancelEdit() {
+      closeSheet();
+      editingLeaveId = null;
+      document.body.classList.remove("editing-leave");
     }
 
     function openSettings() {
@@ -3590,23 +3733,45 @@
       }
 
       const [start, end] = clampDateRange(startDate, endDate);
+      const existing = editingLeaveId
+        ? state.leaves.find(l => l.id === editingLeaveId)
+        : null;
 
-      state.leaves.push({
-        id: `leave_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+      const payload = {
+        id: editingLeaveId || `leave_${Date.now()}_${Math.random().toString(16).slice(2)}`,
         startDate: toISO(start),
         endDate: toISO(end),
         type: selectedType,
         reason,
-        createdAt: new Date().toISOString()
-      });
+        createdAt: existing?.createdAt || new Date().toISOString()
+      };
+
+      if (editingLeaveId) {
+        state.leaves = state.leaves.map(l => l.id === editingLeaveId ? payload : l);
+      } else {
+        state.leaves.push(payload);
+      }
 
       await persist();
       closeSheet();
+      editingLeaveId = null;
+      document.body.classList.remove("editing-leave");
       renderAll();
-      showToast("쉼을 등록했어요.");
+      showToast(existing ? "일정을 수정했어요." : "쉼을 등록했어요.");
     }
 
     async function deleteLeavesForCurrentRange() {
+      if (editingLeaveId) {
+        state.leaves = state.leaves.filter(l => l.id !== editingLeaveId);
+        await persist();
+        closeSheet();
+        editingLeaveId = null;
+        document.body.classList.remove("editing-leave");
+        renderAll();
+        showToast("일정을 삭제했어요.");
+        return;
+      }
+
       const startDate = $("#startDate").value;
       const endDate = $("#endDate").value || startDate;
       const [start, end] = clampDateRange(startDate, endDate);
@@ -3707,6 +3872,7 @@
 
       $("#fab").addEventListener("click", () => openSheet(toISO(today)));
       $("#closeSheet").addEventListener("click", closeSheet);
+      $("#cancelEdit").addEventListener("click", cancelEdit);
       $("#saveLeave").addEventListener("click", saveLeave);
       $("#deleteForDate").addEventListener("click", deleteLeavesForCurrentRange);
 
