@@ -2965,6 +2965,113 @@
       }
     }
 
+
+    @media (max-width: 720px) {
+      .main-grid,
+      .main-grid.report-mode {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .calendar-view {
+        order: 2;
+      }
+
+      .report-view {
+        order: 2;
+      }
+
+      .side {
+        display: contents;
+      }
+
+      .upcoming-card {
+        order: 1;
+      }
+
+      .simple-recommend-card {
+        order: 3;
+      }
+
+      .side .side-card:not(.upcoming-card) {
+        order: 4;
+      }
+
+      .calendar-view.active + .report-view + .side,
+      .report-view.active + .side {
+        display: contents;
+      }
+
+      .upcoming-card {
+        margin-bottom: 0;
+      }
+
+      .upcoming-card h3::after {
+        content: " · 먼저 확인하기";
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .simple-recommend-card {
+        margin-top: 0;
+      }
+    }
+
+
+    @media (max-width: 720px) {
+      body.has-upcoming-leaves .upcoming-card {
+        order: 1;
+      }
+
+      body.has-upcoming-leaves .calendar-view {
+        order: 2;
+      }
+
+      body.has-upcoming-leaves .report-view {
+        order: 2;
+      }
+
+      body.has-upcoming-leaves .simple-recommend-card {
+        order: 3;
+      }
+
+      body.has-upcoming-leaves .side .side-card:not(.upcoming-card) {
+        order: 4;
+      }
+
+      body:not(.has-upcoming-leaves) .calendar-view {
+        order: 1;
+      }
+
+      body:not(.has-upcoming-leaves) .report-view {
+        order: 1;
+      }
+
+      body:not(.has-upcoming-leaves) .simple-recommend-card {
+        order: 2;
+      }
+
+      body:not(.has-upcoming-leaves) .upcoming-card {
+        order: 3;
+      }
+
+      body:not(.has-upcoming-leaves) .side .side-card:not(.upcoming-card) {
+        order: 4;
+      }
+
+      body:not(.has-upcoming-leaves) .upcoming-card h3::after {
+        content: "";
+      }
+
+      body.has-upcoming-leaves .upcoming-card h3::after {
+        content: " · 먼저 확인하기";
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -3967,6 +4074,8 @@
         .filter(l => l.endDate >= nowISO)
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
         .slice(0, 6);
+
+      document.body.classList.toggle("has-upcoming-leaves", upcoming.length > 0);
 
       if (!upcoming.length) {
         $("#upcomingList").innerHTML = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
