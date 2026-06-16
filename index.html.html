@@ -4271,6 +4271,67 @@
       }
     }
 
+
+    /************************************************************
+     * 공휴일 관리자 권한 표시 + 날짜 선택 영역 버그 수정
+     ************************************************************/
+    .holiday-manage-open {
+      display: none;
+    }
+
+    body.is-holiday-admin .holiday-manage-open {
+      display: block;
+    }
+
+    body:not(.is-holiday-admin) .holiday-row-actions,
+    body:not(.is-holiday-admin) .holiday-form {
+      display: none !important;
+    }
+
+    body:not(.is-holiday-admin) .holiday-helper::after {
+      content: "현재 계정은 공휴일을 볼 수만 있어요.";
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-weight: 850;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      position: static !important;
+      inset: auto !important;
+      width: auto !important;
+      height: auto !important;
+      opacity: 1 !important;
+      cursor: pointer !important;
+    }
+
+    .date-field-wrap .date-field {
+      padding-right: 16px !important;
+    }
+
+    .date-field-icon {
+      display: none !important;
+    }
+
+    .date-field-wrap {
+      pointer-events: auto !important;
+    }
+
+    .date-field-wrap .date-field {
+      pointer-events: auto !important;
+    }
+
+
+    .holiday-row:not(:has(.holiday-row-actions)) {
+      grid-template-columns: 105px minmax(0, 1fr);
+    }
+
+    @media (max-width: 720px) {
+      .holiday-row:not(:has(.holiday-row-actions)) {
+        grid-template-columns: 86px minmax(0, 1fr);
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -4649,6 +4710,7 @@
      ************************************************************/
     const SUPABASE_URL = "https://jbhbjhjdzmsmziyjxfyh.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_3KfcxlsmCdxaCjVbhzhtQg_PEro1iKi";
+    const HOLIDAY_ADMIN_EMAIL = "hsoo9897@gmail.com";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
@@ -4993,6 +5055,14 @@
     const calendarEl = $("#calendar");
     const typeGrid = $("#typeGrid");
     const reasonTags = $("#reasonTags");
+
+    function isHolidayAdmin() {
+      return currentUser?.email === HOLIDAY_ADMIN_EMAIL;
+    }
+
+    function syncAdminUI() {
+      document.body.classList.toggle("is-holiday-admin", isHolidayAdmin());
+    }
 
     function getHolidayMap() {
       return Object.keys(holidayMapCache).length
@@ -6268,10 +6338,12 @@
           <div class="holiday-row">
             <span class="holiday-row-date">${row.date}</span>
             <span class="holiday-row-name">${row.name}${row.is_holiday ? "" : " · 비활성"}</span>
-            <span class="holiday-row-actions">
-              <button class="holiday-edit-btn" data-date="${row.date}" data-name="${row.name}" type="button" aria-label="공휴일 수정">✎</button>
-              <button class="holiday-delete-btn" data-date="${row.date}" type="button" aria-label="공휴일 삭제">×</button>
-            </span>
+            ${isHolidayAdmin() ? `
+              <span class="holiday-row-actions">
+                <button class="holiday-edit-btn" data-date="${row.date}" data-name="${row.name}" type="button" aria-label="공휴일 수정">✎</button>
+                <button class="holiday-delete-btn" data-date="${row.date}" type="button" aria-label="공휴일 삭제">×</button>
+              </span>
+            ` : ""}
           </div>
         `).join("");
 
@@ -6285,6 +6357,11 @@
 
         list.querySelectorAll(".holiday-delete-btn").forEach(btn => {
           btn.addEventListener("click", async () => {
+            if (!isHolidayAdmin()) {
+              showToast("공휴일 관리는 관리자 계정에서만 가능해요.");
+              return;
+            }
+
             const date = btn.dataset.date;
             if (!confirm(`${date} 공휴일을 삭제할까요?`)) return;
 
@@ -6308,6 +6385,11 @@
     }
 
     function openHolidayManager() {
+      if (!isHolidayAdmin()) {
+        showToast("공휴일 관리는 관리자 계정에서만 가능해요.");
+        return;
+      }
+
       closeSettingsModal();
       lastFocusedElement = document.activeElement;
       $("#overlay").classList.add("active");
@@ -6331,6 +6413,11 @@
     }
 
     async function saveHolidayFromForm() {
+      if (!isHolidayAdmin()) {
+        showToast("공휴일 관리는 관리자 계정에서만 가능해요.");
+        return;
+      }
+
       const date = $("#holidayDateInput").value;
       const name = $("#holidayNameInput").value.trim();
 
@@ -6379,6 +6466,7 @@
       if (isLoggedIn && currentUser) {
         $("#userEmail").textContent = currentUser.email || "Google 계정";
       }
+      syncAdminUI();
     }
 
     function bindAuthEvents() {
@@ -6409,6 +6497,7 @@
           await supabaseClient.auth.signOut();
           currentUser = null;
           state = { settings: { totalLeave: 15 }, leaves: [] };
+          syncAdminUI();
           setAuthView(false);
         });
       }
@@ -6523,6 +6612,8 @@
       }
 
       currentUser = sessionData.session?.user || null;
+      syncAdminUI();
+
       if (!currentUser) {
         setAuthView(false);
         return;
