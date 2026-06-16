@@ -3348,6 +3348,36 @@
       }
     }
 
+
+    /************************************************************
+     * 다가오는 쉼 표시 복구 패치
+     ************************************************************/
+    @media (max-width: 720px) {
+      .side .upcoming-card {
+        display: block !important;
+      }
+
+      body.has-upcoming-leaves .side .upcoming-card {
+        display: block !important;
+      }
+
+      .mobile-upcoming-card {
+        display: none !important;
+      }
+
+      body.has-upcoming-leaves .mobile-upcoming-card {
+        display: block !important;
+      }
+
+      body:not(.has-upcoming-leaves) .mobile-upcoming-card {
+        display: none !important;
+      }
+
+      body.has-upcoming-leaves .mobile-upcoming-card + .main-grid {
+        margin-top: 0;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -4347,14 +4377,15 @@
     function renderUpcoming() {
       const nowISO = toISO(today);
       const upcoming = state.leaves
-        .filter(l => l.endDate >= nowISO)
+        .filter(l => (l.endDate || l.startDate) >= nowISO)
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
         .slice(0, 6);
 
       document.body.classList.toggle("has-upcoming-leaves", upcoming.length > 0);
 
-      const desktopList = $("#upcomingList");
-      const mobileList = $("#mobileUpcomingList");
+      const desktopList = document.getElementById("upcomingList");
+      const mobileList = document.getElementById("mobileUpcomingList");
+
       const emptyHtml = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
 
       if (!upcoming.length) {
