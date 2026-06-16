@@ -3339,6 +3339,91 @@
       }
     }
 
+
+    /************************************************************
+     * 최종 개선 패치: 차감 미리보기 + 접근성 상태
+     ************************************************************/
+    .leave-preview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 24px;
+      background: #F8FCFF;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.72);
+    }
+
+    .preview-box {
+      min-height: 76px;
+      padding: 13px 12px;
+      border-radius: 20px;
+      background: #fff;
+      display: grid;
+      align-content: center;
+      gap: 7px;
+    }
+
+    .preview-box span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .preview-box strong {
+      color: var(--navy);
+      font-size: 21px;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+    }
+
+    .preview-box.primary {
+      background: var(--sky-soft);
+    }
+
+    .preview-note {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--navy-soft);
+      font-size: 12.5px;
+      font-weight: 800;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .preview-note.warning {
+      color: #D95F5F;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 680px) {
+      .leave-preview {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .preview-box {
+        min-height: 62px;
+        border-radius: 18px;
+      }
+
+      .preview-box strong {
+        font-size: 19px;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -3608,6 +3693,23 @@
       </div>
     </div>
 
+
+    <section class="leave-preview" id="leavePreview" aria-live="polite">
+      <div class="preview-box">
+        <span>이번 차감</span>
+        <strong id="previewAmount">0일</strong>
+      </div>
+      <div class="preview-box">
+        <span>현재 잔여</span>
+        <strong id="previewBefore">0일</strong>
+      </div>
+      <div class="preview-box primary">
+        <span>저장 후 잔여</span>
+        <strong id="previewAfter">0일</strong>
+      </div>
+      <p class="preview-note" id="previewNote">주말과 공휴일은 자동으로 제외해서 계산해요.</p>
+    </section>
+
     <div class="sheet-actions">
       <button class="cancel-edit-btn" id="cancelEdit">수정 취소</button>
       <button class="save-btn" id="saveLeave">등록 완료</button>
@@ -3625,7 +3727,7 @@
     </div>
   </section>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3695,13 +3797,15 @@
         if (settingsError) throw settingsError;
 
         if (!settings) {
-          await supabaseClient
+          const { error: createSettingsError } = await supabaseClient
             .from("annual_settings")
             .upsert({
               user_id: currentUser.id,
               total_leave: 15,
               updated_at: new Date().toISOString()
             }, { onConflict: "user_id" });
+
+          if (createSettingsError) throw createSettingsError;
         }
 
         const { data: leaves, error: leavesError } = await supabaseClient
@@ -3718,45 +3822,87 @@
         };
       },
 
-      async save(data) {
+      async saveSettings(totalLeave) {
         if (!currentUser) throw new Error("로그인이 필요합니다.");
 
-        const totalLeave = Number(data.settings?.totalLeave ?? 15);
-
-        const { error: settingsError } = await supabaseClient
+        const { error } = await supabaseClient
           .from("annual_settings")
           .upsert({
             user_id: currentUser.id,
-            total_leave: totalLeave,
+            total_leave: Number(totalLeave),
             updated_at: new Date().toISOString()
           }, { onConflict: "user_id" });
 
-        if (settingsError) throw settingsError;
+        if (error) throw error;
+      },
 
-        const { error: deleteError } = await supabaseClient
+      async createLeave(leave) {
+        if (!currentUser) throw new Error("로그인이 필요합니다.");
+
+        const { data, error } = await supabaseClient
+          .from("annual_leaves")
+          .insert(normalizeLeaveToRow(leave))
+          .select("id,start_date,end_date,type,reason,created_at")
+          .single();
+
+        if (error) throw error;
+        return normalizeLeaveFromRow(data);
+      },
+
+      async updateLeave(leave) {
+        if (!currentUser) throw new Error("로그인이 필요합니다.");
+
+        const { data, error } = await supabaseClient
+          .from("annual_leaves")
+          .update({
+            start_date: leave.startDate,
+            end_date: leave.endDate || leave.startDate,
+            type: leave.type,
+            reason: leave.reason || ""
+          })
+          .eq("user_id", currentUser.id)
+          .eq("id", leave.id)
+          .select("id,start_date,end_date,type,reason,created_at")
+          .single();
+
+        if (error) throw error;
+        return normalizeLeaveFromRow(data);
+      },
+
+      async deleteLeave(id) {
+        if (!currentUser) throw new Error("로그인이 필요합니다.");
+
+        const { error } = await supabaseClient
           .from("annual_leaves")
           .delete()
-          .eq("user_id", currentUser.id);
+          .eq("user_id", currentUser.id)
+          .eq("id", id);
 
-        if (deleteError) throw deleteError;
+        if (error) throw error;
+      },
 
-        const rows = (data.leaves || []).map(normalizeLeaveToRow);
-        if (!rows.length) return;
+      async deleteLeavesByIds(ids) {
+        if (!currentUser) throw new Error("로그인이 필요합니다.");
+        if (!ids.length) return;
 
-        const { error: insertError } = await supabaseClient
+        const { error } = await supabaseClient
           .from("annual_leaves")
-          .insert(rows);
+          .delete()
+          .eq("user_id", currentUser.id)
+          .in("id", ids);
 
-        if (insertError) throw insertError;
+        if (error) throw error;
       },
 
       async remove() {
         if (!currentUser) return;
 
-        await supabaseClient
+        const { error } = await supabaseClient
           .from("annual_leaves")
           .delete()
           .eq("user_id", currentUser.id);
+
+        if (error) throw error;
       }
     };
 
@@ -3897,6 +4043,8 @@
     let recIndex = 0;
     let currentView = "calendar";
     let editingLeaveId = null;
+    let activeDialog = null;
+    let lastFocusedElement = null;
 
     const $ = sel => document.querySelector(sel);
     const calendarEl = $("#calendar");
@@ -3943,13 +4091,118 @@
       return { total, used, remain };
     }
 
-    async function persist() {
+    function calcUsedExcept(leaveId) {
+      return state.leaves.reduce((sum, leave) => {
+        if (leaveId && leave.id === leaveId) return sum;
+        return sum + calcLeaveAmount(leave);
+      }, 0);
+    }
+
+    async function runStorageAction(action, errorMessage = "저장 중 오류가 발생했어요. Supabase 설정을 확인해 주세요.") {
       try {
-        await storage.save(state);
+        return await action();
       } catch (error) {
         console.error(error);
-        showToast("저장 중 오류가 발생했어요. Supabase 설정을 확인해 주세요.");
+        showToast(errorMessage);
         throw error;
+      }
+    }
+
+    function getSheetPreviewPayload() {
+      const startDate = $("#startDate").value;
+      const endDate = $("#endDate").value || startDate;
+      if (!startDate) return null;
+
+      const [start, end] = clampDateRange(startDate, endDate);
+      return {
+        id: editingLeaveId || "__preview__",
+        startDate: toISO(start),
+        endDate: toISO(end),
+        type: selectedType,
+        reason: selectedReason
+      };
+    }
+
+    function updateLeavePreview() {
+      const amountEl = $("#previewAmount");
+      const beforeEl = $("#previewBefore");
+      const afterEl = $("#previewAfter");
+      const noteEl = $("#previewNote");
+      if (!amountEl || !beforeEl || !afterEl || !noteEl) return;
+
+      const payload = getSheetPreviewPayload();
+      if (!payload) {
+        amountEl.textContent = "-";
+        beforeEl.textContent = formatDays(calcSummary().remain);
+        afterEl.textContent = "-";
+        noteEl.textContent = "날짜를 선택하면 실제 차감일수를 미리 계산해요.";
+        noteEl.classList.remove("warning");
+        return;
+      }
+
+      const amount = calcLeaveAmount(payload);
+      const total = Number(state.settings.totalLeave || 0);
+      const usedExceptCurrent = calcUsedExcept(editingLeaveId);
+      const before = total - usedExceptCurrent;
+      const after = before - amount;
+      const type = getType(payload.type);
+
+      amountEl.textContent = type.countable ? formatDays(amount) : "차감 없음";
+      beforeEl.textContent = formatDays(before);
+      afterEl.textContent = formatDays(after);
+
+      if (!type.countable) {
+        noteEl.textContent = "경조사/공가/기타 휴가는 기록만 남기고 연차에서는 차감하지 않아요.";
+        noteEl.classList.remove("warning");
+      } else if (after < 0) {
+        noteEl.textContent = `잔여 연차보다 ${formatDays(Math.abs(after))} 더 많이 사용하게 돼요. 회사 정책에 맞는지 확인하고 저장해 주세요.`;
+        noteEl.classList.add("warning");
+      } else {
+        noteEl.textContent = "주말과 공휴일은 자동으로 제외해서 실제 차감일수만 계산해요.";
+        noteEl.classList.remove("warning");
+      }
+    }
+
+    function getFocusableElements(container) {
+      return [...container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter(el => !el.disabled && el.offsetParent !== null);
+    }
+
+    function focusFirstField(container, selector = "input, button") {
+      requestAnimationFrame(() => {
+        const target = container.querySelector(selector) || getFocusableElements(container)[0];
+        if (target) target.focus();
+      });
+    }
+
+    function closeActiveDialog() {
+      if ($("#sheet").classList.contains("active")) closeSheet();
+      if ($("#settingsModal").classList.contains("active")) closeSettingsModal();
+    }
+
+    function handleDialogKeydown(event) {
+      if (!activeDialog) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeActiveDialog();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const focusable = getFocusableElements(activeDialog);
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     }
 
@@ -4193,6 +4446,7 @@
         btn.addEventListener("click", () => {
           selectedType = btn.dataset.type;
           renderTypeButtons();
+          updateLeavePreview();
         });
       });
     }
@@ -4209,6 +4463,7 @@
           selectedReason = btn.dataset.reason;
           renderReasonTags();
           updateCustomReasonMotion();
+          updateLeavePreview();
         });
       });
 
@@ -4298,16 +4553,17 @@
         const dow = date.getDay();
         const holidayName = holidayMap[iso];
         const list = leavesForDate(iso);
+        const isTodayDate = isSameDay(date, today);
         const classes = [
           "day",
           dow === 0 ? "sun" : "",
           dow === 6 ? "sat" : "",
           holidayName ? "holiday" : "",
-          isSameDay(date, today) ? "today" : ""
+          isTodayDate ? "today" : ""
         ].filter(Boolean).join(" ");
 
         cells.push(`
-          <button class="${classes}" data-date="${iso}" aria-label="${iso} 휴가 등록">
+          <button class="${classes}" data-date="${iso}" aria-label="${iso} 휴가 등록" ${isTodayDate ? 'aria-current="date"' : ""}>
             <span class="day-number">${dayNum}</span>
             ${holidayName ? `<span class="holiday-dot">♥</span><span class="holiday-name">${holidayName}</span>` : ""}
             <span class="events">
@@ -4411,8 +4667,11 @@
 
       document.querySelectorAll("#upcomingList .delete-btn, #mobileUpcomingList .delete-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
+          await runStorageAction(
+            () => storage.deleteLeave(btn.dataset.id),
+            "휴가 삭제 중 오류가 발생했어요."
+          );
           state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
-          await persist();
           renderAll();
           showToast("삭제했어요.");
         });
@@ -4461,102 +4720,81 @@
       const sixMonthsLater = addMonths(today, 6);
       const recs = [];
       const seen = new Set();
+      const maxLeaveDays = 4;
 
-      // 1) 오늘 이후 6개월 안의 '하루만 쓰면 앞뒤 휴일이 연결되는' 징검다리 추천
+      // 공휴일 DB를 기준으로 오늘 이후 6개월 안의 효율 좋은 연차 조합을 자동 계산합니다.
       for (let d = addDays(today, 1); d <= sixMonthsLater; d = addDays(d, 1)) {
-        if (!isWeekday(d)) continue;
+        if (!isWeekday(d) || holidayMap[toISO(d)]) continue;
 
-        const iso = toISO(d);
-        if (holidayMap[iso]) continue;
+        for (let useCount = 1; useCount <= maxLeaveDays; useCount++) {
+          const leaveDates = [];
+          let cursor = new Date(d);
+          let isValidRange = true;
 
-        const before = addDays(d, -1);
-        const after = addDays(d, 1);
-        const beforeRest = isRestDay(before, holidayMap);
-        const afterRest = isRestDay(after, holidayMap);
+          while (leaveDates.length < useCount) {
+            const iso = toISO(cursor);
+            if (cursor > sixMonthsLater || !isWeekday(cursor) || holidayMap[iso]) {
+              isValidRange = false;
+              break;
+            }
+            leaveDates.push(iso);
+            cursor = addDays(cursor, 1);
+          }
 
-        if (beforeRest && afterRest) {
-          const blockStart = expandRestBlock(before, -1, holidayMap);
-          const blockEnd = expandRestBlock(after, 1, holidayMap);
+          if (!isValidRange || !leaveDates.length) continue;
+
+          const firstLeave = parseISO(leaveDates[0]);
+          const lastLeave = parseISO(leaveDates[leaveDates.length - 1]);
+
+          let blockStart = new Date(firstLeave);
+          let prev = addDays(blockStart, -1);
+          let hasBeforeRest = false;
+          while (isRestDay(prev, holidayMap)) {
+            hasBeforeRest = true;
+            blockStart = new Date(prev);
+            prev = addDays(prev, -1);
+          }
+
+          let blockEnd = new Date(lastLeave);
+          let next = addDays(blockEnd, 1);
+          let hasAfterRest = false;
+          while (isRestDay(next, holidayMap)) {
+            hasAfterRest = true;
+            blockEnd = new Date(next);
+            next = addDays(next, 1);
+          }
+
           const totalDays = countContinuousDays(blockStart, blockEnd);
+          const efficiency = totalDays / leaveDates.length;
+
+          if (!(hasBeforeRest || hasAfterRest)) continue;
+          if (totalDays < leaveDates.length + 2) continue;
+          if (efficiency < 1.5) continue;
+
+          const bridgeLabel = hasBeforeRest && hasAfterRest
+            ? "징검다리"
+            : hasBeforeRest
+              ? "연휴 뒤 연결"
+              : "연휴 앞 연결";
 
           pushUniqueRecommendation(recs, {
-            title: `${formatKoreanDate(iso, true)} 하루 쓰면`,
-            leaveDates: [iso],
-            result: `${totalDays}일 연속 쉼 가능`,
-            desc: `${formatKoreanDate(toISO(blockStart), true)}부터 ${formatKoreanDate(toISO(blockEnd), true)}까지 이어지는 징검다리 휴일이에요.`
+            title: `${formatKoreanDate(leaveDates[0], true)} ${bridgeLabel}`,
+            leaveDates,
+            result: `${leaveDates.length}개 사용으로 ${totalDays}일 쉼`,
+            desc: `${formatKoreanDate(toISO(blockStart), true)}부터 ${formatKoreanDate(toISO(blockEnd), false)}까지 이어지는 추천이에요.`,
+            score: Math.round(efficiency * 1000) + totalDays
           }, seen);
         }
       }
 
-      // 2) 주요 명절/연휴 전후로 2~3일 연차를 붙이는 추천
-      const manualRecs = [
-        {
-          title: "2026년 설날 전후",
-          leaveDates: ["2026-02-19", "2026-02-20"],
-          result: "2일 사용으로 긴 설 연휴",
-          desc: "2/16~2/18 설날 연휴 뒤 2/19, 2/20을 쓰면 주말까지 포근하게 이어져요."
-        },
-        {
-          title: "2026년 추석 앞쪽",
-          leaveDates: ["2026-09-21", "2026-09-22", "2026-09-23"],
-          result: "3일 사용으로 긴 추석 쉼",
-          desc: "9/24~9/28 추석·대체공휴일 앞에 3일을 붙이면 9/19부터 9/28까지 연결돼요."
-        },
-        {
-          title: "2027년 설날 전후",
-          leaveDates: ["2027-02-10", "2027-02-11", "2027-02-12"],
-          result: "3일 사용으로 긴 겨울 쉼",
-          desc: "설 연휴와 주말 사이를 연결해 여유로운 겨울 휴가를 만들 수 있어요."
-        },
-        {
-          title: "2027년 5월 징검다리",
-          leaveDates: ["2027-05-14"],
-          result: "하루 사용으로 4일 연속 쉼 가능",
-          desc: "부처님오신날 다음 금요일에 연차를 쓰면 5/13부터 5/16까지 이어져요."
-        },
-        {
-          title: "2027년 추석 앞뒤",
-          leaveDates: ["2027-09-17"],
-          result: "하루 사용으로 추석 뒤 긴 쉼",
-          desc: "추석 연휴 뒤 금요일 하루를 붙이면 주말까지 자연스럽게 연결돼요."
-        },
-        {
-          title: "2027년 10월 공휴일 연결",
-          leaveDates: ["2027-10-05", "2027-10-06", "2027-10-07", "2027-10-08"],
-          result: "4일 사용으로 긴 가을 쉼",
-          desc: "개천절 대체휴일과 한글날 대체휴일 사이를 연결하는 가을 황금휴가예요."
-        },
-        {
-          title: "2027년 크리스마스 전후",
-          leaveDates: ["2027-12-24"],
-          result: "하루 사용으로 연말 4일 쉼",
-          desc: "성탄절과 대체공휴일 앞 금요일을 활용하면 연말 쉼이 길어져요."
-        },
-        {
-          title: "2028년 설날 전후",
-          leaveDates: ["2028-01-24", "2028-01-25"],
-          result: "2일 사용으로 긴 설 연휴",
-          desc: "설 연휴 앞 월·화에 연차를 붙이면 주말부터 설 연휴까지 길게 쉴 수 있어요."
-        },
-        {
-          title: "2028년 5월 가정의 달",
-          leaveDates: ["2028-05-03", "2028-05-04"],
-          result: "2일 사용으로 긴 5월 쉼",
-          desc: "부처님오신날과 어린이날 사이를 연결하면 가족과 보내는 미니 휴가가 완성돼요."
-        },
-        {
-          title: "2028년 10월 추석 연휴",
-          leaveDates: ["2028-10-06"],
-          result: "하루 사용으로 긴 가을 쉼",
-          desc: "추석·개천절 연휴 뒤 하루를 붙이면 한글날까지 이어지는 긴 휴식을 만들 수 있어요."
-        }
-      ];
-
-      manualRecs.forEach(rec => pushUniqueRecommendation(recs, rec, seen));
-
       recommendations = recs
         .filter(rec => rec.leaveDates.length && rec.leaveDates.every(isWithinRecommendationRange))
-        .sort((a, b) => a.leaveDates[0].localeCompare(b.leaveDates[0]));
+        .sort((a, b) => {
+          const dateCompare = a.leaveDates[0].localeCompare(b.leaveDates[0]);
+          if (dateCompare) return dateCompare;
+          return b.score - a.score;
+        })
+        .slice(0, 24);
 
       recIndex = 0;
     }
@@ -4673,8 +4911,12 @@
     }
 
     function showSheet() {
+      lastFocusedElement = document.activeElement;
       $("#overlay").classList.add("active");
       $("#sheet").classList.add("active");
+      activeDialog = $("#sheet");
+      updateLeavePreview();
+      focusFirstField(activeDialog, "#startDate");
     }
 
     function resetSheetState(dateISO = toISO(today)) {
@@ -4693,6 +4935,7 @@
       renderTypeButtons();
       renderReasonTags();
       updateCustomReasonMotion();
+      updateLeavePreview();
     }
 
     function openSheet(dateISO = toISO(today)) {
@@ -4725,12 +4968,19 @@
       renderTypeButtons();
       renderReasonTags();
       updateCustomReasonMotion();
+      updateLeavePreview();
       showSheet();
     }
 
     function closeSheet() {
-      $("#overlay").classList.remove("active");
       $("#sheet").classList.remove("active");
+      if (!$("#settingsModal").classList.contains("active")) {
+        $("#overlay").classList.remove("active");
+        activeDialog = null;
+      }
+      if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+        lastFocusedElement.focus();
+      }
     }
 
     function cancelEdit() {
@@ -4741,13 +4991,22 @@
 
     function openSettings() {
       renderDashboard();
+      lastFocusedElement = document.activeElement;
       $("#overlay").classList.add("active");
       $("#settingsModal").classList.add("active");
+      activeDialog = $("#settingsModal");
+      focusFirstField(activeDialog, "#totalInput");
     }
 
     function closeSettingsModal() {
-      $("#overlay").classList.remove("active");
       $("#settingsModal").classList.remove("active");
+      if (!$("#sheet").classList.contains("active")) {
+        $("#overlay").classList.remove("active");
+        activeDialog = null;
+      }
+      if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+        lastFocusedElement.focus();
+      }
     }
 
     function showToast(text) {
@@ -4785,13 +5044,17 @@
         createdAt: existing?.createdAt || new Date().toISOString()
       };
 
+      const savedLeave = await runStorageAction(
+        () => editingLeaveId ? storage.updateLeave(payload) : storage.createLeave(payload),
+        "휴가 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
+      );
+
       if (editingLeaveId) {
-        state.leaves = state.leaves.map(l => l.id === editingLeaveId ? payload : l);
+        state.leaves = state.leaves.map(l => l.id === editingLeaveId ? savedLeave : l);
       } else {
-        state.leaves.push(payload);
+        state.leaves.push(savedLeave);
       }
 
-      await persist();
       closeSheet();
       editingLeaveId = null;
       document.body.classList.remove("editing-leave");
@@ -4801,8 +5064,12 @@
 
     async function deleteLeavesForCurrentRange() {
       if (editingLeaveId) {
+        await runStorageAction(
+          () => storage.deleteLeave(editingLeaveId),
+          "휴가 삭제 중 오류가 발생했어요."
+        );
+
         state.leaves = state.leaves.filter(l => l.id !== editingLeaveId);
-        await persist();
         closeSheet();
         editingLeaveId = null;
         document.body.classList.remove("editing-leave");
@@ -4815,18 +5082,24 @@
       const endDate = $("#endDate").value || startDate;
       const [start, end] = clampDateRange(startDate, endDate);
 
-      const before = state.leaves.length;
-      state.leaves = state.leaves.filter(l => {
-        const [ls, le] = clampDateRange(l.startDate, l.endDate);
-        return le < start || ls > end;
-      });
+      const targetIds = state.leaves
+        .filter(l => {
+          const [ls, le] = clampDateRange(l.startDate, l.endDate);
+          return !(le < start || ls > end);
+        })
+        .map(l => l.id);
 
-      if (before === state.leaves.length) {
+      if (!targetIds.length) {
         showToast("삭제할 기록이 없어요.");
         return;
       }
 
-      await persist();
+      await runStorageAction(
+        () => storage.deleteLeavesByIds(targetIds),
+        "선택한 날짜의 기록 삭제 중 오류가 발생했어요."
+      );
+
+      state.leaves = state.leaves.filter(l => !targetIds.includes(l.id));
       closeSheet();
       renderAll();
       showToast("선택한 날짜의 기록을 삭제했어요.");
@@ -4919,6 +5192,9 @@
       $("#cancelEdit").addEventListener("click", cancelEdit);
       $("#saveLeave").addEventListener("click", saveLeave);
       $("#deleteForDate").addEventListener("click", deleteLeavesForCurrentRange);
+      $("#startDate").addEventListener("input", updateLeavePreview);
+      $("#endDate").addEventListener("input", updateLeavePreview);
+      document.addEventListener("keydown", handleDialogKeydown);
 
       $("#openSettings").addEventListener("click", openSettings);
       $("#closeSettings").addEventListener("click", closeSettingsModal);
@@ -4929,8 +5205,12 @@
           showToast("올바른 연차 개수를 입력해 주세요.");
           return;
         }
-        state.settings.totalLeave = Math.round(value * 100) / 100;
-        await persist();
+        const nextTotalLeave = Math.round(value * 100) / 100;
+        await runStorageAction(
+          () => storage.saveSettings(nextTotalLeave),
+          "연차 설정 저장 중 오류가 발생했어요."
+        );
+        state.settings.totalLeave = nextTotalLeave;
         closeSettingsModal();
         renderAll();
         showToast("연차 설정을 저장했어요.");
