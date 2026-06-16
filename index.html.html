@@ -1,0 +1,3794 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>쉼표 · Google 로그인 연차 관리</title>
+  <style>
+    :root {
+      --sky: #D4EBF9;
+      --sky-strong: #A9D9F5;
+      --sky-soft: #EEF8FE;
+      --navy: #102A43;
+      --navy-soft: #496A86;
+      --blue-sat: #426B9A;
+      --red-sun: #E86B6B;
+      --ivory: #FFFDF7;
+      --white: #FFFFFF;
+      --line: #EAF1F6;
+      --muted: #8CA0B3;
+      --shadow: 0 18px 46px rgba(16, 42, 67, 0.08);
+      --shadow-soft: 0 12px 30px rgba(16, 42, 67, 0.06);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-pill: 999px;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+      color: var(--navy);
+      background:
+        radial-gradient(circle at top left, rgba(212,235,249,.65), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(255,244,222,.75), transparent 30rem),
+        var(--ivory);
+    }
+
+    button, input, textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      padding: 28px 22px 110px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: var(--sky);
+      box-shadow: var(--shadow-soft);
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -0.08em;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .brand p {
+      margin: 6px 0 0;
+      color: var(--navy-soft);
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .today-chip {
+      padding: 12px 16px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow-soft);
+      color: var(--navy-soft);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 20px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      gap: 14px;
+      padding: 16px;
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,.74);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-card {
+      min-height: 112px;
+      padding: 20px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, #fff, #F8FCFF);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: inset 0 0 0 1px rgba(234,241,246,.8);
+    }
+
+    .stat-card.primary {
+      background: linear-gradient(145deg, var(--sky), #F3FBFF);
+    }
+
+    .stat-label {
+      color: var(--navy-soft);
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-value {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-top: 12px;
+      font-size: clamp(28px, 4vw, 38px);
+      font-weight: 950;
+      letter-spacing: -0.06em;
+    }
+
+    .stat-unit {
+      font-size: 14px;
+      font-weight: 850;
+      color: var(--muted);
+    }
+
+    .settings-btn {
+      align-self: stretch;
+      width: 64px;
+      border-radius: 24px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 22px;
+      box-shadow: var(--shadow-soft);
+      transition: transform .2s var(--ease), background .2s var(--ease);
+    }
+
+    .settings-btn:hover { transform: translateY(-2px) rotate(16deg); }
+
+    .mini-panel {
+      padding: 22px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, rgba(212,235,249,.92), rgba(255,255,255,.72));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .mini-panel:after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      bottom: -46px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.52);
+    }
+
+    .mini-panel h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.05em;
+      word-break: keep-all;
+    }
+
+    .mini-panel p {
+      margin: 10px 0 0;
+      color: var(--navy-soft);
+      font-size: 14px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .quick-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .quick-pill {
+      padding: 9px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,.75);
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 20px;
+    }
+
+    .calendar-card, .side-card {
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .calendar-card {
+      padding: 20px;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .month-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .month-title h2 {
+      margin: 0;
+      font-size: clamp(23px, 3vw, 32px);
+      letter-spacing: -0.06em;
+    }
+
+    .month-title span {
+      padding: 7px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--sky-soft);
+      color: var(--navy-soft);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .nav-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn, .today-btn {
+      height: 42px;
+      min-width: 42px;
+      padding: 0 14px;
+      border-radius: 16px;
+      background: #F4FAFE;
+      color: var(--navy);
+      font-weight: 950;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.72);
+      transition: transform .2s var(--ease), background .2s var(--ease);
+    }
+
+    .nav-btn:hover, .today-btn:hover { transform: translateY(-2px); background: var(--sky); }
+
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .weekday {
+      height: 32px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .weekday.sat { color: var(--blue-sat); }
+    .weekday.sun { color: var(--red-sun); }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .day {
+      position: relative;
+      min-height: 96px;
+      padding: 11px 10px;
+      border-radius: 24px;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: background .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .day:not(.empty):hover {
+      background: #F7FCFF;
+      transform: translateY(-2px);
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.72);
+    }
+
+    .day.empty { pointer-events: none; opacity: .35; }
+
+    .day-number {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .day.today .day-number {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .day.sat .day-number { color: var(--blue-sat); }
+    .day.sun .day-number,
+    .day.holiday .day-number { color: var(--red-sun); }
+    .day.today.sat .day-number,
+    .day.today.sun .day-number,
+    .day.today.holiday .day-number { color: #fff; }
+
+    .holiday-dot {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      font-size: 12px;
+    }
+
+    .events {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 2px;
+      min-width: 0;
+    }
+
+    .event-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding: 6px 7px;
+      border-radius: var(--radius-pill);
+      background: var(--sky);
+      color: var(--navy);
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .event-pill.free {
+      background: #F7EBDD;
+    }
+
+    .event-pill.range-start {
+      justify-content: center;
+      background: var(--sky);
+    }
+
+    .event-pill.range-mid,
+    .event-pill.range-end {
+      height: 9px;
+      min-height: 9px;
+      padding: 0;
+      margin-top: 9px;
+      color: transparent;
+      font-size: 0;
+      background: rgba(212, 235, 249, 0.88);
+      border-radius: var(--radius-pill);
+    }
+
+    .event-pill.range-mid::after,
+    .event-pill.range-end::after {
+      content: "";
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(16, 42, 67, 0.08);
+    }
+
+    .holiday-name {
+      color: var(--red-sun);
+      font-size: 10px;
+      font-weight: 950;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: .9;
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .side-card {
+      padding: 22px;
+    }
+
+    .side-card h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: -0.05em;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .leave-item {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 22px;
+      background: #F8FCFF;
+      box-shadow: inset 0 0 0 1px rgba(234,241,246,.9);
+    }
+
+    .leave-date {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      background: var(--sky);
+      display: grid;
+      place-items: center;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .leave-meta strong {
+      display: block;
+      font-size: 14px;
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+    }
+
+    .leave-meta span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 150px;
+    }
+
+    .delete-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 14px;
+      background: #FFF3F3;
+      color: #D95F5F;
+      font-weight: 950;
+    }
+
+    .empty-state {
+      padding: 18px;
+      border-radius: 22px;
+      background: #F8FCFF;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .recommend-card {
+      position: sticky;
+      top: 16px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 90% -10%, rgba(212,235,249,.22), transparent 150px),
+        linear-gradient(155deg, var(--navy), #254B68);
+      color: #fff;
+    }
+
+    .recommend-card::after {
+      content: "";
+      position: absolute;
+      right: -42px;
+      bottom: -54px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      pointer-events: none;
+    }
+
+    .recommend-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .recommend-kicker {
+      display: block;
+      margin-bottom: 6px;
+      color: rgba(212,235,249,.92);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .08em;
+    }
+
+    .recommend-card h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 20px;
+      letter-spacing: -0.06em;
+    }
+
+    .recommend-count {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,.13);
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .recommend-card p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    .recommend-intro {
+      margin-bottom: 16px !important;
+    }
+
+    .recommend-summary {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin: 14px 0 10px;
+    }
+
+    .summary-box {
+      min-height: 76px;
+      padding: 13px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.11);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+
+    .summary-box span {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .summary-box strong {
+      display: block;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .summary-box.primary {
+      background: rgba(212,235,249,.22);
+    }
+
+    .recommend-date-card {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 6px;
+      margin: 10px 0;
+      padding: 13px 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.92);
+      color: var(--navy);
+    }
+
+    .recommend-date-label {
+      color: var(--navy-soft);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .recommend-date-card strong {
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .recommend-highlight {
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin: 10px 0;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(212,235,249,.16);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 950;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .recommend-desc {
+      padding-left: 2px;
+    }
+
+    .recommend-nav {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .recommend-nav button {
+      flex: 1;
+      height: 40px;
+      border-radius: 15px;
+      background: rgba(255,255,255,.14);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 950;
+      transition: transform .18s var(--ease), background .18s var(--ease);
+    }
+
+    .recommend-nav button:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.2);
+    }
+
+    .fab {
+      position: fixed;
+      right: max(22px, calc((100vw - 1280px)/2 + 22px));
+      bottom: 24px;
+      z-index: 30;
+      width: 66px;
+      height: 66px;
+      border-radius: 24px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 34px;
+      line-height: 1;
+      box-shadow: 0 18px 42px rgba(16, 42, 67, .22);
+      transition: transform .2s var(--ease);
+    }
+
+    .fab:hover { transform: translateY(-4px) rotate(8deg); }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(16, 42, 67, .25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s var(--ease);
+      backdrop-filter: blur(3px);
+    }
+
+    .overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 50;
+      width: min(760px, calc(100% - 20px));
+      max-height: min(88vh, 820px);
+      overflow-y: auto;
+      padding: 12px 18px 24px;
+      border-radius: 34px 34px 0 0;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 -24px 70px rgba(16, 42, 67, .16);
+      transform: translate(-50%, 105%);
+      transition: transform .34s var(--ease);
+    }
+
+    .bottom-sheet.active {
+      transform: translate(-50%, 0);
+    }
+
+    .handle {
+      width: 48px;
+      height: 5px;
+      border-radius: var(--radius-pill);
+      background: #D9E6EF;
+      margin: 0 auto 18px;
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .sheet-head h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.06em;
+    }
+
+    .sheet-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .close-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      background: #F5F9FC;
+      color: var(--navy-soft);
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .form-section {
+      margin-top: 20px;
+    }
+
+    .form-section label.title {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .date-input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .date-field, .text-field {
+      width: 100%;
+      height: 50px;
+      border: 0;
+      outline: none;
+      border-radius: 18px;
+      background: #F5FAFD;
+      padding: 0 16px;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.75);
+      color: var(--navy);
+      font-weight: 850;
+    }
+
+    .custom-reason-wrap {
+      display: grid;
+      grid-template-rows: 0fr;
+      margin-top: 0;
+      opacity: 0;
+      transform: translateY(10px);
+      transition:
+        grid-template-rows .34s var(--ease),
+        margin-top .34s var(--ease),
+        opacity .24s var(--ease),
+        transform .34s var(--ease);
+    }
+
+    .custom-reason-wrap.active {
+      grid-template-rows: 1fr;
+      margin-top: 10px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .custom-reason-inner {
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .text-field {
+      display: block;
+      opacity: 0;
+      transform: translateY(12px);
+      transition:
+        opacity .22s var(--ease) .08s,
+        transform .28s var(--ease) .06s;
+    }
+
+    .custom-reason-wrap.active .text-field {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .type-btn {
+      min-height: 72px;
+      padding: 12px 8px;
+      border-radius: 22px;
+      background: #F5FAFD;
+      color: var(--navy-soft);
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.65);
+      transition: background .16s var(--ease), transform .16s var(--ease), color .16s var(--ease);
+    }
+
+    .type-btn small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .type-btn.active {
+      background: var(--sky);
+      color: var(--navy);
+      transform: translateY(-2px);
+      box-shadow: none;
+    }
+
+    .reason-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .reason-tag {
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: var(--radius-pill);
+      background: #F5FAFD;
+      color: var(--navy-soft);
+      font-size: 14px;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.65);
+      transition: background .16s var(--ease), transform .16s var(--ease);
+    }
+
+    .reason-tag.active {
+      background: var(--sky);
+      color: var(--navy);
+      box-shadow: none;
+      transform: translateY(-2px);
+    }
+
+    .sheet-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .save-btn {
+      height: 56px;
+      border-radius: 20px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .clear-btn {
+      height: 56px;
+      padding: 0 18px;
+      border-radius: 20px;
+      background: #FFF3F3;
+      color: #D95F5F;
+      font-weight: 950;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 98px;
+      z-index: 80;
+      transform: translate(-50%, 16px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 13px 18px;
+      border-radius: var(--radius-pill);
+      background: var(--navy);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 850;
+      box-shadow: 0 12px 30px rgba(16,42,67,.18);
+      transition: opacity .2s var(--ease), transform .2s var(--ease);
+    }
+
+    .toast.active {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .modal {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 60;
+      width: min(420px, calc(100% - 32px));
+      padding: 20px;
+      border-radius: 30px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      transform: translate(-50%, -46%) scale(.98);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s var(--ease), transform .22s var(--ease);
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .modal h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing: -0.06em;
+    }
+
+    .modal p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .modal-actions button {
+      height: 50px;
+      border-radius: 18px;
+      font-weight: 950;
+    }
+
+    .modal-actions .ghost {
+      background: #F5FAFD;
+      color: var(--navy-soft);
+    }
+
+    .modal-actions .solid {
+      background: var(--navy);
+      color: #fff;
+    }
+
+
+    .view-tabs {
+      display: inline-flex;
+      gap: 8px;
+      margin: 0 0 20px;
+      padding: 6px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .view-tab {
+      min-width: 104px;
+      height: 42px;
+      padding: 0 18px;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: var(--navy-soft);
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      transition: background .18s var(--ease), color .18s var(--ease), transform .18s var(--ease);
+    }
+
+    .view-tab.active {
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(16,42,67,.14);
+    }
+
+    .view-tab:hover {
+      transform: translateY(-1px);
+    }
+
+    .calendar-view,
+    .report-view {
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity .26s var(--ease), transform .26s var(--ease);
+    }
+
+    .calendar-view.active,
+    .report-view.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .main-grid.report-mode {
+      grid-template-columns: minmax(0, 1fr) 280px;
+    }
+
+    .main-grid.report-mode .calendar-view {
+      display: none;
+    }
+
+    .main-grid:not(.report-mode) .report-view {
+      display: none;
+    }
+
+    .report-card {
+      padding: 22px;
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .report-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .report-kicker {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--navy-soft);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .08em;
+    }
+
+    .report-header h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -0.06em;
+    }
+
+    .report-header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .report-back {
+      flex: 0 0 auto;
+      height: 42px;
+      padding: 0 15px;
+      border-radius: 16px;
+      background: var(--sky-soft);
+      color: var(--navy);
+      font-weight: 950;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.72);
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .donut-card,
+    .report-summary-card,
+    .reason-report-card {
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(234,241,246,.9);
+    }
+
+    .donut-card {
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      min-height: 330px;
+      padding: 20px;
+    }
+
+    .donut-wrap {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      display: grid;
+      place-items: center;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .donut-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .donut-bg,
+    .donut-used {
+      fill: none;
+      stroke-width: 20;
+      stroke-linecap: round;
+    }
+
+    .donut-bg {
+      stroke: #EEF4F8;
+    }
+
+    .donut-used {
+      stroke: var(--navy);
+      stroke-dasharray: 0 999;
+      transition: stroke-dasharray .55s var(--ease);
+    }
+
+    .donut-center {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .donut-center span {
+      color: var(--navy-soft);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .donut-center strong {
+      margin-top: 5px;
+      font-size: 34px;
+      font-weight: 950;
+      letter-spacing: -0.07em;
+    }
+
+    .donut-center small {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .donut-tooltip {
+      position: absolute;
+      left: 50%;
+      top: 14px;
+      z-index: 3;
+      display: grid;
+      gap: 3px;
+      min-width: 132px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 14px 30px rgba(16,42,67,.2);
+      transform: translate(-50%, -8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s var(--ease), transform .18s var(--ease);
+      text-align: center;
+    }
+
+    .donut-wrap:hover .donut-tooltip,
+    .donut-wrap:focus .donut-tooltip,
+    .donut-wrap.show-tooltip .donut-tooltip {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .donut-tooltip strong {
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .donut-tooltip span {
+      color: rgba(255,255,255,.78);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .donut-legend {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      color: var(--navy-soft);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .donut-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .donut-legend i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .legend-used { background: var(--navy); }
+    .legend-remain { background: #EEF4F8; }
+
+    .report-summary-card {
+      padding: 22px;
+    }
+
+    .report-summary-card h3,
+    .reason-report-card h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.05em;
+    }
+
+    .report-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .report-metrics div {
+      padding: 15px;
+      border-radius: 22px;
+      background: #F8FCFF;
+    }
+
+    .report-metrics span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .report-metrics strong {
+      display: block;
+      font-size: 23px;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+    }
+
+    #reportInsight {
+      margin: 0;
+      padding: 15px;
+      border-radius: 22px;
+      background: var(--sky-soft);
+      color: var(--navy-soft);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .reason-report-card {
+      margin-top: 16px;
+      padding: 22px;
+    }
+
+    .reason-report-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .reason-report-head span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .reason-bars {
+      display: grid;
+      gap: 12px;
+    }
+
+    .reason-bar-item {
+      display: grid;
+      gap: 7px;
+    }
+
+    .reason-bar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .reason-bar-top span:last-child {
+      color: var(--navy-soft);
+    }
+
+    .reason-track {
+      height: 12px;
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      background: #EEF4F8;
+    }
+
+    .reason-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: var(--sky-strong);
+      transition: width .55s var(--ease);
+    }
+
+    .simple-recommend-card {
+      position: sticky;
+      top: 16px;
+      overflow: hidden;
+      background: linear-gradient(155deg, var(--navy), #254B68);
+      color: #fff;
+    }
+
+    .simple-rec-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .simple-rec-head h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 18px;
+      letter-spacing: -0.05em;
+    }
+
+    .simple-rec-head span {
+      padding: 6px 9px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,.13);
+      color: rgba(255,255,255,.82);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .simple-rec-main {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(212,235,249,.16);
+    }
+
+    .simple-rec-label {
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .simple-rec-main strong {
+      color: #fff;
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+    }
+
+    .simple-rec-flow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .simple-rec-flow div {
+      padding: 11px 12px;
+      border-radius: 17px;
+      background: rgba(255,255,255,.1);
+    }
+
+    .simple-rec-flow span {
+      display: block;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,.64);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .simple-rec-flow strong {
+      display: block;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 950;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+
+    .simple-rec-result {
+      margin: 0 0 6px !important;
+      color: #fff !important;
+      font-size: 15px !important;
+      font-weight: 950;
+      line-height: 1.45 !important;
+    }
+
+    .simple-rec-desc {
+      margin: 0 !important;
+      color: rgba(255,255,255,.72) !important;
+      font-size: 12px !important;
+      line-height: 1.55 !important;
+    }
+
+
+    .simple-recommend-card {
+      padding: 22px;
+    }
+
+    .rec-conversion {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 9px;
+      margin: 12px 0 12px;
+    }
+
+    .rec-number-box {
+      min-height: 88px;
+      padding: 14px 12px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.11);
+      text-align: center;
+    }
+
+    .rec-number-box.primary {
+      background: rgba(212,235,249,.24);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+
+    .rec-number-box span {
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .rec-number-box strong {
+      color: #fff;
+      font-size: 34px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -0.08em;
+    }
+
+    .rec-arrow {
+      color: rgba(255,255,255,.7);
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .simple-rec-result {
+      margin-top: 12px !important;
+      padding: 10px 12px;
+      border-radius: 17px;
+      background: rgba(255,255,255,.1);
+      text-align: center;
+    }
+
+    .simple-rec-desc {
+      text-align: center;
+    }
+
+
+    .simple-recommend-card {
+      padding: 20px;
+    }
+
+    .rec-conversion {
+      gap: 7px;
+      margin: 10px 0 10px;
+    }
+
+    .rec-number-box {
+      min-height: 72px;
+      padding: 12px 10px;
+      border-radius: 19px;
+      gap: 6px;
+    }
+
+    .rec-number-box span {
+      font-size: 11px;
+    }
+
+    .rec-number-box strong {
+      font-size: 25px;
+      letter-spacing: -0.07em;
+    }
+
+    .rec-arrow {
+      font-size: 18px;
+    }
+
+    .simple-rec-flow {
+      gap: 7px;
+      margin-bottom: 8px;
+    }
+
+    .simple-rec-flow div {
+      padding: 10px 11px;
+      border-radius: 16px;
+    }
+
+    .simple-rec-flow span {
+      font-size: 10.5px;
+      margin-bottom: 5px;
+    }
+
+    .simple-rec-flow strong {
+      font-size: 12px;
+    }
+
+    .simple-rec-result {
+      margin-top: 9px !important;
+      padding: 9px 11px;
+      border-radius: 16px;
+      font-size: 13.5px !important;
+    }
+
+    .simple-rec-desc {
+      font-size: 11.5px !important;
+    }
+
+
+    .monthly-report-card,
+    .remaining-suggestion-card,
+    .pattern-comment-card {
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(234,241,246,.9);
+    }
+
+    .monthly-report-card {
+      margin-top: 16px;
+      padding: 22px;
+    }
+
+    .month-bars {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 8px;
+      align-items: end;
+      min-height: 128px;
+      padding-top: 10px;
+    }
+
+    .month-bar-item {
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      gap: 7px;
+      min-width: 0;
+      height: 128px;
+      align-items: end;
+      text-align: center;
+    }
+
+    .month-column {
+      width: 100%;
+      min-height: 6px;
+      border-radius: 999px 999px 8px 8px;
+      background: var(--sky);
+      transition: height .55s var(--ease);
+    }
+
+    .month-bar-item.empty .month-column {
+      background: #EEF4F8;
+    }
+
+    .month-value {
+      color: var(--navy-soft);
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .month-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .report-extra-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .remaining-suggestion-card,
+    .pattern-comment-card {
+      padding: 22px;
+    }
+
+    .remaining-suggestion-card h3,
+    .pattern-comment-card h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      letter-spacing: -0.05em;
+    }
+
+    .remaining-suggestion-card p,
+    .pattern-comment-card p {
+      margin: 0;
+      padding: 15px;
+      border-radius: 22px;
+      background: #F8FCFF;
+      color: var(--navy-soft);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    .simple-recommend-card .recommend-nav {
+      margin-top: 14px;
+    }
+
+    .simple-recommend-card .recommend-nav button {
+      height: 36px;
+      font-size: 13px;
+    }
+
+
+    @media (min-width: 981px) {
+      .calendar-card {
+        padding: 26px;
+      }
+
+      .day {
+        min-height: 112px;
+        padding: 13px 11px;
+      }
+
+      .calendar {
+        gap: 10px;
+      }
+
+      .weekdays {
+        gap: 10px;
+      }
+
+      .month-title h2 {
+        font-size: 36px;
+      }
+    }
+
+
+    .side {
+      gap: 14px;
+    }
+
+    .side-card {
+      padding: 18px;
+    }
+
+    .simple-recommend-card {
+      position: relative !important;
+      top: auto !important;
+      padding: 18px;
+    }
+
+    .simple-rec-head {
+      margin-bottom: 10px;
+    }
+
+    .simple-rec-head h3 {
+      font-size: 16px;
+    }
+
+    .rec-conversion {
+      margin: 8px 0;
+    }
+
+    .rec-number-box {
+      min-height: 64px;
+      padding: 10px 9px;
+      border-radius: 18px;
+    }
+
+    .rec-number-box strong {
+      font-size: 22px;
+    }
+
+    .simple-rec-flow {
+      margin-bottom: 7px;
+    }
+
+    .simple-rec-flow div {
+      padding: 9px 10px;
+      border-radius: 15px;
+    }
+
+    .simple-rec-result {
+      font-size: 12.8px !important;
+      padding: 8px 10px;
+    }
+
+    .simple-rec-desc {
+      font-size: 11px !important;
+    }
+
+    .simple-recommend-card .recommend-nav {
+      margin-top: 10px;
+    }
+
+    .simple-recommend-card .recommend-nav button {
+      height: 33px;
+      font-size: 12px;
+      border-radius: 13px;
+    }
+
+    .side-card h3 {
+      font-size: 16px;
+      margin-bottom: 11px;
+    }
+
+    .leave-item {
+      grid-template-columns: 42px 1fr auto;
+      gap: 9px;
+      padding: 10px;
+      border-radius: 19px;
+    }
+
+    .leave-date {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+    }
+
+    .leave-meta strong {
+      font-size: 13px;
+    }
+
+    .leave-meta span {
+      max-width: 120px;
+      font-size: 11px;
+    }
+
+    .delete-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 12px;
+    }
+
+    .empty-state {
+      padding: 14px;
+      border-radius: 19px;
+      font-size: 12.5px;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mini-panel {
+        order: -1;
+      }
+
+      .dashboard {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .settings-btn {
+        grid-column: 1 / -1;
+        width: 100%;
+        height: 52px;
+      }
+
+      .recommend-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .app {
+        padding: 20px 14px 96px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .today-chip {
+        display: none;
+      }
+
+      .brand-mark {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+
+      .dashboard {
+        padding: 12px;
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card {
+        min-height: 92px;
+        padding: 18px;
+      }
+
+      .calendar-card {
+        padding: 14px;
+        border-radius: 28px;
+      }
+
+      .calendar-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-btns {
+        width: 100%;
+      }
+
+      .today-btn {
+        flex: 1;
+      }
+
+      .weekdays,
+      .calendar {
+        gap: 3px;
+      }
+
+      .weekday {
+        height: 28px;
+      }
+
+      .day {
+        min-height: 74px;
+        padding: 7px 4px;
+        border-radius: 17px;
+      }
+
+      .day-number {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+      }
+
+      .holiday-dot {
+        display: none;
+      }
+
+      .holiday-name {
+        font-size: 9px;
+      }
+
+      .event-pill {
+        padding: 4px 3px;
+        font-size: 8.6px;
+        gap: 2px;
+        letter-spacing: -0.08em;
+      }
+
+      .event-pill.range-mid,
+      .event-pill.range-end {
+        height: 7px;
+        min-height: 7px;
+        margin-top: 7px;
+        padding: 0;
+      }
+
+      .side-card {
+        padding: 18px;
+        border-radius: 28px;
+      }
+
+      .view-tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .view-tab {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .report-card {
+        padding: 16px;
+        border-radius: 28px;
+      }
+
+      .report-header {
+        flex-direction: column;
+      }
+
+      .report-back {
+        width: 100%;
+      }
+
+      .report-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .donut-card {
+        min-height: 280px;
+      }
+
+      .donut-wrap {
+        width: 190px;
+        height: 190px;
+      }
+
+      .donut-center strong {
+        font-size: 29px;
+      }
+
+      .report-metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .simple-rec-flow {
+        grid-template-columns: 1fr;
+      }
+
+
+      .rec-number-box {
+        min-height: 68px;
+      }
+
+      .rec-number-box strong {
+        font-size: 23px;
+      }
+
+      .rec-arrow {
+        font-size: 16px;
+      }
+
+      .month-bars {
+        gap: 4px;
+        min-height: 112px;
+      }
+
+      .month-bar-item {
+        height: 112px;
+      }
+
+      .month-value {
+        display: none;
+      }
+
+      .report-extra-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .rec-number-box {
+        min-height: 68px;
+      }
+
+      .rec-number-box strong {
+        font-size: 23px;
+      }
+
+
+
+      .recommend-summary {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .summary-box strong {
+        font-size: 21px;
+      }
+
+      .recommend-date-card strong {
+        font-size: 14px;
+      }
+
+
+      .type-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .date-input-row {
+        grid-template-columns: 1fr;
+      }
+
+      .sheet-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .clear-btn {
+        order: -1;
+      }
+
+      .fab {
+        right: 16px;
+        bottom: 18px;
+        width: 60px;
+        height: 60px;
+        border-radius: 22px;
+      }
+    }
+
+    .simple-recommend-card .recommend-date-card,
+    .simple-recommend-card .recommend-summary,
+    .simple-recommend-card .recommend-highlight,
+    .simple-recommend-card .recommend-intro,
+    .simple-recommend-card .recommend-kicker,
+    .simple-recommend-card .recommend-head {
+      display: none !important;
+    }
+
+
+    .side .recommend-card,
+    .side .simple-recommend-card {
+      position: relative !important;
+      top: auto !important;
+    }
+
+
+    .auth-screen {
+      min-height: 100vh;
+      display: none;
+      place-items: center;
+      padding: 28px 20px;
+    }
+
+    body.auth-mode .auth-screen {
+      display: grid;
+    }
+
+    body.auth-mode .app,
+    body.auth-mode .fab,
+    body.auth-mode .bottom-sheet,
+    body.auth-mode .modal,
+    body.auth-mode .overlay {
+      display: none !important;
+    }
+
+    .auth-card {
+      width: min(520px, 100%);
+      padding: 36px;
+      border-radius: 36px;
+      background: rgba(255,255,255,.82);
+      box-shadow: var(--shadow);
+      text-align: center;
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,.72);
+    }
+
+    .auth-logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      display: grid;
+      place-items: center;
+      border-radius: 26px;
+      background: var(--sky);
+      color: var(--navy);
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -0.08em;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .auth-card h1 {
+      margin: 0;
+      font-size: 38px;
+      letter-spacing: -0.07em;
+    }
+
+    .auth-card p {
+      margin: 12px auto 26px;
+      max-width: 360px;
+      color: var(--navy-soft);
+      line-height: 1.6;
+      font-weight: 700;
+      word-break: keep-all;
+    }
+
+    .google-login-btn {
+      width: 100%;
+      min-height: 56px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border-radius: 20px;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 900;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .auth-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px 9px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow-soft);
+      color: var(--navy-soft);
+      font-weight: 900;
+      font-size: 12px;
+      max-width: 320px;
+    }
+
+    .user-chip span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .logout-btn {
+      min-width: 72px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
+      background: #F1F6FA;
+      color: var(--navy-soft);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #8FCB9B;
+    }
+
+    @media (max-width: 720px) {
+      .auth-card {
+        padding: 30px 22px;
+      }
+
+      .topbar-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .user-chip {
+        max-width: 100%;
+      }
+    }
+
+  </style>
+</head>
+<body class="auth-mode">
+  <section class="auth-screen" id="authScreen" aria-label="로그인 화면">
+    <div class="auth-card">
+      <div class="auth-logo">쉼</div>
+      <h1>쉼표</h1>
+      <p>Google 계정으로 로그인하면 어느 기기에서든 나의 연차 기록을 이어서 사용할 수 있어요.</p>
+      <button class="google-login-btn" id="googleLogin" type="button">
+        <span>G</span>
+        <strong>Google로 시작하기</strong>
+      </button>
+      <div class="auth-note">로그인 후 등록한 연차와 설정은 Supabase에 사용자별로 안전하게 저장돼요.</div>
+    </div>
+  </section>
+
+  <div class="app" id="appRoot">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">쉼</div>
+        <div>
+          <h1>쉼표</h1>
+          <p>Google 계정으로 이어 쓰는 연차 캘린더</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="today-chip" id="todayChip"></div>
+        <div class="user-chip" title="로그인 계정">
+          <span id="userEmail">로그인 확인 중</span>
+          <button class="logout-btn" id="logoutBtn" type="button">로그아웃</button>
+        </div>
+        <div class="sync-status" title="Supabase 동기화 사용 중"><i class="sync-dot"></i> Cloud Sync</div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="dashboard">
+        <article class="stat-card">
+          <div class="stat-label">총 연차</div>
+          <div class="stat-value"><span id="totalLeave">0.00</span><span class="stat-unit">일</span></div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-label">사용한 연차</div>
+          <div class="stat-value"><span id="usedLeave">0.00</span><span class="stat-unit">일</span></div>
+        </article>
+        <article class="stat-card primary">
+          <div class="stat-label">잔여 연차</div>
+          <div class="stat-value"><span id="remainLeave">0.00</span><span class="stat-unit">일</span></div>
+        </article>
+        <button class="settings-btn" id="openSettings" aria-label="연차 설정">⚙</button>
+      </div>
+
+      <aside class="mini-panel">
+        <h2>오늘도 무리하지 말고, 쉼표 하나.</h2>
+        <p>연차, 반차, 반반차는 자동 차감하고 경조사/공가/기타 휴가는 기록만 남겨요.</p>
+        <div class="quick-row">
+          <span class="quick-pill">연차 -1</span>
+          <span class="quick-pill">반차 -0.5</span>
+          <span class="quick-pill">반반차 -0.25</span>
+        </div>
+      </aside>
+    </section>
+
+    <div class="view-tabs" aria-label="보기 전환">
+      <button class="view-tab active" id="calendarTab" type="button">캘린더</button>
+      <button class="view-tab" id="reportTab" type="button">연차 리포트</button>
+    </div>
+
+    <main class="main-grid">
+      <section class="calendar-card calendar-view active" id="calendarView">
+        <div class="calendar-header">
+          <div class="month-title">
+            <h2 id="monthTitle"></h2>
+            <span id="monthCount">0건</span>
+          </div>
+          <div class="nav-btns">
+            <button class="nav-btn" id="prevMonth" aria-label="이전 달">‹</button>
+            <button class="today-btn" id="goToday">오늘</button>
+            <button class="nav-btn" id="nextMonth" aria-label="다음 달">›</button>
+          </div>
+        </div>
+
+        <div class="weekdays">
+          <div class="weekday sun">일</div>
+          <div class="weekday">월</div>
+          <div class="weekday">화</div>
+          <div class="weekday">수</div>
+          <div class="weekday">목</div>
+          <div class="weekday">금</div>
+          <div class="weekday sat">토</div>
+        </div>
+        <div class="calendar" id="calendar"></div>
+      </section>
+
+      <section class="report-card report-view" id="reportView" aria-label="연차 리포트">
+        <div class="report-header">
+          <div>
+            <span class="report-kicker">MY REST REPORT</span>
+            <h2>연차 리포트</h2>
+            <p>총 연차 중 얼마나 쉬었는지, 어떤 이유로 쉬었는지 한눈에 확인해요.</p>
+          </div>
+          <button class="report-back" id="backToCalendar" type="button">캘린더 보기</button>
+        </div>
+
+        <div class="report-grid">
+          <article class="donut-card">
+            <div class="donut-wrap" id="donutWrap" tabindex="0" role="button" aria-label="연차 사용률 보기">
+              <svg class="donut-svg" viewBox="0 0 160 160" aria-hidden="true">
+                <circle class="donut-bg" cx="80" cy="80" r="58"></circle>
+                <circle class="donut-used" id="donutUsed" cx="80" cy="80" r="58"></circle>
+              </svg>
+              <div class="donut-center">
+                <span id="donutLabel">잔여</span>
+                <strong id="donutRemain">0일</strong>
+                <small id="donutPercent">0% 사용</small>
+              </div>
+              <div class="donut-tooltip" id="donutTooltip">
+                <strong>사용한 연차</strong>
+                <span id="donutTooltipText">0일 / 0일</span>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <span><i class="legend-used"></i>사용</span>
+              <span><i class="legend-remain"></i>잔여</span>
+            </div>
+          </article>
+
+          <article class="report-summary-card">
+            <h3>사용 요약</h3>
+            <div class="report-metrics">
+              <div>
+                <span>총 연차</span>
+                <strong id="reportTotal">0일</strong>
+              </div>
+              <div>
+                <span>사용</span>
+                <strong id="reportUsed">0일</strong>
+              </div>
+              <div>
+                <span>잔여</span>
+                <strong id="reportRemain">0일</strong>
+              </div>
+              <div>
+                <span>사용률</span>
+                <strong id="reportPercent">0%</strong>
+              </div>
+            </div>
+            <p id="reportInsight">아직 등록된 연차가 없어요. 첫 쉼표를 기록해 보세요.</p>
+          </article>
+        </div>
+
+        <article class="reason-report-card">
+          <div class="reason-report-head">
+            <h3>사유별 사용량</h3>
+            <span id="reasonTotalText">0일 사용</span>
+          </div>
+          <div class="reason-bars" id="reasonBars"></div>
+        </article>
+
+        <article class="monthly-report-card">
+          <div class="reason-report-head">
+            <h3>월별 사용 추이</h3>
+            <span id="monthlyTotalText">올해 기준</span>
+          </div>
+          <div class="month-bars" id="monthBars"></div>
+        </article>
+
+        <div class="report-extra-grid">
+          <article class="remaining-suggestion-card">
+            <h3>남은 연차 사용법</h3>
+            <p id="remainingSuggestionText">잔여 연차를 기준으로 추천 조합을 보여드릴게요.</p>
+          </article>
+          <article class="pattern-comment-card">
+            <h3>쉼 패턴 코멘트</h3>
+            <p id="patternCommentText">연차를 등록하면 나의 쉼 패턴을 분석해드려요.</p>
+          </article>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="side-card recommend-card simple-recommend-card">
+          <div class="simple-rec-head">
+            <h3>스마트 연차 추천</h3>
+            <span id="recommendCount">0/0</span>
+          </div>
+
+          <div class="rec-conversion">
+            <div class="rec-number-box">
+              <span>연차</span>
+              <strong id="recommendUseDays">-</strong>
+            </div>
+            <div class="rec-arrow">→</div>
+            <div class="rec-number-box primary">
+              <span>총 휴식</span>
+              <strong id="recommendRestDays">-</strong>
+            </div>
+          </div>
+
+          <div class="simple-rec-flow">
+            <div>
+              <span>쉼 시작</span>
+              <strong id="recommendStartDate">-</strong>
+            </div>
+            <div>
+              <span>쉼 종료</span>
+              <strong id="recommendEndDate">-</strong>
+            </div>
+          </div>
+
+          <p class="simple-rec-result" id="recommendText">추천을 확인하는 중이에요.</p>
+          <p class="simple-rec-desc" id="recommendDesc">오늘 이후 6개월 안의 징검다리 휴일을 찾아 추천해요.</p>
+
+          <div class="recommend-nav">
+            <button id="prevRec">이전</button>
+            <button id="nextRec">다음</button>
+          </div>
+        </section>
+
+        <section class="side-card">
+          <h3>다가오는 쉼</h3>
+          <div class="list" id="upcomingList"></div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <button class="fab" id="fab" aria-label="휴가 등록">+</button>
+
+  <div class="overlay" id="overlay"></div>
+
+  <section class="bottom-sheet" id="sheet" aria-modal="true" role="dialog">
+    <div class="handle"></div>
+    <div class="sheet-head">
+      <div>
+        <h2>휴가 등록</h2>
+        <p id="sheetSub">날짜와 휴가 종류를 선택해 주세요.</p>
+      </div>
+      <button class="close-btn" id="closeSheet" aria-label="닫기">×</button>
+    </div>
+
+    <div class="form-section">
+      <label class="title">날짜 선택</label>
+      <div class="date-input-row">
+        <input class="date-field" type="date" id="startDate" />
+        <input class="date-field" type="date" id="endDate" />
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="title">휴가 종류 선택</label>
+      <div class="type-grid" id="typeGrid"></div>
+    </div>
+
+    <div class="form-section">
+      <label class="title">사유 선택 태그</label>
+      <div class="reason-tags" id="reasonTags"></div>
+      <div class="custom-reason-wrap" id="customReasonWrap">
+        <div class="custom-reason-inner">
+          <input class="text-field" id="customReason" type="text" placeholder="사유를 직접 입력해 주세요" />
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="save-btn" id="saveLeave">등록 완료</button>
+      <button class="clear-btn" id="deleteForDate">이 날짜 삭제</button>
+    </div>
+  </section>
+
+  <section class="modal" id="settingsModal" aria-modal="true" role="dialog">
+    <h2>연차 설정</h2>
+    <p>올해 사용할 수 있는 총 연차 개수를 입력해 주세요. 저장하면 대시보드에 바로 반영돼요.</p>
+    <input class="date-field" id="totalInput" type="number" min="0" max="365" step="0.25" />
+    <div class="modal-actions">
+      <button class="ghost" id="closeSettings">닫기</button>
+      <button class="solid" id="saveSettings">저장</button>
+    </div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    /************************************************************
+     * 쉼표 데이터 저장 계층
+     * Google 로그인 사용자별 Supabase DB 저장 버전입니다.
+     ************************************************************/
+    const SUPABASE_URL = "https://jbhbjhjdzmsmziyjxfyh.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_3KfcxlsmCdxaCjVbhzhtQg_PEro1iKi";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let holidayMapCache = {};
+    let appEventsBound = false;
+
+    function normalizeLeaveFromRow(row) {
+      return {
+        id: row.id,
+        startDate: row.start_date,
+        endDate: row.end_date,
+        type: row.type,
+        reason: row.reason || "",
+        createdAt: row.created_at || new Date().toISOString()
+      };
+    }
+
+    function normalizeLeaveToRow(leave) {
+      return {
+        id: leave.id,
+        user_id: currentUser.id,
+        start_date: leave.startDate,
+        end_date: leave.endDate || leave.startDate,
+        type: leave.type,
+        reason: leave.reason || "",
+        created_at: leave.createdAt || new Date().toISOString()
+      };
+    }
+
+    async function loadHolidaysFromSupabase() {
+      const { data, error } = await supabaseClient
+        .from("holidays")
+        .select("date,name,is_holiday")
+        .eq("is_holiday", true);
+
+      if (error) {
+        console.warn("공휴일 DB 로드 실패, 기본 내장 데이터를 사용합니다.", error);
+        holidayMapCache = {};
+        return;
+      }
+
+      holidayMapCache = Object.fromEntries((data || []).map(item => [item.date, item.name]));
+    }
+
+    const storage = {
+      async load() {
+        if (!currentUser) return null;
+
+        await loadHolidaysFromSupabase();
+
+        const { data: settings, error: settingsError } = await supabaseClient
+          .from("annual_settings")
+          .select("total_leave")
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+
+        if (settingsError) throw settingsError;
+
+        if (!settings) {
+          await supabaseClient
+            .from("annual_settings")
+            .upsert({
+              user_id: currentUser.id,
+              total_leave: 15,
+              updated_at: new Date().toISOString()
+            }, { onConflict: "user_id" });
+        }
+
+        const { data: leaves, error: leavesError } = await supabaseClient
+          .from("annual_leaves")
+          .select("id,start_date,end_date,type,reason,created_at")
+          .eq("user_id", currentUser.id)
+          .order("start_date", { ascending: true });
+
+        if (leavesError) throw leavesError;
+
+        return {
+          settings: { totalLeave: Number(settings?.total_leave ?? 15) },
+          leaves: (leaves || []).map(normalizeLeaveFromRow)
+        };
+      },
+
+      async save(data) {
+        if (!currentUser) throw new Error("로그인이 필요합니다.");
+
+        const totalLeave = Number(data.settings?.totalLeave ?? 15);
+
+        const { error: settingsError } = await supabaseClient
+          .from("annual_settings")
+          .upsert({
+            user_id: currentUser.id,
+            total_leave: totalLeave,
+            updated_at: new Date().toISOString()
+          }, { onConflict: "user_id" });
+
+        if (settingsError) throw settingsError;
+
+        const { error: deleteError } = await supabaseClient
+          .from("annual_leaves")
+          .delete()
+          .eq("user_id", currentUser.id);
+
+        if (deleteError) throw deleteError;
+
+        const rows = (data.leaves || []).map(normalizeLeaveToRow);
+        if (!rows.length) return;
+
+        const { error: insertError } = await supabaseClient
+          .from("annual_leaves")
+          .insert(rows);
+
+        if (insertError) throw insertError;
+      },
+
+      async remove() {
+        if (!currentUser) return;
+
+        await supabaseClient
+          .from("annual_leaves")
+          .delete()
+          .eq("user_id", currentUser.id);
+      }
+    };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const pad = n => String(n).padStart(2, "0");
+    const toISO = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const parseISO = iso => {
+      const [y, m, d] = iso.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    };
+    const addDays = (date, days) => {
+      const d = new Date(date);
+      d.setDate(d.getDate() + days);
+      return d;
+    };
+    const addMonths = (date, months) => {
+      const d = new Date(date);
+      d.setMonth(d.getMonth() + months);
+      return d;
+    };
+
+    const dayLabel = ["일", "월", "화", "수", "목", "금", "토"];
+    const money = n => Number(n || 0).toFixed(2);
+    const isSameDay = (a, b) => toISO(a) === toISO(b);
+    const isWeekend = d => d.getDay() === 0 || d.getDay() === 6;
+    const isWeekday = d => !isWeekend(d);
+    const clampDateRange = (startISO, endISO) => {
+      const start = parseISO(startISO);
+      const end = parseISO(endISO || startISO);
+      return start <= end ? [start, end] : [end, start];
+    };
+
+    const leaveTypes = [
+      { id: "annual", label: "연차", icon: "🏖️", unit: 1, countable: true },
+      { id: "amHalf", label: "오전반차", icon: "🌤️", unit: 0.5, countable: true },
+      { id: "pmHalf", label: "오후반차", icon: "🌙", unit: 0.5, countable: true },
+      { id: "quarter", label: "반반차", icon: "⏱️", unit: 0.25, countable: true },
+      { id: "etc", label: "경조사/공가", icon: "🎁", unit: 0, countable: false }
+    ];
+
+    const reasonOptions = [
+      "🎂 생일/기념일",
+      "✈️ 여행",
+      "🏥 병원/검진",
+      "🏡 늦잠/휴식",
+      "👨‍👩‍👧 가족행사",
+      "✏️ 직접 입력"
+    ];
+
+    /*
+      기본 공휴일 데이터:
+      - 현재 버전은 앱 내부에 직접 저장된 정적 holidaySeed 데이터를 사용합니다.
+      - 새 법정공휴일, 임시공휴일, 대체공휴일이 생기면 아래 holidaySeed를 갱신해야 합니다.
+      - 추후 Supabase 또는 공공데이터 API를 연결하면 주기적 업데이트 구조로 바꿀 수 있습니다.
+    */
+    const holidaySeed = {
+      2026: {
+        "2026-01-01": "신정",
+        "2026-02-16": "설날 연휴",
+        "2026-02-17": "설날",
+        "2026-02-18": "설날 연휴",
+        "2026-03-01": "삼일절",
+        "2026-03-02": "대체공휴일",
+        "2026-05-05": "어린이날",
+        "2026-05-24": "부처님오신날",
+        "2026-05-25": "대체공휴일",
+        "2026-06-03": "지방선거일",
+        "2026-06-06": "현충일",
+        "2026-07-17": "제헌절",
+        "2026-08-15": "광복절",
+        "2026-08-17": "대체공휴일",
+        "2026-09-24": "추석 연휴",
+        "2026-09-25": "추석",
+        "2026-09-26": "추석 연휴",
+        "2026-09-28": "대체공휴일",
+        "2026-10-03": "개천절",
+        "2026-10-05": "대체공휴일",
+        "2026-10-09": "한글날",
+        "2026-12-25": "성탄절"
+      },
+      2027: {
+        "2027-01-01": "신정",
+        "2027-02-06": "설날 연휴",
+        "2027-02-07": "설날",
+        "2027-02-08": "설날 연휴",
+        "2027-02-09": "대체공휴일",
+        "2027-03-01": "삼일절",
+        "2027-05-05": "어린이날",
+        "2027-05-13": "부처님오신날",
+        "2027-06-06": "현충일",
+        "2027-07-17": "제헌절",
+        "2027-08-15": "광복절",
+        "2027-08-16": "대체공휴일",
+        "2027-09-14": "추석 연휴",
+        "2027-09-15": "추석",
+        "2027-09-16": "추석 연휴",
+        "2027-10-03": "개천절",
+        "2027-10-04": "대체공휴일",
+        "2027-10-09": "한글날",
+        "2027-10-11": "대체공휴일",
+        "2027-12-25": "성탄절",
+        "2027-12-27": "대체공휴일"
+      },
+      2028: {
+        "2028-01-01": "신정",
+        "2028-01-26": "설날 연휴",
+        "2028-01-27": "설날",
+        "2028-01-28": "설날 연휴",
+        "2028-03-01": "삼일절",
+        "2028-05-02": "부처님오신날",
+        "2028-05-05": "어린이날",
+        "2028-06-06": "현충일",
+        "2028-07-17": "제헌절",
+        "2028-08-15": "광복절",
+        "2028-10-02": "추석 연휴",
+        "2028-10-03": "추석/개천절",
+        "2028-10-04": "추석 연휴",
+        "2028-10-05": "대체공휴일",
+        "2028-10-09": "한글날",
+        "2028-12-25": "성탄절"
+      }
+    };
+
+    let state = {
+      settings: {
+        totalLeave: 15
+      },
+      leaves: []
+    };
+
+    let viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    let selectedType = "annual";
+    let selectedReason = reasonOptions[0];
+    let selectedDateISO = toISO(today);
+    let recommendations = [];
+    let recIndex = 0;
+    let currentView = "calendar";
+
+    const $ = sel => document.querySelector(sel);
+    const calendarEl = $("#calendar");
+    const typeGrid = $("#typeGrid");
+    const reasonTags = $("#reasonTags");
+
+    function getHolidayMap() {
+      return Object.keys(holidayMapCache).length
+        ? holidayMapCache
+        : Object.assign({}, ...Object.values(holidaySeed));
+    }
+
+    function getType(id) {
+      return leaveTypes.find(t => t.id === id) || leaveTypes[0];
+    }
+
+    function eachDate(start, end) {
+      const out = [];
+      let d = new Date(start);
+      while (d <= end) {
+        out.push(new Date(d));
+        d.setDate(d.getDate() + 1);
+      }
+      return out;
+    }
+
+    function calcLeaveAmount(leave) {
+      const type = getType(leave.type);
+      if (!type.countable) return 0;
+
+      const [start, end] = clampDateRange(leave.startDate, leave.endDate);
+      const days = eachDate(start, end).filter(d => {
+        const iso = toISO(d);
+        return isWeekday(d) && !getHolidayMap()[iso];
+      }).length;
+
+      return days * type.unit;
+    }
+
+    function calcSummary() {
+      const total = Number(state.settings.totalLeave || 0);
+      const used = state.leaves.reduce((sum, leave) => sum + calcLeaveAmount(leave), 0);
+      const remain = total - used;
+      return { total, used, remain };
+    }
+
+    async function persist() {
+      try {
+        await storage.save(state);
+      } catch (error) {
+        console.error(error);
+        showToast("저장 중 오류가 발생했어요. Supabase 설정을 확인해 주세요.");
+        throw error;
+      }
+    }
+
+
+    function formatDays(value) {
+      const n = Math.round((Number(value || 0) + Number.EPSILON) * 100) / 100;
+      return `${n.toLocaleString("ko-KR", {
+        minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+      })}일`;
+    }
+
+    function getLeaveReason(leave) {
+      return leave.reason || "사유 없음";
+    }
+
+    function setViewMode(mode) {
+      currentView = mode;
+      const isReport = mode === "report";
+
+      $("#calendarTab").classList.toggle("active", !isReport);
+      $("#reportTab").classList.toggle("active", isReport);
+      $("#calendarView").classList.toggle("active", !isReport);
+      $("#reportView").classList.toggle("active", isReport);
+      $(".main-grid").classList.toggle("report-mode", isReport);
+
+      if (isReport) renderReport();
+    }
+
+    function getReasonUsage() {
+      const map = new Map();
+
+      state.leaves.forEach(leave => {
+        const amount = calcLeaveAmount(leave);
+        if (amount <= 0) return;
+
+        const reason = getLeaveReason(leave);
+        map.set(reason, (map.get(reason) || 0) + amount);
+      });
+
+      return [...map.entries()]
+        .map(([reason, amount]) => ({ reason, amount }))
+        .sort((a, b) => b.amount - a.amount);
+    }
+
+
+    function getCurrentMonthUsed() {
+      const y = today.getFullYear();
+      const m = today.getMonth();
+
+      return state.leaves.reduce((sum, leave) => {
+        const [start, end] = clampDateRange(leave.startDate, leave.endDate);
+        const dates = eachDate(start, end).filter(d => d.getFullYear() === y && d.getMonth() === m);
+        if (!dates.length) return sum;
+
+        const cloned = Object.assign({}, leave, {
+          startDate: toISO(dates[0]),
+          endDate: toISO(dates[dates.length - 1])
+        });
+
+        return sum + calcLeaveAmount(cloned);
+      }, 0);
+    }
+
+
+    function getMonthlyUsage() {
+      const currentYear = today.getFullYear();
+      const monthly = Array.from({ length: 12 }, (_, index) => ({
+        month: index + 1,
+        amount: 0
+      }));
+
+      state.leaves.forEach(leave => {
+        const [start, end] = clampDateRange(leave.startDate, leave.endDate);
+        eachDate(start, end).forEach(date => {
+          if (date.getFullYear() !== currentYear) return;
+
+          const iso = toISO(date);
+          const type = getType(leave.type);
+          if (!type.countable) return;
+          if (!isWeekday(date) || getHolidayMap()[iso]) return;
+
+          monthly[date.getMonth()].amount += type.unit;
+        });
+      });
+
+      return monthly;
+    }
+
+    function renderMonthlyUsage() {
+      const monthly = getMonthlyUsage();
+      const max = Math.max(...monthly.map(item => item.amount), 0);
+      const total = monthly.reduce((sum, item) => sum + item.amount, 0);
+
+      $("#monthlyTotalText").textContent = `${today.getFullYear()}년 · ${formatDays(total)} 사용`;
+
+      if (total <= 0) {
+        $("#monthBars").innerHTML = monthly.map(item => `
+          <div class="month-bar-item empty">
+            <div class="month-column" style="height:6px"></div>
+            <span class="month-value">0</span>
+            <span class="month-label">${item.month}월</span>
+          </div>
+        `).join("");
+        return;
+      }
+
+      $("#monthBars").innerHTML = monthly.map(item => {
+        const height = item.amount > 0 ? Math.max(8, (item.amount / max) * 88) : 6;
+        return `
+          <div class="month-bar-item ${item.amount ? "" : "empty"}" title="${item.month}월 ${formatDays(item.amount)}">
+            <div class="month-column" style="height:${height}px"></div>
+            <span class="month-value">${item.amount ? formatDays(item.amount).replace("일", "") : "0"}</span>
+            <span class="month-label">${item.month}월</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderRemainingSuggestion(remain) {
+      if (remain <= 0) {
+        $("#remainingSuggestionText").textContent = "남은 연차가 없어요. 다음 연차가 생기면 미리 쉬는 날을 예약해 보세요.";
+        return;
+      }
+
+      const full = Math.floor(remain);
+      const halfPossible = Math.floor((remain - full) / 0.5);
+      const quarterPossible = Math.floor((remain % 1) / 0.25);
+
+      const suggestions = [];
+      if (full > 0) suggestions.push(`연차 ${full}번`);
+      if (halfPossible > 0) suggestions.push(`반차 ${halfPossible}번`);
+      if (quarterPossible > 0) suggestions.push(`반반차 ${quarterPossible}번`);
+
+      const halfCount = Math.floor(remain / 0.5);
+      const quarterCount = Math.floor(remain / 0.25);
+
+      $("#remainingSuggestionText").textContent =
+        `잔여 ${formatDays(remain)}로 ${suggestions.join(" + ")} 정도 사용할 수 있어요. 작게 나누면 반차 ${halfCount}번 또는 반반차 ${quarterCount}번으로도 쓸 수 있어요.`;
+    }
+
+    function renderPatternComment(reasonUsage) {
+      const used = calcSummary().used;
+
+      if (used <= 0 || !reasonUsage.length) {
+        $("#patternCommentText").textContent = "아직 사용한 연차가 없어요. 연차를 등록하면 나의 쉼 패턴을 부드럽게 분석해드려요.";
+        return;
+      }
+
+      const top = reasonUsage[0];
+      const reason = top.reason;
+
+      if (reason.includes("여행")) {
+        $("#patternCommentText").textContent = "여행을 위한 쉼이 가장 많아요. 긴 휴가를 만들 수 있는 징검다리 연휴를 함께 확인해 보세요.";
+      } else if (reason.includes("병원") || reason.includes("검진")) {
+        $("#patternCommentText").textContent = "건강 관리를 위한 쉼이 많아요. 반차나 오전 시간을 활용한 계획이 잘 맞는 패턴이에요.";
+      } else if (reason.includes("휴식") || reason.includes("늦잠")) {
+        $("#patternCommentText").textContent = "회복을 위한 쉼이 많아요. 한 달에 한 번 작은 쉼표를 미리 예약해두면 좋아요.";
+      } else if (reason.includes("가족")) {
+        $("#patternCommentText").textContent = "가족 일정과 함께한 쉼이 많아요. 주말과 붙여 쓰는 연차 계획이 잘 어울려요.";
+      } else if (reason.includes("생일") || reason.includes("기념일")) {
+        $("#patternCommentText").textContent = "기념일을 챙기는 쉼이 눈에 띄어요. 중요한 날을 미리 등록해두면 더 여유로워요.";
+      } else {
+        $("#patternCommentText").textContent = `${reason} 사유가 가장 많아요. 나에게 필요한 쉼의 흐름이 조금씩 쌓이고 있어요.`;
+      }
+    }
+
+    function renderReport() {
+      const { total, used, remain } = calcSummary();
+      const percent = total > 0 ? Math.min(100, Math.max(0, (used / total) * 100)) : 0;
+      const radius = 58;
+      const circumference = 2 * Math.PI * radius;
+      const usedLength = circumference * (percent / 100);
+      const remainLength = circumference - usedLength;
+
+      $("#donutUsed").style.strokeDasharray = `${usedLength} ${remainLength}`;
+      $("#donutRemain").textContent = formatDays(remain);
+      $("#donutPercent").textContent = `${percent.toFixed(1)}% 사용`;
+      $("#donutTooltipText").textContent = `${formatDays(used)} / ${formatDays(total)} · 잔여 ${formatDays(remain)}`;
+
+      $("#reportTotal").textContent = formatDays(total);
+      $("#reportUsed").textContent = formatDays(used);
+      $("#reportRemain").textContent = formatDays(remain);
+      $("#reportPercent").textContent = `${percent.toFixed(1)}%`;
+
+      const reasonUsage = getReasonUsage();
+      const topReason = reasonUsage[0];
+
+      if (used <= 0) {
+        $("#reportInsight").textContent = "아직 사용한 연차가 없어요. 첫 쉼표를 기록하면 이곳에 사용 패턴이 보여요.";
+      } else if (topReason) {
+        const monthUsed = getCurrentMonthUsed();
+        $("#reportInsight").textContent = `가장 많이 사용한 사유는 ${topReason.reason}이고, 총 ${formatDays(topReason.amount)}를 사용했어요. 이번 달에는 ${formatDays(monthUsed)}를 사용했어요.`;
+      }
+
+      $("#reasonTotalText").textContent = `${formatDays(used)} 사용`;
+
+      renderMonthlyUsage();
+      renderRemainingSuggestion(remain);
+      renderPatternComment(reasonUsage);
+
+      if (!reasonUsage.length) {
+        $("#reasonBars").innerHTML = `<div class="empty-state">아직 사유별 사용 데이터가 없어요.<br>연차를 등록하면 자동으로 분석돼요.</div>`;
+        return;
+      }
+
+      const max = Math.max(...reasonUsage.map(item => item.amount), 1);
+      $("#reasonBars").innerHTML = reasonUsage.map(item => {
+        const width = Math.max(6, (item.amount / max) * 100);
+        return `
+          <div class="reason-bar-item">
+            <div class="reason-bar-top">
+              <span>${item.reason}</span>
+              <span>${formatDays(item.amount)}</span>
+            </div>
+            <div class="reason-track">
+              <div class="reason-fill" style="width:${width}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderDashboard() {
+      const { total, used, remain } = calcSummary();
+      $("#totalLeave").textContent = money(total);
+      $("#usedLeave").textContent = money(used);
+      $("#remainLeave").textContent = money(remain);
+      $("#totalInput").value = total;
+    }
+
+    function renderTypeButtons() {
+      typeGrid.innerHTML = leaveTypes.map(t => `
+        <button class="type-btn ${selectedType === t.id ? "active" : ""}" data-type="${t.id}">
+          ${t.icon} ${t.label}
+          <small>${t.countable ? `-${t.unit}일` : "차감 없음"}</small>
+        </button>
+      `).join("");
+
+      typeGrid.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedType = btn.dataset.type;
+          renderTypeButtons();
+        });
+      });
+    }
+
+    function renderReasonTags() {
+      reasonTags.innerHTML = reasonOptions.map(reason => `
+        <button class="reason-tag ${selectedReason === reason ? "active" : ""}" data-reason="${reason}">
+          ${reason}
+        </button>
+      `).join("");
+
+      reasonTags.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedReason = btn.dataset.reason;
+          renderReasonTags();
+          updateCustomReasonMotion();
+        });
+      });
+
+      updateCustomReasonMotion();
+    }
+
+    function leavesForDate(iso) {
+      return state.leaves.filter(l => {
+        const [start, end] = clampDateRange(l.startDate, l.endDate);
+        const date = parseISO(iso);
+        return date >= start && date <= end;
+      });
+    }
+
+
+    function leavePositionOnDate(leave, iso) {
+      if (leave.startDate === leave.endDate) return "single";
+      if (iso === leave.startDate) return "start";
+      if (iso === leave.endDate) return "end";
+      return "mid";
+    }
+
+    function leaveDurationLabel(leave) {
+      const [start, end] = clampDateRange(leave.startDate, leave.endDate);
+      const holidayMap = getHolidayMap();
+      const type = getType(leave.type);
+      const days = eachDate(start, end).filter(d => {
+        if (!type.countable) return true;
+        return isWeekday(d) && !holidayMap[toISO(d)];
+      }).length;
+
+      if (days <= 1) return "";
+      return `${days}일`;
+    }
+
+    function calendarEventLabel(leave, iso) {
+      const type = getType(leave.type);
+      const position = leavePositionOnDate(leave, iso);
+
+      if (position === "mid" || position === "end") {
+        return "";
+      }
+
+      const duration = leaveDurationLabel(leave);
+      return duration ? `${type.icon} ${type.label} ${duration}` : `${type.icon} ${type.label}`;
+    }
+
+    function calendarEventClass(leave, iso) {
+      const type = getType(leave.type);
+      const position = leavePositionOnDate(leave, iso);
+      const classes = ["event-pill"];
+
+      if (!type.countable) classes.push("free");
+      if (position === "start") classes.push("range-start");
+      if (position === "mid") classes.push("range-mid");
+      if (position === "end") classes.push("range-end");
+
+      return classes.join(" ");
+    }
+
+    function renderCalendar() {
+      const y = viewDate.getFullYear();
+      const m = viewDate.getMonth();
+      const first = new Date(y, m, 1);
+      const last = new Date(y, m + 1, 0);
+      const startBlank = first.getDay();
+      const totalCells = Math.ceil((startBlank + last.getDate()) / 7) * 7;
+      const holidayMap = getHolidayMap();
+
+      $("#monthTitle").textContent = `${y}년 ${m + 1}월`;
+      $("#monthCount").textContent = `${state.leaves.filter(l => {
+        const s = parseISO(l.startDate);
+        const e = parseISO(l.endDate);
+        return (s.getFullYear() === y && s.getMonth() === m) || (e.getFullYear() === y && e.getMonth() === m);
+      }).length}건`;
+
+      const cells = [];
+      for (let i = 0; i < totalCells; i++) {
+        const dayNum = i - startBlank + 1;
+        if (dayNum < 1 || dayNum > last.getDate()) {
+          cells.push(`<button class="day empty"></button>`);
+          continue;
+        }
+
+        const date = new Date(y, m, dayNum);
+        const iso = toISO(date);
+        const dow = date.getDay();
+        const holidayName = holidayMap[iso];
+        const list = leavesForDate(iso);
+        const classes = [
+          "day",
+          dow === 0 ? "sun" : "",
+          dow === 6 ? "sat" : "",
+          holidayName ? "holiday" : "",
+          isSameDay(date, today) ? "today" : ""
+        ].filter(Boolean).join(" ");
+
+        cells.push(`
+          <button class="${classes}" data-date="${iso}" aria-label="${iso} 휴가 등록">
+            <span class="day-number">${dayNum}</span>
+            ${holidayName ? `<span class="holiday-dot">♥</span><span class="holiday-name">${holidayName}</span>` : ""}
+            <span class="events">
+              ${list.slice(0, 2).map(l => {
+                return `<span class="${calendarEventClass(l, iso)}">${calendarEventLabel(l, iso)}</span>`;
+              }).join("")}
+              ${list.length > 2 ? `<span class="event-pill">+${list.length - 2}</span>` : ""}
+            </span>
+          </button>
+        `);
+      }
+
+      calendarEl.innerHTML = cells.join("");
+
+      calendarEl.querySelectorAll(".day:not(.empty)").forEach(day => {
+        day.addEventListener("click", () => openSheet(day.dataset.date));
+      });
+    }
+
+    function formatKoreanDate(iso, includeYear = false) {
+      const d = parseISO(iso);
+      const base = `${d.getMonth() + 1}/${d.getDate()}(${dayLabel[d.getDay()]})`;
+      return includeYear ? `${d.getFullYear()}년 ${base}` : base;
+    }
+
+    function renderUpcoming() {
+      const nowISO = toISO(today);
+      const upcoming = state.leaves
+        .filter(l => l.endDate >= nowISO)
+        .sort((a, b) => a.startDate.localeCompare(b.startDate))
+        .slice(0, 6);
+
+      if (!upcoming.length) {
+        $("#upcomingList").innerHTML = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
+        return;
+      }
+
+      $("#upcomingList").innerHTML = upcoming.map(l => {
+        const type = getType(l.type);
+        const reason = l.reason || "사유 없음";
+        const dateText = l.startDate === l.endDate
+          ? formatKoreanDate(l.startDate)
+          : `${formatKoreanDate(l.startDate)} ~ ${formatKoreanDate(l.endDate)}`;
+
+        return `
+          <div class="leave-item">
+            <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
+            <div class="leave-meta">
+              <strong>${type.icon} ${type.label}</strong>
+              <span>${dateText} · ${reason}</span>
+            </div>
+            <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
+          </div>
+        `;
+      }).join("");
+
+      $("#upcomingList").querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
+          await persist();
+          renderAll();
+          showToast("삭제했어요.");
+        });
+      });
+    }
+
+    function isRestDay(date, holidayMap) {
+      return isWeekend(date) || Boolean(holidayMap[toISO(date)]);
+    }
+
+    function expandRestBlock(date, direction, holidayMap) {
+      let current = new Date(date);
+      let lastRest = new Date(date);
+
+      while (true) {
+        if (isRestDay(current, holidayMap)) {
+          lastRest = new Date(current);
+          current = addDays(current, direction);
+        } else {
+          return lastRest;
+        }
+      }
+    }
+
+    function countContinuousDays(startDate, endDate) {
+      return Math.round((endDate - startDate) / 86400000) + 1;
+    }
+
+    function isWithinRecommendationRange(iso) {
+      const d = parseISO(iso);
+      const end = addMonths(today, 6);
+      end.setHours(23, 59, 59, 999);
+      return d > today && d <= end;
+    }
+
+    function pushUniqueRecommendation(target, rec, seen) {
+      const key = rec.leaveDates.join(",");
+      if (!seen.has(key) && rec.leaveDates.every(isWithinRecommendationRange)) {
+        seen.add(key);
+        target.push(rec);
+      }
+    }
+
+    function buildRecommendations() {
+      const holidayMap = getHolidayMap();
+      const sixMonthsLater = addMonths(today, 6);
+      const recs = [];
+      const seen = new Set();
+
+      // 1) 오늘 이후 6개월 안의 '하루만 쓰면 앞뒤 휴일이 연결되는' 징검다리 추천
+      for (let d = addDays(today, 1); d <= sixMonthsLater; d = addDays(d, 1)) {
+        if (!isWeekday(d)) continue;
+
+        const iso = toISO(d);
+        if (holidayMap[iso]) continue;
+
+        const before = addDays(d, -1);
+        const after = addDays(d, 1);
+        const beforeRest = isRestDay(before, holidayMap);
+        const afterRest = isRestDay(after, holidayMap);
+
+        if (beforeRest && afterRest) {
+          const blockStart = expandRestBlock(before, -1, holidayMap);
+          const blockEnd = expandRestBlock(after, 1, holidayMap);
+          const totalDays = countContinuousDays(blockStart, blockEnd);
+
+          pushUniqueRecommendation(recs, {
+            title: `${formatKoreanDate(iso, true)} 하루 쓰면`,
+            leaveDates: [iso],
+            result: `${totalDays}일 연속 쉼 가능`,
+            desc: `${formatKoreanDate(toISO(blockStart), true)}부터 ${formatKoreanDate(toISO(blockEnd), true)}까지 이어지는 징검다리 휴일이에요.`
+          }, seen);
+        }
+      }
+
+      // 2) 주요 명절/연휴 전후로 2~3일 연차를 붙이는 추천
+      const manualRecs = [
+        {
+          title: "2026년 설날 전후",
+          leaveDates: ["2026-02-19", "2026-02-20"],
+          result: "2일 사용으로 긴 설 연휴",
+          desc: "2/16~2/18 설날 연휴 뒤 2/19, 2/20을 쓰면 주말까지 포근하게 이어져요."
+        },
+        {
+          title: "2026년 추석 앞쪽",
+          leaveDates: ["2026-09-21", "2026-09-22", "2026-09-23"],
+          result: "3일 사용으로 긴 추석 쉼",
+          desc: "9/24~9/28 추석·대체공휴일 앞에 3일을 붙이면 9/19부터 9/28까지 연결돼요."
+        },
+        {
+          title: "2027년 설날 전후",
+          leaveDates: ["2027-02-10", "2027-02-11", "2027-02-12"],
+          result: "3일 사용으로 긴 겨울 쉼",
+          desc: "설 연휴와 주말 사이를 연결해 여유로운 겨울 휴가를 만들 수 있어요."
+        },
+        {
+          title: "2027년 5월 징검다리",
+          leaveDates: ["2027-05-14"],
+          result: "하루 사용으로 4일 연속 쉼 가능",
+          desc: "부처님오신날 다음 금요일에 연차를 쓰면 5/13부터 5/16까지 이어져요."
+        },
+        {
+          title: "2027년 추석 앞뒤",
+          leaveDates: ["2027-09-17"],
+          result: "하루 사용으로 추석 뒤 긴 쉼",
+          desc: "추석 연휴 뒤 금요일 하루를 붙이면 주말까지 자연스럽게 연결돼요."
+        },
+        {
+          title: "2027년 10월 공휴일 연결",
+          leaveDates: ["2027-10-05", "2027-10-06", "2027-10-07", "2027-10-08"],
+          result: "4일 사용으로 긴 가을 쉼",
+          desc: "개천절 대체휴일과 한글날 대체휴일 사이를 연결하는 가을 황금휴가예요."
+        },
+        {
+          title: "2027년 크리스마스 전후",
+          leaveDates: ["2027-12-24"],
+          result: "하루 사용으로 연말 4일 쉼",
+          desc: "성탄절과 대체공휴일 앞 금요일을 활용하면 연말 쉼이 길어져요."
+        },
+        {
+          title: "2028년 설날 전후",
+          leaveDates: ["2028-01-24", "2028-01-25"],
+          result: "2일 사용으로 긴 설 연휴",
+          desc: "설 연휴 앞 월·화에 연차를 붙이면 주말부터 설 연휴까지 길게 쉴 수 있어요."
+        },
+        {
+          title: "2028년 5월 가정의 달",
+          leaveDates: ["2028-05-03", "2028-05-04"],
+          result: "2일 사용으로 긴 5월 쉼",
+          desc: "부처님오신날과 어린이날 사이를 연결하면 가족과 보내는 미니 휴가가 완성돼요."
+        },
+        {
+          title: "2028년 10월 추석 연휴",
+          leaveDates: ["2028-10-06"],
+          result: "하루 사용으로 긴 가을 쉼",
+          desc: "추석·개천절 연휴 뒤 하루를 붙이면 한글날까지 이어지는 긴 휴식을 만들 수 있어요."
+        }
+      ];
+
+      manualRecs.forEach(rec => pushUniqueRecommendation(recs, rec, seen));
+
+      recommendations = recs
+        .filter(rec => rec.leaveDates.length && rec.leaveDates.every(isWithinRecommendationRange))
+        .sort((a, b) => a.leaveDates[0].localeCompare(b.leaveDates[0]));
+
+      recIndex = 0;
+    }
+
+
+    function extractFirstNumber(text) {
+      const match = String(text || "").match(/(\d+(?:\.\d+)?)/);
+      return match ? Number(match[1]) : null;
+    }
+
+    function getRecommendationUseDays(rec) {
+      if (!rec || !Array.isArray(rec.leaveDates)) return "-";
+      return `${rec.leaveDates.length}일`;
+    }
+
+    function getRecommendationRestDays(rec) {
+      const n = extractFirstNumber(rec?.result);
+      return n ? `${n}일` : "-";
+    }
+
+    function getRecommendationDateLabel(rec) {
+      if (!rec || !Array.isArray(rec.leaveDates) || !rec.leaveDates.length) return "-";
+      if (rec.leaveDates.length === 1) return formatKoreanDate(rec.leaveDates[0], true);
+      return `${formatKoreanDate(rec.leaveDates[0], true)} ~ ${formatKoreanDate(rec.leaveDates[rec.leaveDates.length - 1])}`;
+    }
+
+    function getRecommendationRange(rec) {
+      if (!rec || !Array.isArray(rec.leaveDates) || !rec.leaveDates.length) {
+        return {
+          start: "-",
+          end: "-",
+          startISO: null,
+          endISO: null,
+          totalDays: 0
+        };
+      }
+
+      const holidayMap = getHolidayMap();
+      const leaveDates = rec.leaveDates.slice().sort();
+      const firstLeave = parseISO(leaveDates[0]);
+      const lastLeave = parseISO(leaveDates[leaveDates.length - 1]);
+
+      let start = new Date(firstLeave);
+      let prev = addDays(start, -1);
+      while (isRestDay(prev, holidayMap)) {
+        start = new Date(prev);
+        prev = addDays(prev, -1);
+      }
+
+      let end = new Date(lastLeave);
+      let next = addDays(end, 1);
+      while (isRestDay(next, holidayMap)) {
+        end = new Date(next);
+        next = addDays(next, 1);
+      }
+
+      return {
+        start: formatKoreanDate(toISO(start), true),
+        end: formatKoreanDate(toISO(end), false),
+        startISO: toISO(start),
+        endISO: toISO(end),
+        totalDays: countContinuousDays(start, end)
+      };
+    }
+
+    function renderRecommendation() {
+      if (!recommendations.length) {
+        $("#recommendCount").textContent = "0/0";
+        $("#recommendUseDays").textContent = "-";
+        $("#recommendRestDays").textContent = "-";
+        $("#recommendStartDate").textContent = "-";
+        $("#recommendEndDate").textContent = "-";
+        $("#recommendText").textContent = "6개월 안에 딱 맞는 추천이 없어요.";
+        $("#recommendDesc").textContent = "금요일 반차나 월요일 오전반차처럼 작은 쉼표를 먼저 예약해 보세요.";
+        return;
+      }
+
+      const safeIndex = recIndex % recommendations.length;
+      const rec = recommendations[safeIndex];
+      const range = getRecommendationRange(rec);
+      const leaveCount = rec.leaveDates.length;
+      const restDays = range.totalDays || extractFirstNumber(rec?.result) || 0;
+
+      $("#recommendCount").textContent = `${safeIndex + 1}/${recommendations.length}`;
+      $("#recommendUseDays").textContent = `${leaveCount}개`;
+      $("#recommendRestDays").textContent = `${restDays}일`;
+      $("#recommendStartDate").textContent = range.start;
+      $("#recommendEndDate").textContent = range.end;
+      $("#recommendText").textContent = `연차 ${leaveCount}개로 총 ${restDays}일 쉴 수 있어요.`;
+      $("#recommendDesc").textContent = `${rec.leaveDates.map(d => formatKoreanDate(d)).join(", ")}에 연차를 붙이는 추천이에요.`;
+    }
+
+
+    function updateCustomReasonMotion() {
+      const wrap = $("#customReasonWrap");
+      const input = $("#customReason");
+      const isCustom = selectedReason.includes("직접 입력");
+
+      wrap.classList.toggle("active", isCustom);
+
+      if (isCustom) {
+        setTimeout(() => input.focus(), 220);
+      } else {
+        input.value = "";
+      }
+    }
+
+    function openSheet(dateISO = toISO(today)) {
+      selectedDateISO = dateISO;
+      selectedReason = reasonOptions[0];
+      $("#customReason").value = "";
+      updateCustomReasonMotion();
+      $("#startDate").value = dateISO;
+      $("#endDate").value = dateISO;
+      $("#sheetSub").textContent = `${formatKoreanDate(dateISO, true)}의 쉼을 기록해요.`;
+      $("#deleteForDate").style.display = leavesForDate(dateISO).length ? "block" : "none";
+
+      $("#overlay").classList.add("active");
+      $("#sheet").classList.add("active");
+    }
+
+    function closeSheet() {
+      $("#overlay").classList.remove("active");
+      $("#sheet").classList.remove("active");
+    }
+
+    function openSettings() {
+      renderDashboard();
+      $("#overlay").classList.add("active");
+      $("#settingsModal").classList.add("active");
+    }
+
+    function closeSettingsModal() {
+      $("#overlay").classList.remove("active");
+      $("#settingsModal").classList.remove("active");
+    }
+
+    function showToast(text) {
+      const toast = $("#toast");
+      toast.textContent = text;
+      toast.classList.add("active");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("active"), 1800);
+    }
+
+    async function saveLeave() {
+      const startDate = $("#startDate").value;
+      const endDate = $("#endDate").value || startDate;
+      if (!startDate) {
+        showToast("날짜를 선택해 주세요.");
+        return;
+      }
+
+      let reason = selectedReason;
+      if (selectedReason.includes("직접 입력")) {
+        reason = $("#customReason").value.trim() || "직접 입력";
+      }
+
+      const [start, end] = clampDateRange(startDate, endDate);
+
+      state.leaves.push({
+        id: `leave_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        startDate: toISO(start),
+        endDate: toISO(end),
+        type: selectedType,
+        reason,
+        createdAt: new Date().toISOString()
+      });
+
+      await persist();
+      closeSheet();
+      renderAll();
+      showToast("쉼을 등록했어요.");
+    }
+
+    async function deleteLeavesForCurrentRange() {
+      const startDate = $("#startDate").value;
+      const endDate = $("#endDate").value || startDate;
+      const [start, end] = clampDateRange(startDate, endDate);
+
+      const before = state.leaves.length;
+      state.leaves = state.leaves.filter(l => {
+        const [ls, le] = clampDateRange(l.startDate, l.endDate);
+        return le < start || ls > end;
+      });
+
+      if (before === state.leaves.length) {
+        showToast("삭제할 기록이 없어요.");
+        return;
+      }
+
+      await persist();
+      closeSheet();
+      renderAll();
+      showToast("선택한 날짜의 기록을 삭제했어요.");
+    }
+
+    function renderAll() {
+      renderDashboard();
+      renderCalendar();
+      renderUpcoming();
+      buildRecommendations();
+      renderRecommendation();
+      if (currentView === "report") renderReport();
+      $("#todayChip").textContent = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 ${dayLabel[today.getDay()]}요일`;
+    }
+
+
+    function setAuthView(isLoggedIn) {
+      document.body.classList.toggle("auth-mode", !isLoggedIn);
+      if (isLoggedIn && currentUser) {
+        $("#userEmail").textContent = currentUser.email || "Google 계정";
+      }
+    }
+
+    function bindAuthEvents() {
+      const googleBtn = $("#googleLogin");
+      if (googleBtn) {
+        googleBtn.addEventListener("click", async () => {
+          googleBtn.disabled = true;
+          googleBtn.querySelector("strong").textContent = "Google 로그인으로 이동 중...";
+          const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: window.location.origin
+            }
+          });
+
+          if (error) {
+            console.error(error);
+            googleBtn.disabled = false;
+            googleBtn.querySelector("strong").textContent = "Google로 시작하기";
+            alert("Google 로그인 연결에 실패했어요. Supabase Redirect URL 설정을 확인해 주세요.");
+          }
+        });
+      }
+
+      const logoutBtn = $("#logoutBtn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+          await supabaseClient.auth.signOut();
+          currentUser = null;
+          state = { settings: { totalLeave: 15 }, leaves: [] };
+          setAuthView(false);
+        });
+      }
+    }
+
+    function bindAppEventsOnce() {
+      if (appEventsBound) return;
+      appEventsBound = true;
+      $("#prevMonth").addEventListener("click", () => {
+        viewDate.setMonth(viewDate.getMonth() - 1);
+        renderCalendar();
+      });
+
+      $("#nextMonth").addEventListener("click", () => {
+        viewDate.setMonth(viewDate.getMonth() + 1);
+        renderCalendar();
+      });
+
+      $("#goToday").addEventListener("click", () => {
+        viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        renderCalendar();
+      });
+
+      $("#calendarTab").addEventListener("click", () => setViewMode("calendar"));
+      $("#reportTab").addEventListener("click", () => setViewMode("report"));
+      $("#backToCalendar").addEventListener("click", () => setViewMode("calendar"));
+
+      $("#donutWrap").addEventListener("click", () => {
+        $("#donutWrap").classList.toggle("show-tooltip");
+      });
+
+      $("#fab").addEventListener("click", () => openSheet(toISO(today)));
+      $("#closeSheet").addEventListener("click", closeSheet);
+      $("#saveLeave").addEventListener("click", saveLeave);
+      $("#deleteForDate").addEventListener("click", deleteLeavesForCurrentRange);
+
+      $("#openSettings").addEventListener("click", openSettings);
+      $("#closeSettings").addEventListener("click", closeSettingsModal);
+
+      $("#saveSettings").addEventListener("click", async () => {
+        const value = Number($("#totalInput").value);
+        if (Number.isNaN(value) || value < 0) {
+          showToast("올바른 연차 개수를 입력해 주세요.");
+          return;
+        }
+        state.settings.totalLeave = Math.round(value * 100) / 100;
+        await persist();
+        closeSettingsModal();
+        renderAll();
+        showToast("연차 설정을 저장했어요.");
+      });
+
+      $("#overlay").addEventListener("click", () => {
+        closeSheet();
+        closeSettingsModal();
+      });
+
+      $("#prevRec").addEventListener("click", () => {
+        if (!recommendations.length) return;
+        recIndex = (recIndex - 1 + recommendations.length) % recommendations.length;
+        renderRecommendation();
+      });
+
+      $("#nextRec").addEventListener("click", () => {
+        if (!recommendations.length) return;
+        recIndex = (recIndex + 1) % recommendations.length;
+        renderRecommendation();
+      });
+
+      setInterval(() => {
+        if (!recommendations.length) return;
+        recIndex = (recIndex + 1) % recommendations.length;
+        renderRecommendation();
+      }, 9000);
+    }
+
+    async function init() {
+      bindAuthEvents();
+
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+      if (sessionError) {
+        console.error(sessionError);
+        setAuthView(false);
+        return;
+      }
+
+      currentUser = sessionData.session?.user || null;
+      if (!currentUser) {
+        setAuthView(false);
+        return;
+      }
+
+      setAuthView(true);
+
+      try {
+        const saved = await storage.load();
+        if (saved && typeof saved === "object") {
+          state = {
+            settings: Object.assign({ totalLeave: 15 }, saved.settings || {}),
+            leaves: Array.isArray(saved.leaves) ? saved.leaves : []
+          };
+        }
+      } catch (error) {
+        console.error(error);
+        showToast("데이터를 불러오지 못했어요. Supabase 설정을 확인해 주세요.");
+      }
+
+      renderTypeButtons();
+      renderReasonTags();
+      renderAll();
+      setViewMode("calendar");
+      bindAppEventsOnce();
+    }
+
+    init();
+  </script>
+</body>
+</html>
