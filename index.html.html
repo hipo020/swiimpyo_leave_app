@@ -4513,6 +4513,113 @@
       }
     }
 
+
+    /************************************************************
+     * 실사용 편의 기능 패치
+     * - 공휴일 연도 필터
+     * - 공휴일 수정 상태 표시
+     * - CSV 내보내기 버튼
+     ************************************************************/
+    .leave-export-btn {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 10px;
+      border-radius: 18px;
+      background: #F5FAFD;
+      color: var(--navy-soft);
+      font-size: 14px;
+      font-weight: 950;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.8);
+    }
+
+    .holiday-edit-state {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(212,235,249,.26);
+      color: var(--navy-soft);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.45;
+    }
+
+    body.is-holiday-admin .holiday-edit-state {
+      display: flex;
+    }
+
+    .holiday-edit-state.editing {
+      background: rgba(212,235,249,.55);
+      color: var(--navy);
+    }
+
+    .holiday-edit-state button {
+      display: none;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 12px;
+      background: #fff;
+      color: var(--navy-soft);
+      font-size: 11px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .holiday-edit-state.editing button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .holiday-filter {
+      display: flex;
+      gap: 7px;
+      margin: 14px 0 8px;
+      padding: 5px;
+      border-radius: 999px;
+      background: #F5FAFD;
+      box-shadow: inset 0 0 0 1px rgba(212,235,249,.7);
+    }
+
+    .holiday-filter button {
+      flex: 1;
+      min-height: 34px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--navy-soft);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .holiday-filter button.active {
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(16,42,67,.12);
+    }
+
+    @media (max-width: 720px) {
+      .leave-export-btn,
+      .holiday-manage-open {
+        min-height: 42px;
+        border-radius: 16px;
+        font-size: 13px;
+      }
+
+      .holiday-edit-state {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .holiday-edit-state.editing button {
+        width: 100%;
+        min-height: 34px;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -4841,6 +4948,7 @@
     <p>올해 사용할 수 있는 총 연차 개수를 입력해 주세요. 저장하면 대시보드에 바로 반영돼요.</p>
     <input class="date-field" id="totalInput" type="number" min="0" max="365" step="0.25" />
     <button class="holiday-manage-open" id="openHolidayManager" type="button">공휴일 관리</button>
+    <button class="leave-export-btn" id="exportLeavesCsv" type="button">연차 기록 내보내기 CSV</button>
     <div class="modal-actions">
       <button class="ghost" id="closeSettings">닫기</button>
       <button class="solid" id="saveSettings">저장</button>
@@ -4865,12 +4973,23 @@
         <span>이름</span>
         <input class="date-field" id="holidayNameInput" type="text" placeholder="예: 임시공휴일" />
       </label>
-      <button class="solid holiday-save-btn" id="saveHoliday" type="button">추가/수정</button>
+      <button class="solid holiday-save-btn" id="saveHoliday" type="button">추가하기</button>
+    </div>
+
+    <div class="holiday-edit-state" id="holidayEditState">
+      <span id="holidayEditText">새 공휴일을 추가하는 중이에요.</span>
+      <button id="cancelHolidayEdit" type="button">수정 취소</button>
     </div>
 
     <div class="holiday-helper">
       <strong>공휴일 데이터 기준</strong>
       <span>Supabase holidays 테이블을 우선 사용하고, 불러오지 못할 때만 앱 안의 기본 데이터를 사용해요.</span>
+    </div>
+
+    <div class="holiday-filter">
+      <button class="active" data-holiday-year="all" type="button">전체</button>
+      <button data-holiday-year="current" type="button">올해</button>
+      <button data-holiday-year="next" type="button">내년</button>
     </div>
 
     <div class="holiday-list-head">
@@ -5229,6 +5348,8 @@
     let recIndex = 0;
     let currentView = "calendar";
     let editingLeaveId = null;
+    let editingHolidayOriginalDate = null;
+    let selectedHolidayYearFilter = "all";
     let activeDialog = null;
     let lastFocusedElement = null;
 
@@ -6435,6 +6556,11 @@
         createdAt: existing?.createdAt || new Date().toISOString()
       };
 
+      if (hasOverlappingLeave(payload)) {
+        const ok = confirm("선택한 날짜에 이미 등록된 쉼이 있어요. 그래도 저장할까요?");
+        if (!ok) return;
+      }
+
       const savedLeave = await runStorageAction(
         () => editingLeaveId ? storage.updateLeave(payload) : storage.createLeave(payload),
         "휴가 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
@@ -6502,21 +6628,128 @@
     }
 
 
+
+    function getHolidayFilterYearValue() {
+      const currentYear = today.getFullYear();
+      if (selectedHolidayYearFilter === "current") return String(currentYear);
+      if (selectedHolidayYearFilter === "next") return String(currentYear + 1);
+      return "all";
+    }
+
+    function updateHolidayFilterLabels() {
+      const currentYear = today.getFullYear();
+      document.querySelectorAll("[data-holiday-year]").forEach(btn => {
+        const key = btn.dataset.holidayYear;
+        if (key === "current") btn.textContent = `${currentYear}년`;
+        if (key === "next") btn.textContent = `${currentYear + 1}년`;
+        btn.classList.toggle("active", selectedHolidayYearFilter === key);
+      });
+    }
+
+    function setHolidayEditMode(date = null, name = "") {
+      editingHolidayOriginalDate = date;
+      const stateEl = $("#holidayEditState");
+      const textEl = $("#holidayEditText");
+      const saveBtn = $("#saveHoliday");
+      if (!stateEl || !textEl || !saveBtn) return;
+
+      stateEl.classList.toggle("editing", Boolean(date));
+
+      if (date) {
+        textEl.textContent = `수정 중: ${date} · ${name}`;
+        saveBtn.textContent = "수정 완료";
+      } else {
+        textEl.textContent = "새 공휴일을 추가하는 중이에요.";
+        saveBtn.textContent = "추가하기";
+      }
+    }
+
+    function cancelHolidayEditMode() {
+      editingHolidayOriginalDate = null;
+      $("#holidayDateInput").value = toISO(today);
+      $("#holidayNameInput").value = "";
+      setHolidayEditMode(null);
+    }
+
+    function getExistingHolidayName(date) {
+      const map = getHolidayMap();
+      return map[date] || "";
+    }
+
+    function csvEscape(value) {
+      const text = String(value ?? "");
+      return `"${text.replace(/"/g, '""')}"`;
+    }
+
+    function exportLeavesCsv() {
+      if (!state.leaves.length) {
+        showToast("내보낼 연차 기록이 없어요.");
+        return;
+      }
+
+      const headers = ["시작일", "종료일", "휴가종류", "사유", "차감일수", "등록일"];
+      const rows = state.leaves
+        .slice()
+        .sort((a, b) => a.startDate.localeCompare(b.startDate))
+        .map(leave => {
+          const type = getType(leave.type);
+          return [
+            leave.startDate,
+            leave.endDate || leave.startDate,
+            type.label,
+            leave.reason || "",
+            calcLeaveAmount(leave),
+            leave.createdAt || ""
+          ];
+        });
+
+      const csv = [
+        headers.map(csvEscape).join(","),
+        ...rows.map(row => row.map(csvEscape).join(","))
+      ].join("\n");
+
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `쉼표_연차기록_${toISO(today)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast("CSV 파일을 내려받았어요.");
+    }
+
+    function hasOverlappingLeave(payload) {
+      const [start, end] = clampDateRange(payload.startDate, payload.endDate);
+      return state.leaves.some(leave => {
+        if (editingLeaveId && leave.id === editingLeaveId) return false;
+        const [leaveStart, leaveEnd] = clampDateRange(leave.startDate, leave.endDate);
+        return !(leaveEnd < start || leaveStart > end);
+      });
+    }
+
+
     async function renderHolidayManager() {
       const list = $("#holidayAdminList");
       if (!list) return;
 
+      updateHolidayFilterLabels();
       list.innerHTML = `<div class="holiday-empty">공휴일 데이터를 불러오는 중이에요.</div>`;
 
       try {
         const rows = await listHolidaysFromSupabase();
+        const filterYear = getHolidayFilterYearValue();
+        const filteredRows = filterYear === "all"
+          ? rows
+          : rows.filter(row => String(row.date).startsWith(`${filterYear}-`));
 
-        if (!rows.length) {
-          list.innerHTML = `<div class="holiday-empty">등록된 공휴일이 없어요. 날짜와 이름을 입력해 첫 공휴일을 추가해 보세요.</div>`;
+        if (!filteredRows.length) {
+          list.innerHTML = `<div class="holiday-empty">해당 연도에 등록된 공휴일이 없어요.</div>`;
           return;
         }
 
-        list.innerHTML = rows.map(row => `
+        list.innerHTML = filteredRows.map(row => `
           <div class="holiday-row">
             <span class="holiday-row-date">${row.date}</span>
             <span class="holiday-row-name">${row.name}${row.is_holiday ? "" : " · 비활성"}</span>
@@ -6533,6 +6766,7 @@
           btn.addEventListener("click", () => {
             $("#holidayDateInput").value = btn.dataset.date;
             $("#holidayNameInput").value = btn.dataset.name;
+            setHolidayEditMode(btn.dataset.date, btn.dataset.name);
             $("#holidayNameInput").focus();
           });
         });
@@ -6552,6 +6786,7 @@
               "공휴일 삭제 중 오류가 발생했어요. Supabase 정책을 확인해 주세요."
             );
 
+            if (editingHolidayOriginalDate === date) cancelHolidayEditMode();
             await loadHolidaysFromSupabase();
             renderCalendar();
             buildRecommendations();
@@ -6579,6 +6814,8 @@
       activeDialog = $("#holidayModal");
       $("#holidayDateInput").value = toISO(today);
       $("#holidayNameInput").value = "";
+      setHolidayEditMode(null);
+      updateHolidayFilterLabels();
       bindAllDatePickers();
       renderHolidayManager();
       focusFirstField(activeDialog, "#holidayDateInput");
@@ -6614,10 +6851,26 @@
         return;
       }
 
+      const existingName = getExistingHolidayName(date);
+      const isEditing = Boolean(editingHolidayOriginalDate);
+      const isChangingDate = isEditing && editingHolidayOriginalDate !== date;
+
+      if (existingName && (!isEditing || isChangingDate)) {
+        const ok = confirm(`${date}에는 이미 "${existingName}" 공휴일이 있어요. 이 이름을 "${name}"으로 덮어쓸까요?`);
+        if (!ok) return;
+      }
+
       await runStorageAction(
         () => upsertHolidayToSupabase(date, name),
         "공휴일 저장 중 오류가 발생했어요. Supabase 정책을 확인해 주세요."
       );
+
+      if (isChangingDate) {
+        await runStorageAction(
+          () => deleteHolidayFromSupabase(editingHolidayOriginalDate),
+          "기존 공휴일 삭제 중 오류가 발생했어요."
+        );
+      }
 
       await loadHolidaysFromSupabase();
       renderCalendar();
@@ -6625,7 +6878,8 @@
       renderRecommendation();
       await renderHolidayManager();
       $("#holidayNameInput").value = "";
-      showToast("공휴일을 저장했어요.");
+      setHolidayEditMode(null);
+      showToast(isEditing ? "공휴일을 수정했어요." : "공휴일을 저장했어요.");
     }
 
 
@@ -6741,6 +6995,14 @@
       $("#closeHolidayModal").addEventListener("click", closeHolidayManager);
       $("#saveHoliday").addEventListener("click", saveHolidayFromForm);
       $("#refreshHolidays").addEventListener("click", renderHolidayManager);
+      $("#cancelHolidayEdit").addEventListener("click", cancelHolidayEditMode);
+      $("#exportLeavesCsv").addEventListener("click", exportLeavesCsv);
+      document.querySelectorAll("[data-holiday-year]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedHolidayYearFilter = btn.dataset.holidayYear;
+          renderHolidayManager();
+        });
+      });
 
       $("#saveSettings").addEventListener("click", async () => {
         const value = Number($("#totalInput").value);
