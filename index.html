@@ -6657,6 +6657,425 @@
       }
     }
 
+
+    /************************************************************
+     * Final mobile polish overrides
+     ************************************************************/
+    @media (max-width: 720px) {
+      .app {
+        padding: 12px 12px 108px !important;
+      }
+
+      .topbar {
+        gap: 12px !important;
+        margin-bottom: 14px !important;
+        padding: 12px !important;
+        border-radius: 26px !important;
+      }
+
+      .brand {
+        gap: 12px !important;
+        align-items: center !important;
+      }
+
+      .brand-mark {
+        width: 46px !important;
+        height: 46px !important;
+        border-radius: 17px !important;
+        font-size: 21px !important;
+        flex: 0 0 46px !important;
+      }
+
+      .brand h1 {
+        font-size: 30px !important;
+        line-height: 0.96 !important;
+      }
+
+      .brand p {
+        font-size: 11px !important;
+        line-height: 1.3 !important;
+        max-width: 100% !important;
+        margin-top: 4px !important;
+      }
+
+      .topbar-actions {
+        gap: 6px !important;
+      }
+
+      .user-chip {
+        height: 40px !important;
+        padding: 0 8px 0 14px !important;
+      }
+
+      .user-chip span {
+        font-size: 12px !important;
+      }
+
+      .logout-btn {
+        height: 30px !important;
+        min-width: 66px !important;
+      }
+
+      .sync-status {
+        font-size: 10px !important;
+      }
+
+      .hero {
+        gap: 12px !important;
+        margin-bottom: 12px !important;
+      }
+
+      .dashboard {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        grid-template-areas:
+          "total used remain"
+          "settings settings settings" !important;
+        gap: 8px !important;
+        padding: 10px !important;
+        border-radius: 28px !important;
+      }
+
+      .dashboard > .stat-card:nth-child(1) { grid-area: total; }
+      .dashboard > .stat-card:nth-child(2) { grid-area: used; }
+      .dashboard > .stat-card:nth-child(3) { grid-area: remain; }
+      .dashboard > .settings-btn { grid-area: settings; }
+
+      .stat-card {
+        min-height: 80px !important;
+        padding: 10px 10px 9px !important;
+        border-radius: 20px !important;
+      }
+
+      .stat-label {
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 2px !important;
+      }
+
+      .stat-value {
+        display: flex !important;
+        align-items: flex-end !important;
+        gap: 2px !important;
+        flex-wrap: nowrap !important;
+        white-space: nowrap !important;
+        min-width: 0 !important;
+        line-height: 1 !important;
+      }
+
+      .stat-value span:first-child,
+      .stat-value > :first-child {
+        font-size: clamp(19px, 7vw, 25px) !important;
+        line-height: 0.95 !important;
+        letter-spacing: -0.06em !important;
+        min-width: 0 !important;
+        flex: 0 1 auto !important;
+      }
+
+      .stat-unit {
+        flex: 0 0 auto !important;
+        font-size: 11px !important;
+        line-height: 1 !important;
+        padding-bottom: 2px !important;
+      }
+
+      .settings-btn {
+        min-height: 50px !important;
+        height: 50px !important;
+        margin-top: 4px !important;
+        border-radius: 18px !important;
+      }
+
+      .settings-btn .settings-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 14px !important;
+      }
+
+      .settings-btn .settings-label {
+        font-size: 14px !important;
+      }
+
+      .mini-panel {
+        padding: 16px !important;
+        border-radius: 28px !important;
+      }
+
+      .mini-panel h2,
+      .mini-panel h3 {
+        font-size: 18px !important;
+        line-height: 1.14 !important;
+        letter-spacing: -0.05em !important;
+        max-width: calc(100% - 88px) !important;
+      }
+
+      .mini-panel p {
+        margin-top: 8px !important;
+        font-size: 12px !important;
+        line-height: 1.45 !important;
+      }
+
+      .mini-panel-toggle {
+        height: 38px !important;
+        min-width: 74px !important;
+        padding: 0 14px !important;
+        font-size: 12px !important;
+      }
+
+      .quick-row {
+        gap: 8px !important;
+        margin-top: 10px !important;
+      }
+
+      .quick-pill {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+      }
+
+      .calendar-card,
+      .report-card,
+      .side-card,
+      .mobile-upcoming-card,
+      .simple-recommend-card {
+        border-radius: 28px !important;
+      }
+
+      .calendar-card {
+        padding: 14px !important;
+      }
+
+      .calendar-header {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        align-items: start !important;
+        margin-bottom: 12px !important;
+      }
+
+      .month-title {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+        min-width: 0 !important;
+      }
+
+      .month-title h2 {
+        margin: 0 !important;
+        font-size: clamp(22px, 8vw, 31px) !important;
+        line-height: 1.08 !important;
+        white-space: nowrap !important;
+      }
+
+      #monthCount {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        min-width: 48px !important;
+        padding: 4px 10px !important;
+        font-size: 12px !important;
+        text-align: center !important;
+        border-radius: 999px !important;
+      }
+
+      .nav-btns {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+        gap: 8px !important;
+        align-items: center !important;
+      }
+
+      .nav-btn,
+      .today-btn {
+        height: 40px !important;
+        border-radius: 16px !important;
+      }
+
+      .nav-btn {
+        width: 44px !important;
+        min-width: 44px !important;
+        font-size: 24px !important;
+      }
+
+      .today-btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 14px !important;
+      }
+
+      .weekdays,
+      .calendar {
+        gap: 4px !important;
+      }
+
+      .weekday {
+        font-size: 10px !important;
+      }
+
+      .day {
+        min-height: 72px !important;
+        border-radius: 16px !important;
+        padding: 8px 5px !important;
+      }
+
+      .day-number {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 13px !important;
+      }
+
+      .event-pill {
+        font-size: 9px !important;
+        line-height: 1.15 !important;
+        padding: 3px 5px !important;
+        border-radius: 10px !important;
+      }
+
+      .side-card,
+      .report-card,
+      .mobile-upcoming-card,
+      .simple-recommend-card {
+        padding: 14px !important;
+      }
+
+      .simple-recommend-card h3,
+      .report-card h3,
+      .mobile-upcoming-card h3,
+      .side-card h3 {
+        font-size: 16px !important;
+      }
+
+      .simple-rec-hero {
+        gap: 10px !important;
+      }
+
+      .simple-rec-number {
+        font-size: 18px !important;
+      }
+
+      .simple-rec-pill {
+        min-height: 50px !important;
+        font-size: 12px !important;
+        padding: 10px 12px !important;
+      }
+
+      .fab {
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 20px !important;
+        bottom: max(84px, calc(env(safe-area-inset-bottom) + 82px)) !important;
+      }
+
+      .view-tabs {
+        width: min(420px, calc(100vw - 24px)) !important;
+        height: 62px !important;
+        padding: 7px !important;
+        gap: 7px !important;
+      }
+
+      .view-tab {
+        height: 48px !important;
+        font-size: 13px !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding: 10px 10px 106px !important;
+      }
+
+      .topbar {
+        padding: 10px !important;
+        border-radius: 24px !important;
+      }
+
+      .brand h1 {
+        font-size: 28px !important;
+      }
+
+      .brand p {
+        font-size: 10.5px !important;
+      }
+
+      .dashboard {
+        gap: 7px !important;
+        padding: 8px !important;
+      }
+
+      .stat-card {
+        min-height: 76px !important;
+        padding: 9px 8px 8px !important;
+      }
+
+      .stat-label {
+        font-size: 10px !important;
+      }
+
+      .stat-value span:first-child,
+      .stat-value > :first-child {
+        font-size: clamp(17px, 6.9vw, 22px) !important;
+      }
+
+      .stat-unit {
+        font-size: 10px !important;
+      }
+
+      .settings-btn {
+        min-height: 46px !important;
+        height: 46px !important;
+      }
+
+      .settings-btn .settings-label {
+        font-size: 13px !important;
+      }
+
+      .mini-panel {
+        padding: 14px !important;
+      }
+
+      .mini-panel h2,
+      .mini-panel h3 {
+        font-size: 16px !important;
+        max-width: calc(100% - 78px) !important;
+      }
+
+      .mini-panel p {
+        font-size: 11px !important;
+      }
+
+      .month-title {
+        gap: 6px !important;
+      }
+
+      .month-title h2 {
+        font-size: 21px !important;
+      }
+
+      #monthCount {
+        min-width: 44px !important;
+        padding: 3px 8px !important;
+        font-size: 11px !important;
+      }
+
+      .nav-btns {
+        grid-template-columns: 40px minmax(0, 1fr) 40px !important;
+        gap: 6px !important;
+      }
+
+      .nav-btn,
+      .today-btn {
+        height: 38px !important;
+      }
+
+      .day {
+        min-height: 66px !important;
+      }
+
+      .fab {
+        width: 54px !important;
+        height: 54px !important;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
