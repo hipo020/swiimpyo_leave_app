@@ -6572,32 +6572,52 @@
       }
 
       .dashboard {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
         grid-template-areas:
-          "total"
-          "used"
-          "remain"
-          "settings" !important;
-        padding: 14px !important;
+          "total used remain"
+          "settings settings settings" !important;
+        gap: 10px !important;
+        padding: 12px !important;
       }
 
       .stat-card {
-        min-height: 118px !important;
-        padding: 16px !important;
-        border-radius: 24px !important;
+        min-height: 92px !important;
+        padding: 12px 12px 10px !important;
+        border-radius: 22px !important;
       }
 
       .stat-label {
-        font-size: 14px !important;
+        font-size: 12px !important;
+        margin-bottom: 4px !important;
+      }
+
+      .stat-value {
+        gap: 1px !important;
       }
 
       .stat-value span:first-child {
-        font-size: clamp(36px, 11vw, 48px) !important;
+        font-size: clamp(28px, 8.6vw, 38px) !important;
+        line-height: 0.95 !important;
+      }
+
+      .stat-unit {
+        font-size: 12px !important;
+        padding-bottom: 4px !important;
       }
 
       .settings-btn {
-        min-height: 58px !important;
-        border-radius: 20px !important;
+        min-height: 52px !important;
+        border-radius: 18px !important;
+      }
+
+      .settings-btn .settings-icon {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 15px !important;
+      }
+
+      .settings-btn .settings-label {
+        font-size: 15px !important;
       }
 
       .mini-panel {
