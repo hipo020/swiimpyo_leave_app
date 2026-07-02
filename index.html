@@ -7135,6 +7135,67 @@
       }
     }
 
+
+    /************************************************************
+     * Memo textarea input fix
+     * - 메모 입력칸 클릭/터치/키보드 입력 보정
+     ************************************************************/
+    #leaveMemo,
+    textarea#leaveMemo,
+    .memo-field {
+      display: block !important;
+      width: 100% !important;
+      min-height: 86px !important;
+      height: auto !important;
+      padding: 13px 15px !important;
+      border: 1px solid var(--line-soft, #ECEFED) !important;
+      outline: none !important;
+      border-radius: 18px !important;
+      background: #FBFDFD !important;
+      color: var(--ink-main, #2F2B29) !important;
+      font: inherit !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      resize: vertical !important;
+      overflow: auto !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.55) !important;
+      pointer-events: auto !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      touch-action: manipulation !important;
+      position: relative !important;
+      z-index: 3 !important;
+      -webkit-appearance: none !important;
+      appearance: none !important;
+    }
+
+    #leaveMemo:focus,
+    textarea#leaveMemo:focus,
+    .memo-field:focus {
+      border-color: #CFE8F0 !important;
+      background: #FFFFFF !important;
+      box-shadow: 0 0 0 4px rgba(207,232,240,.35), inset 0 0 0 1px rgba(255,255,255,.8) !important;
+    }
+
+    .memo-section,
+    .memo-section * {
+      pointer-events: auto !important;
+    }
+
+    .memo-section .title {
+      pointer-events: none !important;
+    }
+
+    @media (max-width: 720px) {
+      #leaveMemo,
+      textarea#leaveMemo,
+      .memo-field {
+        min-height: 76px !important;
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -7436,7 +7497,7 @@
 
     <div class="form-section memo-section">
       <label class="title" for="leaveMemo">메모</label>
-      <textarea class="text-field memo-field" id="leaveMemo" rows="3" maxlength="200" placeholder="선택 사항이에요. 예: 치과 예약 10:30"></textarea>
+      <textarea class="memo-field" id="leaveMemo" name="leaveMemo" rows="3" maxlength="200" autocomplete="off" placeholder="선택 사항이에요. 예: 치과 예약 10:30"></textarea>
       <p class="memo-helper">캘린더에는 길게 표시하지 않고, 상세 목록과 CSV에 기록돼요.</p>
     </div>
 
@@ -9032,6 +9093,7 @@
       $("#sheet").classList.add("active");
       activeDialog = $("#sheet");
       bindAllDatePickers();
+      bindMemoField();
       updateLeavePreview();
       focusFirstField(activeDialog, "#startDate");
     }
@@ -9697,6 +9759,7 @@
       setViewMode("calendar");
       bindAppEventsOnce();
       bindAllDatePickers();
+      bindMemoField();
     }
 
 
