@@ -7076,6 +7076,65 @@
       }
     }
 
+
+    /************************************************************
+     * Leave memo field
+     ************************************************************/
+    .memo-section {
+      margin-top: 18px;
+    }
+
+    .memo-field {
+      display: block;
+      width: 100%;
+      min-height: 84px;
+      height: auto;
+      padding: 14px 16px;
+      line-height: 1.5;
+      resize: vertical;
+      border-radius: 18px;
+    }
+
+    .memo-helper {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .leave-memo {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.4;
+      white-space: normal;
+      word-break: keep-all;
+    }
+
+    @media (max-width: 720px) {
+      .memo-section {
+        margin-top: 14px;
+      }
+
+      .memo-field {
+        min-height: 72px;
+        padding: 12px 14px;
+        font-size: 13px;
+      }
+
+      .memo-helper {
+        font-size: 11px;
+      }
+
+      .leave-memo {
+        font-size: 11px;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -7375,6 +7434,11 @@
       </div>
     </div>
 
+    <div class="form-section memo-section">
+      <label class="title" for="leaveMemo">메모</label>
+      <textarea class="text-field memo-field" id="leaveMemo" rows="3" maxlength="200" placeholder="선택 사항이에요. 예: 치과 예약 10:30"></textarea>
+      <p class="memo-helper">캘린더에는 길게 표시하지 않고, 상세 목록과 CSV에 기록돼요.</p>
+    </div>
 
     <section class="leave-preview" id="leavePreview" aria-live="polite">
       <div class="preview-box">
@@ -7472,6 +7536,30 @@
     let currentUser = null;
     let holidayMapCache = {};
     let appEventsBound = false;
+    let memoColumnAvailable = true;
+
+    function normalizeReasonLabel(reason) {
+      if (reason === "🏡 늦잠/휴식") return "🌿 휴식/컨디션 관리";
+      return reason || "";
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function isMemoColumnError(error) {
+      const message = String(error?.message || error?.details || "").toLowerCase();
+      return message.includes("memo") && (
+        message.includes("column") ||
+        message.includes("schema cache") ||
+        message.includes("could not find")
+      );
+    }
 
     function normalizeLeaveFromRow(row) {
       return {
@@ -7479,21 +7567,34 @@
         startDate: row.start_date,
         endDate: row.end_date,
         type: row.type,
-        reason: row.reason || "",
+        reason: normalizeReasonLabel(row.reason || ""),
+        memo: row.memo || "",
         createdAt: row.created_at || new Date().toISOString()
       };
     }
 
     function normalizeLeaveToRow(leave) {
-      return {
+      const row = {
         id: leave.id,
         user_id: currentUser.id,
         start_date: leave.startDate,
         end_date: leave.endDate || leave.startDate,
         type: leave.type,
-        reason: leave.reason || "",
+        reason: normalizeReasonLabel(leave.reason || ""),
         created_at: leave.createdAt || new Date().toISOString()
       };
+
+      if (memoColumnAvailable) {
+        row.memo = leave.memo || "";
+      }
+
+      return row;
+    }
+
+    function leaveSelectColumns() {
+      return memoColumnAvailable
+        ? "id,start_date,end_date,type,reason,memo,created_at"
+        : "id,start_date,end_date,type,reason,created_at";
     }
 
     async function loadHolidaysFromSupabase() {
@@ -7569,11 +7670,23 @@
           if (createSettingsError) throw createSettingsError;
         }
 
-        const { data: leaves, error: leavesError } = await supabaseClient
+        let { data: leaves, error: leavesError } = await supabaseClient
           .from("annual_leaves")
-          .select("id,start_date,end_date,type,reason,created_at")
+          .select(leaveSelectColumns())
           .eq("user_id", currentUser.id)
           .order("start_date", { ascending: true });
+
+        if (leavesError && isMemoColumnError(leavesError)) {
+          memoColumnAvailable = false;
+          const fallback = await supabaseClient
+            .from("annual_leaves")
+            .select(leaveSelectColumns())
+            .eq("user_id", currentUser.id)
+            .order("start_date", { ascending: true });
+
+          leaves = fallback.data;
+          leavesError = fallback.error;
+        }
 
         if (leavesError) throw leavesError;
 
@@ -7600,11 +7713,23 @@
       async createLeave(leave) {
         if (!currentUser) throw new Error("로그인이 필요합니다.");
 
-        const { data, error } = await supabaseClient
+        let { data, error } = await supabaseClient
           .from("annual_leaves")
           .insert(normalizeLeaveToRow(leave))
-          .select("id,start_date,end_date,type,reason,created_at")
+          .select(leaveSelectColumns())
           .single();
+
+        if (error && isMemoColumnError(error)) {
+          memoColumnAvailable = false;
+          const retry = await supabaseClient
+            .from("annual_leaves")
+            .insert(normalizeLeaveToRow(leave))
+            .select(leaveSelectColumns())
+            .single();
+
+          data = retry.data;
+          error = retry.error;
+        }
 
         if (error) throw error;
         return normalizeLeaveFromRow(data);
@@ -7613,18 +7738,40 @@
       async updateLeave(leave) {
         if (!currentUser) throw new Error("로그인이 필요합니다.");
 
-        const { data, error } = await supabaseClient
+        const changes = {
+          start_date: leave.startDate,
+          end_date: leave.endDate || leave.startDate,
+          type: leave.type,
+          reason: normalizeReasonLabel(leave.reason || "")
+        };
+
+        if (memoColumnAvailable) {
+          changes.memo = leave.memo || "";
+        }
+
+        let { data, error } = await supabaseClient
           .from("annual_leaves")
-          .update({
-            start_date: leave.startDate,
-            end_date: leave.endDate || leave.startDate,
-            type: leave.type,
-            reason: leave.reason || ""
-          })
+          .update(changes)
           .eq("user_id", currentUser.id)
           .eq("id", leave.id)
-          .select("id,start_date,end_date,type,reason,created_at")
+          .select(leaveSelectColumns())
           .single();
+
+        if (error && isMemoColumnError(error)) {
+          memoColumnAvailable = false;
+          delete changes.memo;
+
+          const retry = await supabaseClient
+            .from("annual_leaves")
+            .update(changes)
+            .eq("user_id", currentUser.id)
+            .eq("id", leave.id)
+            .select(leaveSelectColumns())
+            .single();
+
+          data = retry.data;
+          error = retry.error;
+        }
 
         if (error) throw error;
         return normalizeLeaveFromRow(data);
@@ -7707,11 +7854,12 @@
     ];
 
     const reasonOptions = [
-      "🎂 생일/기념일",
-      "✈️ 여행",
+      "👤 개인 일정",
       "🏥 병원/검진",
-      "🏡 늦잠/휴식",
       "👨‍👩‍👧 가족행사",
+      "✈️ 여행",
+      "🌿 휴식/컨디션 관리",
+      "🎂 생일/기념일",
       "✏️ 직접 입력"
     ];
 
@@ -8488,7 +8636,8 @@
               <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
               <div class="leave-meta">
                 <strong>${type.icon} ${type.label}</strong>
-                <span>${dateText} · ${reason}</span>
+                <span>${escapeHTML(dateText)} · ${escapeHTML(reason)}</span>
+                ${l.memo ? `<span class="leave-memo">메모: ${escapeHTML(l.memo)}</span>` : ""}
               </div>
               <div class="leave-actions">
                 <button class="edit-btn" data-id="${l.id}" aria-label="수정">✎</button>
@@ -8896,6 +9045,7 @@
       $("#startDate").value = dateISO;
       $("#endDate").value = dateISO;
       $("#customReason").value = "";
+      $("#leaveMemo").value = "";
       $("#sheetSub").textContent = `${formatKoreanDate(dateISO, true)}의 쉼을 기록해요.`;
       $("#deleteForDate").style.display = leavesForDate(dateISO).length ? "block" : "none";
 
@@ -8929,6 +9079,7 @@
       $("#startDate").value = leave.startDate;
       $("#endDate").value = leave.endDate || leave.startDate;
       $("#customReason").value = isPresetReason ? "" : reason;
+      $("#leaveMemo").value = leave.memo || "";
       $("#sheetSub").textContent = `${formatKoreanDate(leave.startDate, true)}의 쉼을 수정해요.`;
       $("#deleteForDate").style.display = "block";
 
@@ -9003,12 +9154,16 @@
         ? state.leaves.find(l => l.id === editingLeaveId)
         : null;
 
+      reason = normalizeReasonLabel(reason);
+      const memo = $("#leaveMemo").value.trim();
+
       const payload = {
         id: editingLeaveId || `leave_${Date.now()}_${Math.random().toString(16).slice(2)}`,
         startDate: toISO(start),
         endDate: toISO(end),
         type: selectedType,
         reason,
+        memo,
         createdAt: existing?.createdAt || new Date().toISOString()
       };
 
@@ -9143,7 +9298,7 @@
         return;
       }
 
-      const headers = ["시작일", "종료일", "휴가종류", "사유", "차감일수", "등록일"];
+      const headers = ["시작일", "종료일", "휴가종류", "사유", "메모", "차감일수", "등록일"];
       const rows = state.leaves
         .slice()
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
@@ -9154,6 +9309,7 @@
             leave.endDate || leave.startDate,
             type.label,
             leave.reason || "",
+            leave.memo || "",
             calcLeaveAmount(leave),
             leave.createdAt || ""
           ];
