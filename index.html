@@ -8297,6 +8297,135 @@
       }
     }
 
+
+    /************************************************************
+     * Mobile settings chip + FAB restore
+     ************************************************************/
+    .mobile-settings-chip {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      .dashboard {
+        grid-template-areas:
+          "total used remain"
+          "progress progress progress" !important;
+      }
+
+      .dashboard > .settings-btn {
+        display: none !important;
+      }
+
+      .topbar-actions {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+
+      .user-chip {
+        width: 100% !important;
+        flex: 1 0 100% !important;
+      }
+
+      .sync-status {
+        flex: 0 0 auto !important;
+      }
+
+      .mobile-settings-chip {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        height: 30px !important;
+        padding: 0 12px !important;
+        border-radius: 999px !important;
+        background: #F4FAFC !important;
+        border: 1px solid rgba(206, 230, 238, .9) !important;
+        color: var(--ink-main, #2F2B29) !important;
+        font-size: 11px !important;
+        font-weight: 900 !important;
+        box-shadow: 0 8px 18px rgba(31, 63, 84, .045) !important;
+      }
+
+      .mobile-settings-chip span {
+        width: 20px !important;
+        height: 20px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        background: #FFF6C8 !important;
+        border: 1px solid rgba(232, 216, 137, .75) !important;
+        font-size: 12px !important;
+      }
+
+      /* 하단 탭바는 기존처럼 전체 폭으로 유지 */
+      .view-tabs {
+        position: fixed !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: max(12px, env(safe-area-inset-bottom)) !important;
+        top: auto !important;
+        transform: translateX(-50%) !important;
+        width: min(430px, calc(100vw - 28px)) !important;
+        max-width: calc(100vw - 28px) !important;
+        height: 64px !important;
+        padding: 8px !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        border-radius: 28px !important;
+        background: rgba(255,255,255,.9) !important;
+        box-shadow: 0 20px 45px rgba(16,36,54,.16) !important;
+        backdrop-filter: blur(20px) !important;
+        z-index: 35 !important;
+      }
+
+      .view-tab {
+        height: 48px !important;
+        min-height: 48px !important;
+        border-radius: 22px !important;
+        font-size: 13px !important;
+      }
+
+      /* + 버튼은 탭바 위 오른쪽으로 분리 */
+      .fab {
+        right: 16px !important;
+        bottom: max(88px, calc(env(safe-area-inset-bottom) + 86px)) !important;
+        width: 58px !important;
+        height: 58px !important;
+        border-radius: 22px !important;
+        font-size: 29px !important;
+        z-index: 36 !important;
+        display: grid !important;
+        place-items: center !important;
+        box-shadow: 0 14px 30px rgba(140, 215, 232, .24) !important;
+        transition: transform .2s var(--ease, ease), opacity .2s var(--ease, ease), box-shadow .2s var(--ease, ease) !important;
+      }
+
+      body.fab-scrolling .fab {
+        transform: scale(.9) !important;
+        opacity: .92 !important;
+        box-shadow: 0 10px 22px rgba(140, 215, 232, .18) !important;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .view-tabs {
+        width: min(420px, calc(100vw - 24px)) !important;
+        max-width: calc(100vw - 24px) !important;
+      }
+
+      .fab {
+        right: 14px !important;
+        bottom: max(86px, calc(env(safe-area-inset-bottom) + 84px)) !important;
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 21px !important;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -8329,6 +8458,7 @@
           <button class="logout-btn" id="logoutBtn" type="button">로그아웃</button>
         </div>
         <div class="sync-status" title="Supabase 동기화 사용 중"><i class="sync-dot"></i> Cloud Sync</div>
+        <button class="mobile-settings-chip" id="mobileOpenSettings" type="button" aria-label="연차 설정"><span>⚙</span> 설정</button>
       </div>
     </header>
 
@@ -8706,6 +8836,22 @@
         document.querySelectorAll(".app, .bottom-sheet, #sheet").forEach((target) => {
           target.addEventListener("scroll", setFabCompact, { passive: true });
         });
+      });
+    })();
+
+  
+    (function bindMobileSettingsChip() {
+      if (window.__shimPyoMobileSettingsBound) return;
+      window.__shimPyoMobileSettingsBound = true;
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("#mobileOpenSettings");
+        if (!button) return;
+        if (typeof openSettings === "function") {
+          openSettings();
+        } else {
+          document.getElementById("openSettings")?.click();
+        }
       });
     })();
 
