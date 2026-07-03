@@ -7375,6 +7375,174 @@
       }
     }
 
+
+
+    /************************************************************
+     * Final usability polish
+     ************************************************************/
+    .dashboard > .leave-progress-card { grid-area: progress; }
+
+    .leave-progress-card {
+      min-height: 66px;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F7FBFD 100%);
+      border: 1px solid rgba(220, 234, 239, .95);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.8), 0 8px 18px rgba(33,38,43,.035);
+    }
+
+    .leave-progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+    }
+
+    .leave-progress-head strong {
+      color: var(--ink-main, #2F2B29);
+      font-size: 13px;
+    }
+
+    .leave-progress-track {
+      position: relative;
+      width: 100%;
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #EDF3F5;
+      box-shadow: inset 0 0 0 1px rgba(218, 229, 233, .9);
+    }
+
+    .leave-progress-track i {
+      display: block;
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #D7EECB 0%, #CFE8F0 100%);
+      transition: width .45s var(--ease, ease);
+    }
+
+    #leaveUsageHint {
+      margin: 8px 0 0;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .memo-indicator,
+    .calendar-memo-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .memo-indicator {
+      margin-left: 4px;
+      font-size: 12px;
+      opacity: .86;
+    }
+
+    .calendar-memo-dot {
+      margin-left: 2px;
+      font-size: .9em;
+    }
+
+    .bottom-sheet .sheet-actions {
+      position: sticky !important;
+      bottom: -1px !important;
+      z-index: 12 !important;
+      margin: 22px -2px -4px !important;
+      padding: 14px 2px 4px !important;
+      background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.94) 28%, #FFFFFF 100%) !important;
+      backdrop-filter: blur(12px) !important;
+      border-top: 1px solid rgba(234, 239, 241, .78) !important;
+    }
+
+    .bottom-sheet .save-btn,
+    .bottom-sheet .clear-btn,
+    .bottom-sheet .cancel-edit-btn {
+      box-shadow: 0 10px 20px rgba(33, 38, 43, .06) !important;
+    }
+
+    @media (min-width: 721px) {
+      .dashboard {
+        grid-template-areas:
+          "total used remain"
+          "progress progress progress"
+          "settings settings settings" !important;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .dashboard {
+        grid-template-areas:
+          "total used remain"
+          "progress progress progress"
+          "settings settings settings" !important;
+      }
+
+      .leave-progress-card {
+        min-height: 58px !important;
+        padding: 11px 12px !important;
+        border-radius: 18px !important;
+      }
+
+      .leave-progress-head {
+        margin-bottom: 7px !important;
+        font-size: 11px !important;
+      }
+
+      .leave-progress-head strong {
+        font-size: 12px !important;
+      }
+
+      .leave-progress-track {
+        height: 8px !important;
+      }
+
+      #leaveUsageHint {
+        margin-top: 6px !important;
+        font-size: 10.5px !important;
+      }
+
+      .bottom-sheet .sheet-actions,
+      body.editing-leave .bottom-sheet .sheet-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        margin-left: -2px !important;
+        margin-right: -2px !important;
+      }
+
+      body.editing-leave .bottom-sheet .save-btn {
+        grid-column: 1 / -1;
+        order: 1;
+      }
+
+      body.editing-leave .bottom-sheet .cancel-edit-btn {
+        order: 2;
+      }
+
+      body.editing-leave .bottom-sheet .clear-btn {
+        order: 3;
+      }
+
+      body:not(.editing-leave) .bottom-sheet .save-btn {
+        grid-column: 1 / -1;
+      }
+
+      body:not(.editing-leave) .bottom-sheet .clear-btn {
+        grid-column: 1 / -1;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -7424,6 +7592,16 @@
           <div class="stat-label">잔여 연차</div>
           <div class="stat-value"><span id="remainLeave">0.00</span><span class="stat-unit">일</span></div>
         </article>
+        <div class="leave-progress-card" aria-label="연차 사용률">
+          <div class="leave-progress-head">
+            <span>사용률</span>
+            <strong id="leaveUsageText">0% 사용</strong>
+          </div>
+          <div class="leave-progress-track" aria-hidden="true">
+            <i id="leaveUsageBar"></i>
+          </div>
+          <p id="leaveUsageHint">아직 사용한 연차가 없어요.</p>
+        </div>
         <button class="settings-btn" id="openSettings" aria-label="연차 설정"><span class="settings-icon">⚙</span><span class="settings-label">연차 설정</span></button>
       </div>
 
@@ -8611,6 +8789,23 @@
       $("#usedLeave").textContent = money(used);
       $("#remainLeave").textContent = money(remain);
       $("#totalInput").value = total;
+
+      const percent = total > 0 ? Math.min(100, Math.max(0, (used / total) * 100)) : 0;
+      const usageText = $("#leaveUsageText");
+      const usageBar = $("#leaveUsageBar");
+      const usageHint = $("#leaveUsageHint");
+
+      if (usageText) usageText.textContent = `${Math.round(percent)}% 사용`;
+      if (usageBar) usageBar.style.width = `${percent}%`;
+      if (usageHint) {
+        if (used <= 0) {
+          usageHint.textContent = "아직 사용한 연차가 없어요.";
+        } else if (remain <= 0) {
+          usageHint.textContent = "올해 연차를 모두 사용했어요.";
+        } else {
+          usageHint.textContent = `남은 연차 ${formatDays(remain)}를 계획적으로 나눠 쓸 수 있어요.`;
+        }
+      }
     }
 
     function renderTypeButtons() {
@@ -8690,7 +8885,8 @@
         ? `${type.icon} ${getCompactLeaveTypeLabel(leave.type)}`
         : `${type.icon} ${type.label}`;
       const duration = leaveDurationLabel(leave);
-      return duration && !isMobileViewport() ? `${baseLabel} ${duration}` : baseLabel;
+      const memoDot = leave.memo ? " 💬" : "";
+      return duration && !isMobileViewport() ? `${baseLabel}${memoDot} ${duration}` : `${baseLabel}${memoDot}`;
     }
 
     function calendarEventClass(leave, iso) {
@@ -8699,6 +8895,7 @@
       const classes = ["event-pill"];
 
       if (!type.countable) classes.push("free");
+      if (leave.memo) classes.push("has-memo");
       if (position === "start") classes.push("range-start");
       if (position === "mid") classes.push("range-mid");
       if (position === "end") classes.push("range-end");
@@ -8894,7 +9091,7 @@
             <div class="leave-item">
               <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
               <div class="leave-meta">
-                <strong>${type.icon} ${type.label}</strong>
+                <strong>${type.icon} ${type.label}${l.memo ? `<span class="memo-indicator" title="메모 있음">💬</span>` : ""}</strong>
                 <span>${escapeHTML(dateText)} · ${escapeHTML(reason)}</span>
                 ${l.memo ? `<span class="leave-memo">메모: ${escapeHTML(l.memo)}</span>` : ""}
               </div>
@@ -9236,7 +9433,7 @@
     function renderRecommendation() {
       document.body.classList.toggle("has-recommendations", recommendations.length > 0);
       if (!recommendations.length) {
-        $("#recommendCount").textContent = "0/0";
+        $("#recommendCount").textContent = "추천 없음";
         $("#recommendUseDays").textContent = "-";
         $("#recommendRestDays").textContent = "-";
         $("#recommendStartDate").textContent = "-";
@@ -9252,7 +9449,7 @@
       const leaveCount = rec.leaveDates.length;
       const restDays = range.totalDays || extractFirstNumber(rec?.result) || 0;
 
-      $("#recommendCount").textContent = `${safeIndex + 1}/${recommendations.length}`;
+      $("#recommendCount").textContent = `추천 ${safeIndex + 1}/${recommendations.length}`;
       $("#recommendUseDays").textContent = `${leaveCount}개`;
       $("#recommendRestDays").textContent = `${restDays}일`;
       $("#recommendStartDate").textContent = range.start;
