@@ -7196,6 +7196,185 @@
       }
     }
 
+
+    /************************************************************
+     * Memo visual polish
+     ************************************************************/
+    .memo-section {
+      padding: 16px !important;
+      border-radius: 24px !important;
+      background:
+        radial-gradient(circle at 94% 0%, rgba(212, 235, 249, .72), transparent 42%),
+        linear-gradient(180deg, rgba(246, 251, 253, .96), rgba(255, 255, 255, .96)) !important;
+      border: 1px solid rgba(212, 235, 249, .85) !important;
+      box-shadow: 0 10px 24px rgba(33, 38, 43, .035), inset 0 0 0 1px rgba(255, 255, 255, .7) !important;
+    }
+
+    .memo-title-row {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 10px !important;
+      margin-bottom: 10px !important;
+    }
+
+    .memo-title {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      margin: 0 !important;
+      font-size: 17px !important;
+      font-weight: 950 !important;
+      color: var(--ink-main, #2F2B29) !important;
+      letter-spacing: -0.04em !important;
+    }
+
+    .memo-icon {
+      width: 28px !important;
+      height: 28px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 50% !important;
+      background: #EAF6FB !important;
+      box-shadow: inset 0 0 0 1px rgba(197, 226, 236, .9) !important;
+      font-size: 14px !important;
+    }
+
+    .memo-optional {
+      flex: 0 0 auto !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-height: 28px !important;
+      padding: 0 11px !important;
+      border-radius: 999px !important;
+      background: #FFFFFF !important;
+      border: 1px solid rgba(225, 235, 239, .95) !important;
+      color: var(--ink-sub, #8F8A83) !important;
+      font-size: 12px !important;
+      font-weight: 900 !important;
+      letter-spacing: -0.03em !important;
+    }
+
+    #leaveMemo,
+    textarea#leaveMemo,
+    .memo-field {
+      min-height: 98px !important;
+      padding: 16px 17px !important;
+      border-radius: 20px !important;
+      background: rgba(255, 255, 255, .96) !important;
+      border: 1px solid rgba(210, 229, 235, .95) !important;
+      color: var(--ink-main, #2F2B29) !important;
+      font-size: 15px !important;
+      font-weight: 800 !important;
+      line-height: 1.55 !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .85), 0 8px 18px rgba(29, 58, 76, .035) !important;
+    }
+
+    #leaveMemo::placeholder,
+    textarea#leaveMemo::placeholder,
+    .memo-field::placeholder {
+      color: #B0AAA2 !important;
+      font-weight: 750 !important;
+    }
+
+    #leaveMemo:focus,
+    textarea#leaveMemo:focus,
+    .memo-field:focus {
+      border-color: #B7DDEA !important;
+      background: #FFFFFF !important;
+      box-shadow: 0 0 0 5px rgba(212, 235, 249, .52), inset 0 0 0 1px rgba(255, 255, 255, .9) !important;
+    }
+
+    .memo-helper {
+      margin: 9px 0 0 !important;
+      color: var(--ink-sub, #8F8A83) !important;
+      font-size: 12px !important;
+      font-weight: 850 !important;
+      line-height: 1.45 !important;
+      letter-spacing: -0.02em !important;
+    }
+
+    .preview-memo {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .72);
+      border: 1px solid rgba(220, 234, 239, .92);
+      color: var(--ink-main, #2F2B29);
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .preview-memo.active {
+      display: block;
+    }
+
+    .preview-memo strong {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-right: 5px;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .preview-memo span {
+      display: inline;
+    }
+
+    @media (max-width: 720px) {
+      .memo-section {
+        padding: 14px !important;
+        border-radius: 22px !important;
+      }
+
+      .memo-title-row {
+        margin-bottom: 9px !important;
+      }
+
+      .memo-title {
+        font-size: 15px !important;
+      }
+
+      .memo-icon {
+        width: 25px !important;
+        height: 25px !important;
+        font-size: 13px !important;
+      }
+
+      .memo-optional {
+        min-height: 25px !important;
+        padding: 0 9px !important;
+        font-size: 11px !important;
+      }
+
+      #leaveMemo,
+      textarea#leaveMemo,
+      .memo-field {
+        min-height: 86px !important;
+        padding: 13px 14px !important;
+        border-radius: 18px !important;
+        font-size: 13px !important;
+      }
+
+      .memo-helper {
+        font-size: 11px !important;
+      }
+
+      .preview-memo {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -7496,9 +7675,12 @@
     </div>
 
     <div class="form-section memo-section">
-      <label class="title" for="leaveMemo">메모</label>
-      <textarea class="memo-field" id="leaveMemo" name="leaveMemo" rows="3" maxlength="200" autocomplete="off" placeholder="선택 사항이에요. 예: 치과 예약 10:30"></textarea>
-      <p class="memo-helper">캘린더에는 길게 표시하지 않고, 상세 목록과 CSV에 기록돼요.</p>
+      <div class="memo-title-row">
+        <label class="title memo-title" for="leaveMemo"><span class="memo-icon">💬</span> 메모</label>
+        <span class="memo-optional">선택 사항</span>
+      </div>
+      <textarea class="memo-field" id="leaveMemo" name="leaveMemo" rows="3" maxlength="200" autocomplete="off" placeholder="예: 치과 예약 10:30, 가족 행사, 여행 준비 메모"></textarea>
+      <p class="memo-helper">메모는 상세 목록과 CSV에만 기록돼요.</p>
     </div>
 
     <section class="leave-preview" id="leavePreview" aria-live="polite">
@@ -7515,6 +7697,7 @@
         <strong id="previewAfter">0일</strong>
       </div>
       <p class="preview-note" id="previewNote">주말과 공휴일은 자동으로 제외해서 계산해요.</p>
+          <div class="preview-memo" id="previewMemo"><strong>💬 메모</strong><span></span></div>
     </section>
 
     <div class="sheet-actions">
@@ -8110,7 +8293,18 @@
       const beforeEl = $("#previewBefore");
       const afterEl = $("#previewAfter");
       const noteEl = $("#previewNote");
+      const previewMemo = $("#previewMemo");
       if (!amountEl || !beforeEl || !afterEl || !noteEl) return;
+
+      const syncPreviewMemo = () => {
+        if (!previewMemo) return;
+        const memoText = ($("#leaveMemo")?.value || "").trim();
+        const memoSpan = previewMemo.querySelector("span");
+        if (memoSpan) {
+          memoSpan.textContent = memoText.length > 42 ? `${memoText.slice(0, 42)}…` : memoText;
+        }
+        previewMemo.classList.toggle("active", Boolean(memoText));
+      };
 
       const payload = getSheetPreviewPayload();
       if (!payload) {
@@ -8119,6 +8313,7 @@
         afterEl.textContent = "-";
         noteEl.textContent = "날짜를 선택하면 실제 차감일수를 미리 계산해요.";
         noteEl.classList.remove("warning");
+        syncPreviewMemo();
         return;
       }
 
@@ -8132,6 +8327,7 @@
       amountEl.textContent = type.countable ? formatDays(amount) : "차감 없음";
       beforeEl.textContent = formatDays(before);
       afterEl.textContent = formatDays(after);
+      syncPreviewMemo();
 
       if (!type.countable) {
         noteEl.textContent = "경조사/공가/기타 휴가는 기록만 남기고 연차에서는 차감하지 않아요.";
@@ -9592,6 +9788,38 @@
         $("#userEmail").textContent = currentUser.email || "Google 계정";
       }
       syncAdminUI();
+    }
+
+
+    function bindAllDatePickers() {
+      document.querySelectorAll('input[type="date"]').forEach(input => {
+        input.readOnly = false;
+        input.disabled = false;
+      });
+    }
+
+    function bindMemoField() {
+      const memo = document.getElementById("leaveMemo");
+      if (!memo || memo.dataset.memoBound === "true") return;
+
+      memo.dataset.memoBound = "true";
+      memo.readOnly = false;
+      memo.disabled = false;
+
+      memo.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+      });
+
+      memo.addEventListener("click", (event) => {
+        event.stopPropagation();
+        memo.focus();
+      });
+
+      memo.addEventListener("touchstart", (event) => {
+        event.stopPropagation();
+      }, { passive: true });
+
+      memo.addEventListener("input", updateLeavePreview);
     }
 
     function bindAuthEvents() {
