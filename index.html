@@ -1681,6 +1681,73 @@
       font-weight: 900;
     }
 
+    .monthly-report-card {
+      position: relative;
+    }
+
+    .month-tooltip {
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      top: 0;
+      min-width: 86px;
+      padding: 9px 11px 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.97);
+      border: 1px solid rgba(200, 226, 236, .95);
+      box-shadow: 0 16px 34px rgba(31, 63, 84, .16);
+      text-align: center;
+      transform: translate(-50%, -100%) translateY(-10px) scale(.96);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .16s ease, transform .16s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    .month-tooltip[hidden] {
+      display: none;
+    }
+
+    .month-tooltip.is-open {
+      opacity: 1;
+      transform: translate(-50%, -100%) translateY(-14px) scale(1);
+    }
+
+    .month-tooltip::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -6px;
+      width: 10px;
+      height: 10px;
+      background: rgba(255,255,255,.97);
+      border-right: 1px solid rgba(200, 226, 236, .95);
+      border-bottom: 1px solid rgba(200, 226, 236, .95);
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .month-tooltip strong {
+      display: block;
+      color: var(--ink-main, #2F2B29);
+      font-size: 13px;
+      font-weight: 950;
+      line-height: 1.2;
+    }
+
+    #monthPopupValue {
+      display: block;
+      margin-top: 3px;
+      color: var(--ink-sub, #827C75);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+
+    .month-bar-item {
+      cursor: default;
+    }
+
     .report-extra-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -2044,6 +2111,14 @@
 
       .month-value {
         display: none;
+      }
+
+      .month-bar-item {
+        cursor: pointer;
+      }
+
+      .month-bar-item:active .month-column {
+        transform: scaleY(.96);
       }
 
       .report-extra-grid {
@@ -8614,6 +8689,10 @@
             <span id="monthlyTotalText">올해 기준</span>
           </div>
           <div class="month-bars" id="monthBars"></div>
+          <div class="month-tooltip" id="monthUsagePopup" hidden aria-hidden="true">
+            <strong id="monthPopupTitle">1월</strong>
+            <span id="monthPopupValue">0일 사용</span>
+          </div>
         </article>
 
         <div class="report-extra-grid">
@@ -9629,7 +9708,7 @@
 
       if (total <= 0) {
         $("#monthBars").innerHTML = monthly.map(item => `
-          <div class="month-bar-item empty">
+          <div class="month-bar-item empty" data-month="${item.month}" data-amount="0" role="button" tabindex="0" aria-label="${item.month}월 0일 사용">
             <div class="month-column" style="height:6px"></div>
             <span class="month-value">0</span>
             <span class="month-label">${item.month}월</span>
@@ -9641,13 +9720,58 @@
       $("#monthBars").innerHTML = monthly.map(item => {
         const height = item.amount > 0 ? Math.max(8, (item.amount / max) * 88) : 6;
         return `
-          <div class="month-bar-item ${item.amount ? "" : "empty"}" title="${item.month}월 ${formatDays(item.amount)}">
+          <div class="month-bar-item ${item.amount ? "" : "empty"}" title="${item.month}월 ${formatDays(item.amount)}" data-month="${item.month}" data-amount="${item.amount}" role="button" tabindex="0" aria-label="${item.month}월 ${formatDays(item.amount)} 사용">
             <div class="month-column" style="height:${height}px"></div>
             <span class="month-value">${item.amount ? formatDays(item.amount).replace("일", "") : "0"}</span>
             <span class="month-label">${item.month}월</span>
           </div>
         `;
       }).join("");
+    }
+
+    let monthTooltipTimer = null;
+
+    function openMonthUsagePopup(month, amount, anchorEl = null) {
+      const popup = $("#monthUsagePopup");
+      const card = document.querySelector(".monthly-report-card");
+      if (!popup || !card) return;
+
+      $("#monthPopupTitle").textContent = `${month}월`;
+      $("#monthPopupValue").textContent = `${formatDays(Number(amount) || 0)} 사용`;
+
+      if (anchorEl) {
+        const anchorRect = anchorEl.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const tooltipHalf = 48;
+        const left = Math.min(
+          Math.max(anchorRect.left - cardRect.left + anchorRect.width / 2, tooltipHalf),
+          Math.max(tooltipHalf, cardRect.width - tooltipHalf)
+        );
+        const top = Math.max(anchorRect.top - cardRect.top, 32);
+
+        popup.style.left = `${left}px`;
+        popup.style.top = `${top}px`;
+      }
+
+      popup.hidden = false;
+      popup.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(() => popup.classList.add("is-open"));
+
+      window.clearTimeout(monthTooltipTimer);
+      monthTooltipTimer = window.setTimeout(() => {
+        closeMonthUsagePopup();
+      }, 2600);
+    }
+
+    function closeMonthUsagePopup() {
+      const popup = $("#monthUsagePopup");
+      if (!popup || popup.hidden) return;
+      popup.classList.remove("is-open");
+      popup.setAttribute("aria-hidden", "true");
+      window.clearTimeout(monthTooltipTimer);
+      setTimeout(() => {
+        popup.hidden = true;
+      }, 160);
     }
 
     function renderRemainingSuggestion(remain) {
@@ -11295,6 +11419,34 @@
     });
 
     init();
+
+    document.addEventListener("click", (event) => {
+      const monthBar = event.target.closest(".month-bar-item[data-month]");
+      if (monthBar && window.matchMedia("(max-width: 720px)").matches) {
+        openMonthUsagePopup(monthBar.dataset.month, monthBar.dataset.amount, monthBar);
+        return;
+      }
+
+      if (!event.target.closest("#monthUsagePopup")) {
+        closeMonthUsagePopup();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeMonthUsagePopup();
+      }
+
+      const monthBar = event.target.closest?.(".month-bar-item[data-month]");
+      if (!monthBar) return;
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openMonthUsagePopup(monthBar.dataset.month, monthBar.dataset.amount, monthBar);
+      }
+    });
+
+    window.addEventListener("resize", closeMonthUsagePopup);
+
   </script>
 </body>
 </html>
