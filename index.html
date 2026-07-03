@@ -8623,7 +8623,67 @@
       }
     }
 
-  </style>
+  
+
+    /************************************************************
+     * Mobile nav button hit-area fix
+     ************************************************************/
+    @media (max-width: 720px) {
+      .nav-btns {
+        position: relative !important;
+        display: grid !important;
+        grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        isolation: isolate !important;
+      }
+
+      .nav-btns > button,
+      .nav-btn,
+      .today-btn {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        position: relative !important;
+        z-index: 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        flex: none !important;
+        touch-action: manipulation !important;
+        box-sizing: border-box !important;
+      }
+
+      .nav-btn {
+        width: 44px !important;
+        min-width: 44px !important;
+        justify-self: center !important;
+      }
+
+      .today-btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        justify-self: stretch !important;
+        overflow: hidden !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .nav-btns {
+        grid-template-columns: 40px minmax(0, 1fr) 40px !important;
+      }
+
+      .nav-btn {
+        width: 40px !important;
+        min-width: 40px !important;
+      }
+    }
+
+</style>
 </head>
 <body class="auth-mode">
   <section class="auth-screen" id="authScreen" aria-label="로그인 화면">
