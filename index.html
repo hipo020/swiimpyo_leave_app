@@ -7589,6 +7589,8 @@
      * 쉼표 데이터 저장 계층
      * Google 로그인 사용자별 Supabase DB 저장 버전입니다.
      ************************************************************/
+    // MEMO_COLUMN_SQL:
+    // alter table public.annual_leaves add column if not exists memo text;
     const SUPABASE_URL = "https://jbhbjhjdzmsmziyjxfyh.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_3KfcxlsmCdxaCjVbhzhtQg_PEro1iKi";
     const HOLIDAY_ADMIN_EMAIL = "hsoo9897@gmail.com";
@@ -7629,7 +7631,7 @@
         endDate: row.end_date,
         type: row.type,
         reason: normalizeReasonLabel(row.reason || ""),
-        memo: row.memo || "",
+        memo: row.memo ?? "",
         createdAt: row.created_at || new Date().toISOString()
       };
     }
@@ -9141,7 +9143,7 @@
       $("#startDate").value = leave.startDate;
       $("#endDate").value = leave.endDate || leave.startDate;
       $("#customReason").value = isPresetReason ? "" : reason;
-      $("#leaveMemo").value = leave.memo || "";
+      $("#leaveMemo").value = leave.memo ?? "";
       $("#sheetSub").textContent = `${formatKoreanDate(leave.startDate, true)}의 쉼을 수정해요.`;
       $("#deleteForDate").style.display = "block";
 
@@ -9151,6 +9153,11 @@
       updateCustomReasonMotion();
       updateLeavePreview();
       showSheet();
+
+      setTimeout(() => {
+        const memoField = document.getElementById("leaveMemo");
+        if (memoField) memoField.value = leave.memo ?? "";
+      }, 0);
     }
 
     function closeSheet() {
@@ -9234,10 +9241,16 @@
         if (!ok) return;
       }
 
-      const savedLeave = await runStorageAction(
+      const savedLeaveFromDb = await runStorageAction(
         () => editingLeaveId ? storage.updateLeave(payload) : storage.createLeave(payload),
         "휴가 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
       );
+
+      const savedLeave = {
+        ...payload,
+        ...savedLeaveFromDb,
+        memo: savedLeaveFromDb?.memo ?? payload.memo ?? ""
+      };
 
       if (editingLeaveId) {
         state.leaves = state.leaves.map(l => l.id === editingLeaveId ? savedLeave : l);
@@ -9245,6 +9258,7 @@
         state.leaves.push(savedLeave);
       }
 
+      warnIfMemoColumnMissing();
       closeSheet();
       editingLeaveId = null;
       document.body.classList.remove("editing-leave");
