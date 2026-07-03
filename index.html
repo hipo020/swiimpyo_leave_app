@@ -17,6 +17,8 @@
       --white: #FFFFFF;
       --line: #EAF1F6;
       --muted: #8CA0B3;
+      --sage-soft: #E5F0D9;
+      --sage-strong: #C6DCA8;
       --shadow: 0 18px 46px rgba(16, 42, 67, 0.08);
       --shadow-soft: 0 12px 30px rgba(16, 42, 67, 0.06);
       --radius-xl: 32px;
@@ -1111,11 +1113,15 @@
     }
 
     .report-kicker {
-      display: block;
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
       margin-bottom: 7px;
+      padding: 5px 12px 6px;
       color: var(--navy-soft);
       font-size: 11px;
       font-weight: 950;
+      line-height: 1;
       letter-spacing: .08em;
     }
 
@@ -1197,7 +1203,7 @@
     }
 
     .donut-used {
-      stroke: var(--navy);
+      stroke: var(--sage-strong);
       stroke-dasharray: 0 999;
       transition: stroke-dasharray .55s var(--ease);
     }
@@ -1290,7 +1296,7 @@
       display: inline-block;
     }
 
-    .legend-used { background: var(--navy); }
+    .legend-used { background: var(--sage-strong); }
     .legend-remain { background: #EEF4F8; }
 
     .report-summary-card {
@@ -5776,6 +5782,14 @@
       box-shadow: inset 0 0 0 1px #E1EBEE;
     }
 
+    .report-kicker {
+      display: inline-flex !important;
+      align-items: center !important;
+      width: fit-content;
+      padding: 6px 14px 7px !important;
+      line-height: 1 !important;
+    }
+
     .nav-btn,
     .today-btn,
     .logout-btn,
@@ -5983,8 +5997,8 @@
     }
 
     .donut-bg { stroke: #ECE8E2 !important; }
-    .donut-used { stroke: #F4E27A !important; }
-    .legend-used { background: #F4E27A !important; }
+    .donut-used { stroke: var(--sage-strong) !important; }
+    .legend-used { background: var(--sage-strong) !important; }
     .legend-remain { background: #D7EEF5 !important; }
 
     .report-metrics > div {
@@ -8498,6 +8512,114 @@
         width: 56px !important;
         height: 56px !important;
         border-radius: 21px !important;
+      }
+    }
+
+
+    /************************************************************
+     * Report final visual tuning
+     ************************************************************/
+    :root {
+      --report-used: #BFDDB7;
+      --report-used-soft: #EAF5E7;
+      --report-remain: #E7F3F7;
+      --report-remain-dot: #CFE8F0;
+    }
+
+    .report-header {
+      padding-top: 4px !important;
+    }
+
+    .report-kicker {
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      width: fit-content !important;
+      min-height: 28px !important;
+      margin-bottom: 14px !important;
+      padding: 0 15px !important;
+      border-radius: 999px !important;
+      background: linear-gradient(180deg, #F7FBFC 0%, #EEF7FA 100%) !important;
+      border: 1px solid rgba(207, 232, 240, .95) !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.78), 0 6px 14px rgba(31, 63, 84, .035) !important;
+      color: #7B8589 !important;
+      font-size: 11px !important;
+      font-weight: 950 !important;
+      line-height: 1 !important;
+      letter-spacing: .08em !important;
+    }
+
+    .report-header h2 {
+      margin-top: 0 !important;
+      letter-spacing: -0.07em !important;
+    }
+
+    .report-header p {
+      margin-top: 12px !important;
+      max-width: 520px !important;
+    }
+
+    .donut-card {
+      background:
+        radial-gradient(circle at 50% 48%, rgba(234, 245, 231, .55), transparent 42%),
+        #FFFFFF !important;
+    }
+
+    .donut-bg {
+      stroke: var(--report-remain) !important;
+    }
+
+    .donut-used {
+      stroke: var(--report-used) !important;
+    }
+
+    .legend-used {
+      background: var(--report-used) !important;
+    }
+
+    .legend-remain {
+      background: var(--report-remain-dot) !important;
+    }
+
+    .donut-center span {
+      color: #7E8782 !important;
+    }
+
+    .donut-center small {
+      color: #8D958E !important;
+    }
+
+    .donut-tooltip {
+      background: #2F3A34 !important;
+      box-shadow: 0 14px 30px rgba(47, 58, 52, .18) !important;
+    }
+
+    @media (max-width: 720px) {
+      .report-header {
+        padding-top: 2px !important;
+      }
+
+      .report-kicker {
+        min-height: 26px !important;
+        margin-bottom: 16px !important;
+        padding: 0 13px !important;
+        font-size: 10.5px !important;
+      }
+
+      .report-header h2 {
+        font-size: clamp(34px, 9vw, 42px) !important;
+        line-height: 1.05 !important;
+      }
+
+      .report-header p {
+        margin-top: 12px !important;
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+      }
+
+      .donut-card {
+        padding-top: 28px !important;
+        padding-bottom: 28px !important;
       }
     }
 
