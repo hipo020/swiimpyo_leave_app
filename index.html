@@ -7657,6 +7657,302 @@
       }
     }
 
+
+    /************************************************************
+     * Planned leave / status upgrade
+     ************************************************************/
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .status-btn {
+      min-height: 72px;
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: #F5FAFC;
+      border: 1px solid rgba(212,235,249,.9);
+      color: var(--ink-main, #2F2B29);
+      text-align: left;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.75);
+      transition: transform .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease);
+    }
+
+    .status-btn strong {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 16px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .status-btn span {
+      display: block;
+      margin-top: 6px;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+
+    .status-btn.active {
+      background: linear-gradient(180deg, #E8F7E1 0%, #D9F4C8 100%);
+      border-color: #C9ECB4;
+    }
+
+    .status-btn[data-status="planned"].active {
+      background: linear-gradient(180deg, #F2EDFF 0%, #E9E0FF 100%);
+      border-color: #D9C9FF;
+    }
+
+    .status-helper {
+      margin: 9px 0 0;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .planned-card {
+      background:
+        radial-gradient(circle at 95% 0%, rgba(232,224,255,.9), transparent 45%),
+        linear-gradient(180deg, #FFFFFF 0%, #F8F5FF 100%) !important;
+      border: 1px solid rgba(217,201,255,.75) !important;
+    }
+
+    .planned-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .planned-head h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .planned-head p {
+      margin: 6px 0 0;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    #plannedCount {
+      flex: 0 0 auto;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(224,215,251,.9);
+      color: #6F5AA8;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .planned-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .planned-summary div {
+      min-height: 76px;
+      padding: 14px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(226,220,248,.8);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.8);
+    }
+
+    .planned-summary span {
+      display: block;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .planned-summary strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--ink-main, #2F2B29);
+      font-size: 24px;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .planned-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .planned-empty {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.72);
+      color: var(--ink-sub, #8F8A83);
+      font-size: 13px;
+      font-weight: 850;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .planned-item {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 10px;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.82);
+      border: 1px dashed rgba(171,145,236,.65);
+    }
+
+    .planned-date {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: #F0E9FF;
+      color: #6F5AA8;
+      font-size: 16px;
+      font-weight: 950;
+    }
+
+    .planned-meta strong {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-main, #2F2B29);
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+    }
+
+    .planned-meta span {
+      display: block;
+      margin-top: 4px;
+      color: var(--ink-sub, #8F8A83);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.4;
+    }
+
+    .planned-actions {
+      grid-column: 2 / 3;
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .confirm-planned-btn,
+    .planned-edit-btn {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .confirm-planned-btn {
+      background: #DDF3D1;
+      color: #2F5D28;
+    }
+
+    .planned-edit-btn {
+      background: #F4F2FA;
+      color: #6F5AA8;
+    }
+
+    .planned-add-btn {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 12px;
+      border-radius: 18px;
+      background: #FFFFFF;
+      border: 1px solid rgba(224,215,251,.9);
+      color: #6F5AA8;
+      font-weight: 950;
+      box-shadow: 0 8px 18px rgba(66,45,130,.045);
+    }
+
+    .event-pill.planned,
+    .leave-item.planned .leave-date {
+      background: #F0E9FF !important;
+      color: #6F5AA8 !important;
+      border: 1px dashed rgba(171,145,236,.75) !important;
+    }
+
+    .event-pill.planned {
+      box-shadow: none !important;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: #F0E9FF;
+      color: #6F5AA8;
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+    }
+
+    @media (max-width: 720px) {
+      .status-grid {
+        gap: 9px;
+      }
+
+      .status-btn {
+        min-height: 64px;
+        padding: 13px 14px;
+        border-radius: 20px;
+      }
+
+      .status-btn strong {
+        font-size: 14px;
+      }
+
+      .status-btn span,
+      .status-helper {
+        font-size: 11px;
+      }
+
+      .planned-head h3 {
+        font-size: 17px;
+      }
+
+      .planned-summary div {
+        min-height: 68px;
+        padding: 12px;
+        border-radius: 19px;
+      }
+
+      .planned-summary strong {
+        font-size: 20px;
+      }
+
+      .planned-item {
+        border-radius: 20px;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
@@ -7849,7 +8145,7 @@
         <div class="report-extra-grid">
           <article class="remaining-suggestion-card">
             <h3>남은 연차 사용법</h3>
-            <p id="remainingSuggestionText">잔여 연차를 기준으로 추천 조합을 보여드릴게요.</p>
+            <p id="remainingSuggestionText">잔여 연차를 어떻게 나눠 쓸 수 있는지 보여드릴게요.</p>
           </article>
           <article class="pattern-comment-card">
             <h3>쉼 패턴 코멘트</h3>
@@ -7859,46 +8155,28 @@
       </section>
 
       <aside class="side">
-        <section class="side-card recommend-card simple-recommend-card" id="recommendCard">
-          <div class="simple-rec-head">
-            <h3>스마트 연차 추천</h3>
-            <span id="recommendCount">0/0</span>
+        <section class="side-card planned-card simple-recommend-card" id="recommendCard">
+          <div class="planned-head">
+            <div>
+              <h3>예정 쉼</h3>
+              <p>쉬고 싶은 날을 미리 담아두고, 확정되면 연차로 전환해요.</p>
+            </div>
+            <span id="plannedCount">0건</span>
           </div>
 
-          <div class="rec-conversion">
-            <div class="rec-number-box">
-              <span>연차</span>
-              <strong id="recommendUseDays">-</strong>
+          <div class="planned-summary">
+            <div>
+              <span>예정 차감</span>
+              <strong id="plannedAmount">0일</strong>
             </div>
-            <div class="rec-arrow">→</div>
-            <div class="rec-number-box primary">
-              <span>총 휴식</span>
-              <strong id="recommendRestDays">-</strong>
-            </div>
-          </div>
-
-          <p class="simple-rec-result" id="recommendText">추천을 확인하는 중이에요.</p>
-
-          <div class="simple-rec-extra" id="recommendExtra">
-            <div class="simple-rec-flow">
-              <div>
-                <span>쉼 시작</span>
-                <strong id="recommendStartDate">-</strong>
-              </div>
-              <div>
-                <span>쉼 종료</span>
-                <strong id="recommendEndDate">-</strong>
-              </div>
-            </div>
-
-            <p class="simple-rec-desc" id="recommendDesc">오늘 이후 6개월 안의 평일 공휴일 징검다리를 찾아 추천해요.</p>
-
-            <div class="recommend-nav">
-              <button id="prevRec">이전</button>
-              <button id="nextRec">다음</button>
+            <div>
+              <span>확정 후 잔여</span>
+              <strong id="plannedAfterRemain">0일</strong>
             </div>
           </div>
 
+          <div class="planned-list" id="plannedLeaveList"></div>
+          <button class="planned-add-btn" id="openPlannedLeave" type="button">예정 쉼 추가하기</button>
           <button class="recommend-toggle" id="toggleRecommendCard" type="button" aria-expanded="false">자세히 보기</button>
         </section>
 
@@ -7949,6 +8227,12 @@
           <span class="date-field-icon" aria-hidden="true">📅</span>
         </label>
       </div>
+    </div>
+
+    <div class="form-section status-section">
+      <label class="title">등록 상태</label>
+      <div class="status-grid" id="statusGrid"></div>
+      <p class="status-helper" id="statusHelper">확정 쉼은 연차에서 바로 차감돼요.</p>
     </div>
 
     <div class="form-section">
@@ -8075,10 +8359,19 @@
     let holidayMapCache = {};
     let appEventsBound = false;
     let memoColumnAvailable = true;
+    let statusColumnAvailable = true;
 
     function normalizeReasonLabel(reason) {
       if (reason === "🏡 늦잠/휴식") return "🌿 휴식/컨디션 관리";
       return reason || "";
+    }
+
+    function normalizeLeaveStatus(status) {
+      return status === "planned" ? "planned" : "confirmed";
+    }
+
+    function isPlannedLeave(leave) {
+      return normalizeLeaveStatus(leave?.status) === "planned";
     }
 
     function escapeHTML(value) {
@@ -8099,6 +8392,23 @@
       );
     }
 
+    function applyOptionalLeaveColumnFallback(error) {
+      const message = String(error?.message || error?.details || "").toLowerCase();
+      let handled = false;
+
+      if (message.includes("memo") && (message.includes("column") || message.includes("schema cache") || message.includes("could not find"))) {
+        memoColumnAvailable = false;
+        handled = true;
+      }
+
+      if (message.includes("status") && (message.includes("column") || message.includes("schema cache") || message.includes("could not find"))) {
+        statusColumnAvailable = false;
+        handled = true;
+      }
+
+      return handled;
+    }
+
     function normalizeLeaveFromRow(row) {
       return {
         id: row.id,
@@ -8107,6 +8417,7 @@
         type: row.type,
         reason: normalizeReasonLabel(row.reason || ""),
         memo: row.memo ?? "",
+        status: normalizeLeaveStatus(row.status),
         createdAt: row.created_at || new Date().toISOString()
       };
     }
@@ -8126,13 +8437,19 @@
         row.memo = leave.memo || "";
       }
 
+      if (statusColumnAvailable) {
+        row.status = normalizeLeaveStatus(leave.status);
+      }
+
       return row;
     }
 
     function leaveSelectColumns() {
-      return memoColumnAvailable
-        ? "id,start_date,end_date,type,reason,memo,created_at"
-        : "id,start_date,end_date,type,reason,created_at";
+      const columns = ["id", "start_date", "end_date", "type", "reason"];
+      if (memoColumnAvailable) columns.push("memo");
+      if (statusColumnAvailable) columns.push("status");
+      columns.push("created_at");
+      return columns.join(",");
     }
 
     async function loadHolidaysFromSupabase() {
@@ -8214,8 +8531,7 @@
           .eq("user_id", currentUser.id)
           .order("start_date", { ascending: true });
 
-        if (leavesError && isMemoColumnError(leavesError)) {
-          memoColumnAvailable = false;
+        if (leavesError && applyOptionalLeaveColumnFallback(leavesError)) {
           const fallback = await supabaseClient
             .from("annual_leaves")
             .select(leaveSelectColumns())
@@ -8257,8 +8573,7 @@
           .select(leaveSelectColumns())
           .single();
 
-        if (error && isMemoColumnError(error)) {
-          memoColumnAvailable = false;
+        if (error && applyOptionalLeaveColumnFallback(error)) {
           const retry = await supabaseClient
             .from("annual_leaves")
             .insert(normalizeLeaveToRow(leave))
@@ -8283,6 +8598,10 @@
           reason: normalizeReasonLabel(leave.reason || "")
         };
 
+        if (statusColumnAvailable) {
+          changes.status = normalizeLeaveStatus(leave.status);
+        }
+
         if (memoColumnAvailable) {
           changes.memo = leave.memo || "";
         }
@@ -8295,9 +8614,9 @@
           .select(leaveSelectColumns())
           .single();
 
-        if (error && isMemoColumnError(error)) {
-          memoColumnAvailable = false;
+        if (error && applyOptionalLeaveColumnFallback(error)) {
           delete changes.memo;
+          delete changes.status;
 
           const retry = await supabaseClient
             .from("annual_leaves")
@@ -8401,6 +8720,22 @@
       "✏️ 직접 입력"
     ];
 
+    const statusOptions = [
+      {
+        id: "confirmed",
+        icon: "✅",
+        label: "확정",
+        desc: "바로 연차에서 차감해요."
+      },
+      {
+        id: "planned",
+        icon: "💜",
+        label: "예정",
+        desc: "미리 담아두고 나중에 확정해요."
+      }
+    ];
+
+
     /*
       기본 공휴일 데이터:
       - 현재 버전은 앱 내부에 직접 저장된 정적 holidaySeed 데이터를 사용합니다.
@@ -8484,6 +8819,7 @@
 
     let viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
     let selectedType = "annual";
+    let selectedStatus = "confirmed";
     let selectedReason = reasonOptions[0];
     let selectedDateISO = toISO(today);
     let recommendations = [];
@@ -8528,8 +8864,9 @@
       return out;
     }
 
-    function calcLeaveAmount(leave) {
+    function calcLeaveAmount(leave, options = {}) {
       const type = getType(leave.type);
+      if (isPlannedLeave(leave) && !options.includePlanned) return 0;
       if (!type.countable) return 0;
 
       const [start, end] = clampDateRange(leave.startDate, leave.endDate);
@@ -8544,8 +8881,9 @@
     function calcSummary() {
       const total = Number(state.settings.totalLeave || 0);
       const used = state.leaves.reduce((sum, leave) => sum + calcLeaveAmount(leave), 0);
+      const planned = state.leaves.reduce((sum, leave) => isPlannedLeave(leave) ? sum + calcLeaveAmount(leave, { includePlanned: true }) : sum, 0);
       const remain = total - used;
-      return { total, used, remain };
+      return { total, used, remain, planned };
     }
 
     function calcUsedExcept(leaveId) {
@@ -8576,7 +8914,8 @@
         startDate: toISO(start),
         endDate: toISO(end),
         type: selectedType,
-        reason: selectedReason
+        reason: selectedReason,
+        status: selectedStatus
       };
     }
 
@@ -8616,12 +8955,15 @@
       const after = before - amount;
       const type = getType(payload.type);
 
-      amountEl.textContent = type.countable ? formatDays(amount) : "차감 없음";
+      amountEl.textContent = selectedStatus === "planned" ? "예정" : (type.countable ? formatDays(amount) : "차감 없음");
       beforeEl.textContent = formatDays(before);
       afterEl.textContent = formatDays(after);
       syncPreviewMemo();
 
-      if (!type.countable) {
+      if (selectedStatus === "planned") {
+        noteEl.textContent = "예정 쉼은 확정 전까지 연차에서 차감하지 않아요.";
+        noteEl.classList.remove("warning");
+      } else if (!type.countable) {
         noteEl.textContent = "경조사/공가/기타 휴가는 기록만 남기고 연차에서는 차감하지 않아요.";
         noteEl.classList.remove("warning");
       } else if (after < 0) {
@@ -8747,6 +9089,7 @@
       }));
 
       state.leaves.forEach(leave => {
+        if (isPlannedLeave(leave)) return;
         const [start, end] = clampDateRange(leave.startDate, leave.endDate);
         eachDate(start, end).forEach(date => {
           if (date.getFullYear() !== currentYear) return;
@@ -8898,7 +9241,7 @@
     }
 
     function renderDashboard() {
-      const { total, used, remain } = calcSummary();
+      const { total, used, remain, planned } = calcSummary();
       $("#totalLeave").textContent = money(total);
       $("#usedLeave").textContent = money(used);
       $("#remainLeave").textContent = money(remain);
@@ -8917,7 +9260,9 @@
         } else if (remain <= 0) {
           usageHint.textContent = "올해 연차를 모두 사용했어요.";
         } else {
-          usageHint.textContent = `남은 연차 ${formatDays(remain)}를 계획적으로 나눠 쓸 수 있어요.`;
+          usageHint.textContent = planned > 0
+            ? `예정 쉼 ${formatDays(planned)}을 확정하면 잔여 ${formatDays(remain - planned)}가 예상돼요.`
+            : `남은 연차 ${formatDays(remain)}를 계획적으로 나눠 쓸 수 있어요.`;
         }
       }
     }
@@ -8937,6 +9282,34 @@
           updateLeavePreview();
         });
       });
+    }
+
+
+    function renderStatusButtons() {
+      const statusGrid = document.getElementById("statusGrid");
+      const helper = document.getElementById("statusHelper");
+      if (!statusGrid) return;
+
+      statusGrid.innerHTML = statusOptions.map(option => `
+        <button class="status-btn ${selectedStatus === option.id ? "active" : ""}" data-status="${option.id}" type="button">
+          <strong>${option.icon} ${option.label}</strong>
+          <span>${option.desc}</span>
+        </button>
+      `).join("");
+
+      statusGrid.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedStatus = btn.dataset.status;
+          renderStatusButtons();
+          updateLeavePreview();
+        });
+      });
+
+      if (helper) {
+        helper.textContent = selectedStatus === "planned"
+          ? "예정 쉼은 확정 전까지 사용한 연차에 포함하지 않아요."
+          : "확정 쉼은 저장 즉시 사용한 연차에 포함돼요.";
+      }
     }
 
     function renderReasonTags() {
@@ -9000,7 +9373,10 @@
         : `${type.icon} ${type.label}`;
       const duration = leaveDurationLabel(leave);
       const memoDot = leave.memo ? " 💬" : "";
-      return duration && !isMobileViewport() ? `${baseLabel}${memoDot} ${duration}` : `${baseLabel}${memoDot}`;
+      const statusPrefix = isPlannedLeave(leave) ? "예정 · " : "";
+      return duration && !isMobileViewport()
+        ? `${statusPrefix}${baseLabel}${memoDot} ${duration}`
+        : `${statusPrefix}${baseLabel}${memoDot}`;
     }
 
     function calendarEventClass(leave, iso) {
@@ -9009,6 +9385,7 @@
       const classes = ["event-pill"];
 
       if (!type.countable) classes.push("free");
+      if (isPlannedLeave(leave)) classes.push("planned");
       if (leave.memo) classes.push("has-memo");
       if (position === "start") classes.push("range-start");
       if (position === "mid") classes.push("range-mid");
@@ -9174,7 +9551,7 @@
     function renderUpcoming() {
       const nowISO = toISO(today);
       const futureLeaves = state.leaves
-        .filter(l => (l.endDate || l.startDate) >= nowISO)
+        .filter(l => !isPlannedLeave(l) && (l.endDate || l.startDate) >= nowISO)
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
         .slice(0, 6);
 
@@ -9191,7 +9568,7 @@
         mobileTitle.innerHTML = `다가오는 쉼 <span>먼저 확인하기</span>`;
       }
 
-      const emptyHtml = `<div class="empty-state">아직 예정된 쉼이 없어요.<br>캘린더 날짜를 누르거나 + 버튼으로 첫 휴가를 등록해 보세요.</div>`;
+      const emptyHtml = `<div class="empty-state">아직 확정된 다가오는 쉼이 없어요.<br>예정 쉼을 확정하거나 + 버튼으로 휴가를 등록해 보세요.</div>`;
 
       function makeItemHtml(list) {
         return list.map(l => {
@@ -9202,10 +9579,10 @@
             : `${formatKoreanDate(l.startDate)} ~ ${formatKoreanDate(l.endDate)}`;
 
           return `
-            <div class="leave-item">
+            <div class="leave-item ${isPlannedLeave(l) ? "planned" : ""}">
               <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
               <div class="leave-meta">
-                <strong>${type.icon} ${type.label}${l.memo ? `<span class="memo-indicator" title="메모 있음">💬</span>` : ""}</strong>
+                <strong>${type.icon} ${type.label}${isPlannedLeave(l) ? `<span class="status-badge">예정</span>` : ""}${l.memo ? `<span class="memo-indicator" title="메모 있음">💬</span>` : ""}</strong>
                 <span>${escapeHTML(dateText)} · ${escapeHTML(reason)}</span>
                 ${l.memo ? `<span class="leave-memo">메모: ${escapeHTML(l.memo)}</span>` : ""}
               </div>
@@ -9234,11 +9611,82 @@
 
       document.querySelectorAll("#upcomingList .delete-btn, #mobileUpcomingList .delete-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
+          await runStorageAction(
+            () => storage.deleteLeave(btn.dataset.id),
+            "휴가 삭제 중 오류가 발생했어요."
+          );
           state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
-          await persist();
           renderAll();
           showToast("삭제했어요.");
         });
+      });
+    }
+
+
+    function renderPlannedLeaves() {
+      const nowISO = toISO(today);
+      const plannedLeaves = state.leaves
+        .filter(l => isPlannedLeave(l) && (l.endDate || l.startDate) >= nowISO)
+        .sort((a, b) => a.startDate.localeCompare(b.startDate));
+
+      const list = document.getElementById("plannedLeaveList");
+      const count = document.getElementById("plannedCount");
+      const amountEl = document.getElementById("plannedAmount");
+      const afterEl = document.getElementById("plannedAfterRemain");
+      if (!list) return;
+
+      const { remain } = calcSummary();
+      const plannedAmount = plannedLeaves.reduce((sum, leave) => sum + calcLeaveAmount(leave, { includePlanned: true }), 0);
+
+      if (count) count.textContent = `${plannedLeaves.length}건`;
+      if (amountEl) amountEl.textContent = formatDays(plannedAmount);
+      if (afterEl) afterEl.textContent = formatDays(remain - plannedAmount);
+
+      if (!plannedLeaves.length) {
+        list.innerHTML = `<div class="planned-empty">아직 예정 쉼이 없어요.<br>쉬고 싶은 날을 등록할 때 상태를 ‘예정’으로 선택해 보세요.</div>`;
+      } else {
+        list.innerHTML = plannedLeaves.slice(0, 5).map(leave => {
+          const type = getType(leave.type);
+          const reason = leave.reason || "사유 없음";
+          const dateText = leave.startDate === leave.endDate
+            ? formatKoreanDate(leave.startDate)
+            : `${formatKoreanDate(leave.startDate)} ~ ${formatKoreanDate(leave.endDate)}`;
+          const amount = calcLeaveAmount(leave, { includePlanned: true });
+
+          return `
+            <div class="planned-item">
+              <div class="planned-date">${parseISO(leave.startDate).getDate()}</div>
+              <div class="planned-meta">
+                <strong>${type.icon} ${type.label}${leave.memo ? `<span class="memo-indicator" title="메모 있음">💬</span>` : ""}</strong>
+                <span>${escapeHTML(dateText)} · ${escapeHTML(reason)} · 예정 ${formatDays(amount)}</span>
+                ${leave.memo ? `<span class="leave-memo">메모: ${escapeHTML(leave.memo)}</span>` : ""}
+              </div>
+              <div class="planned-actions">
+                <button class="confirm-planned-btn" data-id="${leave.id}" type="button">확정하기</button>
+                <button class="planned-edit-btn" data-id="${leave.id}" type="button">수정</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      list.querySelectorAll(".confirm-planned-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const leave = state.leaves.find(item => item.id === btn.dataset.id);
+          if (!leave) return;
+          const next = { ...leave, status: "confirmed" };
+          const saved = await runStorageAction(
+            () => storage.updateLeave(next),
+            "예정 쉼 확정 중 오류가 발생했어요."
+          );
+          state.leaves = state.leaves.map(item => item.id === leave.id ? { ...next, ...saved, status: "confirmed" } : item);
+          renderAll();
+          showToast("예정 쉼을 확정했어요.");
+        });
+      });
+
+      list.querySelectorAll(".planned-edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => openEditSheet(btn.dataset.id));
       });
     }
 
@@ -9611,6 +10059,7 @@
       editingLeaveId = null;
       selectedDateISO = dateISO;
       selectedType = "annual";
+      selectedStatus = "confirmed";
       selectedReason = reasonOptions[0];
 
       $("#startDate").value = dateISO;
@@ -9621,6 +10070,7 @@
       $("#deleteForDate").style.display = leavesForDate(dateISO).length ? "block" : "none";
 
       applySheetMode("create");
+      renderStatusButtons();
       renderTypeButtons();
       renderReasonTags();
       updateCustomReasonMotion();
@@ -9642,6 +10092,7 @@
       editingLeaveId = leave.id;
       selectedDateISO = leave.startDate;
       selectedType = leave.type || "annual";
+      selectedStatus = normalizeLeaveStatus(leave.status);
 
       const reason = leave.reason || reasonOptions[0];
       const isPresetReason = reasonOptions.includes(reason);
@@ -9655,6 +10106,7 @@
       $("#deleteForDate").style.display = "block";
 
       applySheetMode("edit");
+      renderStatusButtons();
       renderTypeButtons();
       renderReasonTags();
       updateCustomReasonMotion();
@@ -9740,6 +10192,7 @@
         type: selectedType,
         reason,
         memo,
+        status: selectedStatus,
         createdAt: existing?.createdAt || new Date().toISOString()
       };
 
@@ -9881,7 +10334,7 @@
         return;
       }
 
-      const headers = ["시작일", "종료일", "휴가종류", "사유", "메모", "차감일수", "등록일"];
+      const headers = ["시작일", "종료일", "상태", "휴가종류", "사유", "메모", "차감일수", "등록일"];
       const rows = state.leaves
         .slice()
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
@@ -9890,10 +10343,11 @@
           return [
             leave.startDate,
             leave.endDate || leave.startDate,
+            isPlannedLeave(leave) ? "예정" : "확정",
             type.label,
             leave.reason || "",
             leave.memo || "",
-            calcLeaveAmount(leave),
+            calcLeaveAmount(leave, { includePlanned: true }),
             leave.createdAt || ""
           ];
         });
@@ -9984,8 +10438,7 @@
             if (editingHolidayOriginalDate === date) cancelHolidayEditMode();
             await loadHolidaysFromSupabase();
             renderCalendar();
-            buildRecommendations();
-            renderRecommendation();
+            renderPlannedLeaves();
             await renderHolidayManager();
             showToast("공휴일을 삭제했어요.");
           });
@@ -10069,8 +10522,7 @@
 
       await loadHolidaysFromSupabase();
       renderCalendar();
-      buildRecommendations();
-      renderRecommendation();
+      renderPlannedLeaves();
       await renderHolidayManager();
       $("#holidayNameInput").value = "";
       setHolidayEditMode(null);
@@ -10082,8 +10534,7 @@
       renderDashboard();
       renderCalendar();
       renderUpcoming();
-      buildRecommendations();
-      renderRecommendation();
+      renderPlannedLeaves();
       syncMobilePanels();
       if (currentView === "report") renderReport();
       $("#todayChip").textContent = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 ${dayLabel[today.getDay()]}요일`;
@@ -10201,7 +10652,13 @@
       });
       $("#toggleRecommendCard")?.addEventListener("click", () => {
         const card = $("#recommendCard");
-        setRecommendationExpanded(card.classList.contains("mobile-collapsed"));
+        if (card) setRecommendationExpanded(card.classList.contains("mobile-collapsed"));
+      });
+      $("#openPlannedLeave")?.addEventListener("click", () => {
+        openSheet(toISO(today));
+        selectedStatus = "planned";
+        renderStatusButtons();
+        updateLeavePreview();
       });
       $("#closeDaySummary")?.addEventListener("click", closeDaySummary);
       $("#addLeaveFromSummary")?.addEventListener("click", () => {
@@ -10254,13 +10711,13 @@
         closeHolidayManager();
       });
 
-      $("#prevRec").addEventListener("click", () => {
+      $("#prevRec")?.addEventListener("click", () => {
         if (!recommendations.length) return;
         recIndex = (recIndex - 1 + recommendations.length) % recommendations.length;
         renderRecommendation();
       });
 
-      $("#nextRec").addEventListener("click", () => {
+      $("#nextRec")?.addEventListener("click", () => {
         if (!recommendations.length) return;
         recIndex = (recIndex + 1) % recommendations.length;
         renderRecommendation();
