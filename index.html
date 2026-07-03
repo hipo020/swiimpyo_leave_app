@@ -7953,6 +7953,73 @@
       }
     }
 
+
+    /************************************************************
+     * Mobile cleanup: hide intro panel + widen memo preview
+     ************************************************************/
+    @media (max-width: 720px) {
+      .mini-panel {
+        display: none !important;
+      }
+
+      .hero {
+        margin-bottom: 12px !important;
+      }
+
+      .preview-memo,
+      .preview-memo.active,
+      #previewMemo,
+      #previewMemo.active {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-height: 72px !important;
+        display: none;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        padding: 15px 16px !important;
+        border-radius: 20px !important;
+      }
+
+      .preview-memo.active,
+      #previewMemo.active {
+        display: block !important;
+      }
+
+      .preview-memo strong,
+      #previewMemo strong {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 0 7px !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+      }
+
+      .preview-memo span,
+      #previewMemo span {
+        display: block !important;
+        width: 100% !important;
+        font-size: 14px !important;
+        line-height: 1.45 !important;
+        font-weight: 900 !important;
+        word-break: keep-all !important;
+      }
+
+      .leave-preview {
+        gap: 10px !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .preview-memo,
+      .preview-memo.active,
+      #previewMemo,
+      #previewMemo.active {
+        min-height: 68px !important;
+        padding: 14px !important;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
