@@ -7543,6 +7543,120 @@
       }
     }
 
+
+    /************************************************************
+     * Mobile memo emphasis upgrade
+     ************************************************************/
+    @media (max-width: 720px) {
+      .memo-section {
+        margin-top: 18px !important;
+        padding: 18px !important;
+        border-radius: 26px !important;
+        background:
+          radial-gradient(circle at 96% 0%, rgba(212, 235, 249, .9), transparent 44%),
+          linear-gradient(180deg, #F4FBFE 0%, #FFFFFF 100%) !important;
+        border: 1px solid rgba(190, 225, 238, .95) !important;
+        box-shadow: 0 14px 30px rgba(31, 63, 84, .055), inset 0 0 0 1px rgba(255,255,255,.85) !important;
+      }
+
+      .memo-title-row {
+        margin-bottom: 13px !important;
+      }
+
+      .memo-title {
+        font-size: 17px !important;
+        gap: 9px !important;
+      }
+
+      .memo-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 15px !important;
+      }
+
+      .memo-optional {
+        min-height: 30px !important;
+        padding: 0 12px !important;
+        font-size: 12px !important;
+        background: rgba(255,255,255,.95) !important;
+      }
+
+      #leaveMemo,
+      textarea#leaveMemo,
+      .memo-field {
+        min-height: 122px !important;
+        padding: 17px 18px !important;
+        border-radius: 22px !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+        background: #FFFFFF !important;
+        border: 1px solid rgba(180, 218, 231, .95) !important;
+      }
+
+      .memo-helper {
+        margin-top: 11px !important;
+        font-size: 12px !important;
+        line-height: 1.45 !important;
+      }
+
+      .preview-memo {
+        width: 100% !important;
+        display: none;
+        margin-top: 14px !important;
+        padding: 14px 16px !important;
+        border-radius: 20px !important;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.92), rgba(247,252,254,.96)) !important;
+        border: 1px solid rgba(199, 226, 236, .95) !important;
+        box-shadow: 0 8px 18px rgba(31, 63, 84, .045) !important;
+        font-size: 13px !important;
+        line-height: 1.55 !important;
+      }
+
+      .preview-memo.active {
+        display: block !important;
+      }
+
+      .preview-memo strong {
+        display: flex !important;
+        margin: 0 0 6px !important;
+        font-size: 12px !important;
+        color: var(--ink-sub, #8F8A83) !important;
+      }
+
+      .preview-memo span {
+        display: block !important;
+        color: var(--ink-main, #2F2B29) !important;
+        font-size: 14px !important;
+        font-weight: 900 !important;
+        line-height: 1.45 !important;
+        word-break: keep-all !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .memo-section {
+        padding: 16px !important;
+        border-radius: 24px !important;
+      }
+
+      #leaveMemo,
+      textarea#leaveMemo,
+      .memo-field {
+        min-height: 112px !important;
+        padding: 15px 16px !important;
+        font-size: 14px !important;
+      }
+
+      .memo-title {
+        font-size: 16px !important;
+      }
+
+      .preview-memo {
+        padding: 13px 14px !important;
+      }
+    }
+
   </style>
 </head>
 <body class="auth-mode">
