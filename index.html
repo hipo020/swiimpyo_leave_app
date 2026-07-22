@@ -8683,6 +8683,289 @@
       }
     }
 
+
+    /************************************************************
+     * 저장 피드백 강화
+     ************************************************************/
+    .toast {
+      left: 50% !important;
+      right: auto !important;
+      bottom: 28px !important;
+      width: max-content !important;
+      max-width: min(440px, calc(100vw - 28px)) !important;
+      min-height: 54px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px !important;
+      padding: 14px 18px !important;
+      border-radius: 18px !important;
+      background: rgba(47, 43, 41, .96) !important;
+      border: 1px solid rgba(255, 255, 255, .14) !important;
+      color: #FFFFFF !important;
+      font-size: 14px !important;
+      font-weight: 900 !important;
+      line-height: 1.35 !important;
+      text-align: center !important;
+      box-shadow: 0 18px 44px rgba(33, 38, 43, .22) !important;
+      backdrop-filter: blur(14px) !important;
+      transform: translate(-50%, 18px) scale(.98) !important;
+      opacity: 0 !important;
+      transition:
+        opacity .22s var(--ease),
+        transform .28s var(--ease) !important;
+    }
+
+    .toast::before {
+      content: "✓";
+      flex: 0 0 auto;
+      width: 27px;
+      height: 27px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #DDEFC8;
+      color: #35512E;
+      font-size: 15px;
+      font-weight: 950;
+    }
+
+    .toast.info::before {
+      content: "i";
+      background: #DCEEF7;
+      color: #315A70;
+    }
+
+    .toast.error::before {
+      content: "!";
+      background: #F7DADA;
+      color: #8E4141;
+    }
+
+    .toast.active {
+      opacity: 1 !important;
+      transform: translate(-50%, 0) scale(1) !important;
+    }
+
+    .save-btn:disabled {
+      cursor: wait !important;
+      opacity: .72 !important;
+      transform: none !important;
+    }
+
+    @media (max-width: 720px) {
+      .toast {
+        bottom: 18px !important;
+        width: calc(100vw - 28px) !important;
+        max-width: none !important;
+        min-height: 56px !important;
+        padding: 14px 16px !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .toast,
+      .bottom-sheet {
+        transition-duration: .01ms !important;
+      }
+    }
+
+
+    /************************************************************
+     * 최종 사용성 개선: 동기화 상태 · 수정 요약 · 삭제 확인
+     ************************************************************/
+    .sync-status {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(224, 232, 228, .95);
+      background: rgba(255,255,255,.9);
+      color: var(--ink-sub, #827C75);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+      box-shadow: 0 6px 14px rgba(33,38,43,.04);
+      transition: background .18s var(--ease), color .18s var(--ease), transform .18s var(--ease);
+    }
+
+    .sync-status:hover {
+      transform: translateY(-1px);
+      color: var(--ink-main, #2F2B29);
+      background: #fff;
+    }
+
+    .sync-status .sync-dot {
+      flex: 0 0 auto;
+      width: 8px;
+      height: 8px;
+      box-shadow: none !important;
+      transition: background .18s ease, box-shadow .18s ease;
+    }
+
+    .sync-status[data-state="idle"] .sync-dot,
+    .sync-status[data-state="synced"] .sync-dot {
+      background: #8FC38B !important;
+      box-shadow: 0 0 0 5px rgba(143,195,139,.13) !important;
+    }
+
+    .sync-status[data-state="syncing"] .sync-dot {
+      background: #E6C965 !important;
+      box-shadow: 0 0 0 5px rgba(230,201,101,.14) !important;
+      animation: syncPulse 1s ease-in-out infinite;
+    }
+
+    .sync-status[data-state="error"] {
+      color: #A75F5A;
+      border-color: rgba(235, 201, 197, .95);
+      background: #FFF8F6;
+    }
+
+    .sync-status[data-state="error"] .sync-dot {
+      background: #D97972 !important;
+      box-shadow: 0 0 0 5px rgba(217,121,114,.12) !important;
+    }
+
+    @keyframes syncPulse {
+      0%, 100% { transform: scale(.85); opacity: .7; }
+      50% { transform: scale(1.12); opacity: 1; }
+    }
+
+    .edit-record-summary {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #F1F8FB 0%, #E8F4F8 100%);
+      border: 1px solid #D9EAF0;
+      color: var(--ink-main, #2F2B29);
+      box-shadow: 0 7px 16px rgba(52, 103, 124, .05);
+    }
+
+    body.editing-leave .edit-record-summary {
+      display: grid;
+      gap: 4px;
+    }
+
+    .edit-record-summary span {
+      color: var(--ink-sub, #827C75);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .edit-record-summary strong {
+      font-size: 14px;
+      font-weight: 950;
+      line-height: 1.4;
+      letter-spacing: -0.04em;
+    }
+
+    .edit-record-summary small {
+      color: var(--ink-sub, #827C75);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .delete-confirm-modal {
+      width: min(410px, calc(100% - 28px));
+      padding: 26px 24px 22px;
+      text-align: center;
+      z-index: 70;
+    }
+
+    .delete-confirm-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #FFF1EE 0%, #F9E3DF 100%);
+      color: #B46D67;
+      border: 1px solid #F0D6D1;
+      font-size: 23px;
+      font-weight: 950;
+    }
+
+    .delete-confirm-modal h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing: -0.06em;
+    }
+
+    .delete-confirm-modal > p {
+      margin: 0;
+      color: var(--ink-sub, #827C75);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .delete-confirm-detail {
+      margin-top: 15px;
+      padding: 13px 14px;
+      border-radius: 17px;
+      background: #F8FAFA;
+      border: 1px solid #ECEFED;
+      color: var(--ink-main, #2F2B29);
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .danger-solid {
+      height: 50px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #F4DCD8 0%, #EFCBC6 100%);
+      color: #9E514C;
+      border: 1px solid #E9C2BC;
+      font-weight: 950;
+      box-shadow: 0 10px 20px rgba(180,109,103,.12);
+    }
+
+    .danger-solid:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(180deg, #F9E7E4 0%, #F2D7D2 100%);
+    }
+
+    .danger-solid:disabled {
+      cursor: wait;
+      opacity: .68;
+      transform: none;
+    }
+
+    @media (max-width: 720px) {
+      .sync-status {
+        width: 100%;
+        min-height: 38px;
+        justify-content: flex-start;
+        padding: 0 14px;
+        font-size: 11px !important;
+      }
+
+      .edit-record-summary {
+        margin-top: 10px;
+        padding: 11px 12px;
+        border-radius: 16px;
+      }
+
+      .edit-record-summary strong { font-size: 13px; }
+      .edit-record-summary small { font-size: 11px; }
+
+      .delete-confirm-modal {
+        width: calc(100vw - 24px);
+        padding: 24px 18px 18px;
+        border-radius: 28px !important;
+      }
+    }
+
 </style>
 </head>
 <body class="auth-mode">
@@ -8705,7 +8988,6 @@
         <div class="brand-mark">쉼</div>
         <div>
           <h1>쉼표</h1>
-          <p>Google 계정으로 이어 쓰는 연차 캘린더</p>
         </div>
       </div>
       <div class="topbar-actions">
@@ -8714,7 +8996,7 @@
           <span id="userEmail">로그인 확인 중</span>
           <button class="logout-btn" id="logoutBtn" type="button">로그아웃</button>
         </div>
-        <div class="sync-status" title="Supabase 동기화 사용 중"><i class="sync-dot"></i> Cloud Sync</div>
+        <button class="sync-status" id="syncStatus" type="button" data-state="idle" title="클릭하면 서버의 최신 데이터를 다시 확인해요."><i class="sync-dot"></i><span id="syncStatusText">동기화 확인 중…</span></button>
         <button class="mobile-settings-chip" id="mobileOpenSettings" type="button" aria-label="연차 설정"><span>⚙</span> 설정</button>
       </div>
     </header>
@@ -8945,6 +9227,11 @@
       <div>
         <h2 id="sheetTitle">휴가 등록</h2>
         <p id="sheetSub">날짜와 휴가 종류를 선택해 주세요.</p>
+        <div class="edit-record-summary" id="editRecordSummary" aria-live="polite">
+          <span>수정 중인 기록</span>
+          <strong id="editSummaryMain"></strong>
+          <small id="editSummaryReason"></small>
+        </div>
       </div>
       <span class="edit-mode-chip">수정 중</span>
       <button class="close-btn" id="closeSheet" aria-label="닫기">×</button>
@@ -9027,6 +9314,17 @@
     <div class="modal-actions">
       <button class="ghost" id="closeSettings">닫기</button>
       <button class="solid" id="saveSettings">저장</button>
+    </div>
+  </section>
+
+  <section class="modal delete-confirm-modal" id="deleteConfirmModal" aria-modal="true" role="alertdialog" aria-labelledby="deleteConfirmTitle" aria-describedby="deleteConfirmMessage">
+    <div class="delete-confirm-icon" aria-hidden="true">!</div>
+    <h2 id="deleteConfirmTitle">이 기록을 삭제할까요?</h2>
+    <p id="deleteConfirmMessage">삭제한 기록은 다시 되돌릴 수 없어요.</p>
+    <div class="delete-confirm-detail" id="deleteConfirmDetail"></div>
+    <div class="modal-actions">
+      <button class="ghost" id="cancelDeleteConfirm" type="button">취소</button>
+      <button class="danger-solid" id="confirmDelete" type="button">삭제하기</button>
     </div>
   </section>
 
@@ -9605,6 +9903,10 @@
     let selectedHolidayYearFilter = "all";
     let activeDialog = null;
     let lastFocusedElement = null;
+    let pendingDeleteRequest = null;
+    let deleteDialogPrevious = null;
+    let deleteDialogFocus = null;
+    let syncStatusResetTimer = null;
 
     const $ = sel => document.querySelector(sel);
     const calendarEl = $("#calendar");
@@ -9668,12 +9970,63 @@
       }, 0);
     }
 
-    async function runStorageAction(action, errorMessage = "저장 중 오류가 발생했어요. Supabase 설정을 확인해 주세요.") {
+    function setSyncStatus(stateName = "idle", text = "동기화됨") {
+      const status = $("#syncStatus");
+      const label = $("#syncStatusText");
+      if (!status || !label) return;
+
+      status.dataset.state = stateName;
+      label.textContent = text;
+      status.setAttribute("aria-label", text);
+      status.title = stateName === "error"
+        ? "클릭하면 서버의 최신 데이터를 다시 확인해요."
+        : "Supabase와 동기화된 상태예요. 클릭하면 최신 데이터를 다시 확인해요.";
+    }
+
+    function markSyncComplete(text = "방금 저장됨") {
+      clearTimeout(syncStatusResetTimer);
+      setSyncStatus("synced", text);
+      syncStatusResetTimer = setTimeout(() => {
+        setSyncStatus("idle", "동기화됨");
+      }, 4200);
+    }
+
+    async function refreshFromCloud(showSuccessToast = true) {
+      if (!currentUser) return;
+
+      clearTimeout(syncStatusResetTimer);
+      setSyncStatus("syncing", "최신 데이터 확인 중…");
+
       try {
-        return await action();
+        const saved = await storage.load();
+        if (saved && typeof saved === "object") {
+          state = {
+            settings: Object.assign({ totalLeave: 15 }, saved.settings || {}),
+            leaves: Array.isArray(saved.leaves) ? saved.leaves : []
+          };
+        }
+        renderAll();
+        markSyncComplete("최신 상태로 동기화됨");
+        if (showSuccessToast) showToast("최신 데이터를 불러왔어요.", "success");
       } catch (error) {
         console.error(error);
-        showToast(errorMessage);
+        setSyncStatus("error", "동기화 실패 · 확인하기");
+        showToast("최신 데이터를 확인하지 못했어요.", "error");
+      }
+    }
+
+    async function runStorageAction(action, errorMessage = "저장 중 오류가 발생했어요. Supabase 설정을 확인해 주세요.") {
+      clearTimeout(syncStatusResetTimer);
+      setSyncStatus("syncing", "저장 중…");
+
+      try {
+        const result = await action();
+        markSyncComplete("방금 저장됨");
+        return result;
+      } catch (error) {
+        console.error(error);
+        setSyncStatus("error", "동기화 실패 · 확인하기");
+        showToast(errorMessage, "error");
         throw error;
       }
     }
@@ -9763,6 +10116,10 @@
     }
 
     function closeActiveDialog() {
+      if ($("#deleteConfirmModal")?.classList.contains("active")) {
+        closeDeleteConfirm();
+        return;
+      }
       if ($("#sheet").classList.contains("active")) closeSheet();
       if ($("#settingsModal").classList.contains("active")) closeSettingsModal();
       if ($("#holidayModal")?.classList.contains("active")) closeHolidayManager();
@@ -10351,17 +10708,18 @@
       });
 
       list.querySelectorAll(".delete-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          await runStorageAction(
-            () => storage.deleteLeave(btn.dataset.id),
-            "휴가 삭제 중 오류가 발생했어요."
-          );
-          state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
-          renderAll();
-          const stillHasLeaves = leavesForDate(dateISO).length;
-          if (stillHasLeaves) openDaySummary(dateISO);
-          else closeDaySummary();
-          showToast("삭제했어요.");
+        btn.addEventListener("click", () => {
+          openDeleteConfirm({
+            ids: [btn.dataset.id],
+            title: "이 쉼 기록을 삭제할까요?",
+            message: "선택한 날짜의 기록만 삭제돼요.",
+            successMessage: "쉼 기록을 삭제했어요.",
+            afterDelete: () => {
+              const stillHasLeaves = leavesForDate(dateISO).length;
+              if (stillHasLeaves) openDaySummary(dateISO);
+              else closeDaySummary();
+            }
+          });
         });
       });
 
@@ -10430,14 +10788,13 @@
       });
 
       document.querySelectorAll("#upcomingList .delete-btn, #mobileUpcomingList .delete-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          await runStorageAction(
-            () => storage.deleteLeave(btn.dataset.id),
-            "휴가 삭제 중 오류가 발생했어요."
-          );
-          state.leaves = state.leaves.filter(l => l.id !== btn.dataset.id);
-          renderAll();
-          showToast("삭제했어요.");
+        btn.addEventListener("click", () => {
+          openDeleteConfirm({
+            ids: [btn.dataset.id],
+            title: "다가오는 쉼을 삭제할까요?",
+            message: "삭제하면 캘린더와 연차 리포트에서도 사라져요.",
+            successMessage: "다가오는 쉼을 삭제했어요."
+          });
         });
       });
     }
@@ -10855,6 +11212,26 @@
       }
     }
 
+    function updateEditRecordSummary(leave = null) {
+      const main = $("#editSummaryMain");
+      const reason = $("#editSummaryReason");
+      if (!main || !reason) return;
+
+      if (!leave) {
+        main.textContent = "";
+        reason.textContent = "";
+        return;
+      }
+
+      const type = getType(leave.type);
+      const dateText = leave.startDate === (leave.endDate || leave.startDate)
+        ? formatKoreanDate(leave.startDate, true)
+        : `${formatKoreanDate(leave.startDate, true)} ~ ${formatKoreanDate(leave.endDate, true)}`;
+
+      main.textContent = `${dateText} · ${type.icon} ${type.label}`;
+      reason.textContent = `${isPlannedLeave(leave) ? "예정 쉼" : "확정 쉼"} · ${normalizeReasonLabel(leave.reason || "사유 없음")}`;
+    }
+
     function applySheetMode(mode = "create") {
       const isEdit = mode === "edit";
       document.body.classList.toggle("editing-leave", isEdit);
@@ -10887,6 +11264,7 @@
       $("#customReason").value = "";
       $("#leaveMemo").value = "";
       $("#sheetSub").textContent = `${formatKoreanDate(dateISO, true)}의 쉼을 기록해요.`;
+      updateEditRecordSummary(null);
       $("#deleteForDate").style.display = leavesForDate(dateISO).length ? "block" : "none";
 
       applySheetMode("create");
@@ -10923,6 +11301,7 @@
       $("#customReason").value = isPresetReason ? "" : reason;
       $("#leaveMemo").value = leave.memo ?? "";
       $("#sheetSub").textContent = `${formatKoreanDate(leave.startDate, true)}의 쉼을 수정해요.`;
+      updateEditRecordSummary(leave);
       $("#deleteForDate").style.display = "block";
 
       applySheetMode("edit");
@@ -10976,19 +11355,142 @@
       }
     }
 
-    function showToast(text) {
+    function showToast(text, type = "auto") {
       const toast = $("#toast");
-      toast.textContent = text;
-      toast.classList.add("active");
+      if (!toast) return;
+
+      const message = String(text || "");
+      let resolvedType = type;
+
+      if (resolvedType === "auto") {
+        if (/오류|못했|찾지 못|필요합니다|선택해 주세요|입력해 주세요|확인해 주세요|올바른/.test(message)) {
+          resolvedType = "error";
+        } else if (/없어요|관리자 계정/.test(message)) {
+          resolvedType = "info";
+        } else {
+          resolvedType = "success";
+        }
+      }
+
+      toast.textContent = message;
+      toast.classList.remove("success", "info", "error", "active");
+      void toast.offsetWidth;
+      toast.classList.add(resolvedType, "active");
+
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove("active"), 1800);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove("active");
+      }, 2600);
+    }
+
+    function formatLeaveDeleteDetail(leaves) {
+      if (!leaves.length) return "선택한 기록";
+      if (leaves.length > 1) {
+        const dates = leaves.map(leave => leave.startDate).sort();
+        const first = formatKoreanDate(dates[0], true);
+        const last = formatKoreanDate(dates[dates.length - 1], true);
+        return `${first}${first === last ? "" : ` ~ ${last}`} · 총 ${leaves.length}건`;
+      }
+
+      const leave = leaves[0];
+      const type = getType(leave.type);
+      const dateText = leave.startDate === (leave.endDate || leave.startDate)
+        ? formatKoreanDate(leave.startDate, true)
+        : `${formatKoreanDate(leave.startDate, true)} ~ ${formatKoreanDate(leave.endDate, true)}`;
+      return `${dateText} · ${type.icon} ${type.label} · ${normalizeReasonLabel(leave.reason || "사유 없음")}`;
+    }
+
+    function openDeleteConfirm({ ids, title, message, successMessage, closeSheetAfter = false, afterDelete = null }) {
+      const uniqueIds = [...new Set((ids || []).filter(Boolean))];
+      const leaves = state.leaves.filter(leave => uniqueIds.includes(leave.id));
+      if (!leaves.length) {
+        showToast("삭제할 기록을 찾지 못했어요.", "error");
+        return;
+      }
+
+      pendingDeleteRequest = {
+        ids: uniqueIds,
+        successMessage: successMessage || (uniqueIds.length > 1 ? "선택한 기록을 삭제했어요." : "일정을 삭제했어요."),
+        closeSheetAfter,
+        afterDelete
+      };
+
+      deleteDialogPrevious = activeDialog;
+      deleteDialogFocus = document.activeElement;
+      $("#deleteConfirmTitle").textContent = title || (uniqueIds.length > 1 ? `${uniqueIds.length}개의 기록을 삭제할까요?` : "이 기록을 삭제할까요?");
+      $("#deleteConfirmMessage").textContent = message || "삭제한 기록은 다시 되돌릴 수 없어요.";
+      $("#deleteConfirmDetail").textContent = formatLeaveDeleteDetail(leaves);
+      $("#confirmDelete").textContent = uniqueIds.length > 1 ? `${uniqueIds.length}건 삭제` : "삭제하기";
+      $("#confirmDelete").disabled = false;
+
+      $("#overlay").classList.add("active");
+      $("#deleteConfirmModal").classList.add("active");
+      activeDialog = $("#deleteConfirmModal");
+      focusFirstField(activeDialog, "#cancelDeleteConfirm");
+    }
+
+    function closeDeleteConfirm(restoreFocus = true) {
+      $("#deleteConfirmModal")?.classList.remove("active");
+      pendingDeleteRequest = null;
+
+      const previousStillOpen = deleteDialogPrevious?.classList?.contains("active");
+      activeDialog = previousStillOpen ? deleteDialogPrevious : null;
+
+      const anotherDialogOpen = $("#sheet").classList.contains("active")
+        || $("#settingsModal").classList.contains("active")
+        || $("#holidayModal")?.classList.contains("active");
+      if (!anotherDialogOpen) $("#overlay").classList.remove("active");
+
+      if (restoreFocus && deleteDialogFocus && typeof deleteDialogFocus.focus === "function") {
+        deleteDialogFocus.focus();
+      }
+      deleteDialogPrevious = null;
+      deleteDialogFocus = null;
+    }
+
+    async function confirmPendingDelete() {
+      const request = pendingDeleteRequest;
+      if (!request) return;
+
+      const button = $("#confirmDelete");
+      button.disabled = true;
+      button.textContent = "삭제 중…";
+
+      try {
+        await runStorageAction(
+          () => request.ids.length === 1
+            ? storage.deleteLeave(request.ids[0])
+            : storage.deleteLeavesByIds(request.ids),
+          "휴가 삭제 중 오류가 발생했어요."
+        );
+
+        state.leaves = state.leaves.filter(leave => !request.ids.includes(leave.id));
+        const afterDelete = request.afterDelete;
+        const closeSheetAfter = request.closeSheetAfter;
+        const successMessage = request.successMessage;
+
+        closeDeleteConfirm(false);
+
+        if (closeSheetAfter) {
+          closeSheet();
+          editingLeaveId = null;
+          document.body.classList.remove("editing-leave");
+        }
+
+        renderAll();
+        if (typeof afterDelete === "function") afterDelete();
+        showToast(successMessage, "success");
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = request.ids.length > 1 ? `${request.ids.length}건 삭제` : "삭제하기";
+      }
     }
 
     async function saveLeave() {
       const startDate = $("#startDate").value;
       const endDate = $("#endDate").value || startDate;
       if (!startDate) {
-        showToast("날짜를 선택해 주세요.");
+        showToast("날짜를 선택해 주세요.", "error");
         return;
       }
 
@@ -11021,44 +11523,59 @@
         if (!ok) return;
       }
 
-      const savedLeaveFromDb = await runStorageAction(
-        () => editingLeaveId ? storage.updateLeave(payload) : storage.createLeave(payload),
-        "휴가 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
-      );
+      const saveButton = $("#saveLeave");
+      saveButton.disabled = true;
+      saveButton.textContent = existing ? "수정 중..." : "등록 중...";
 
-      const savedLeave = {
-        ...payload,
-        ...savedLeaveFromDb,
-        memo: savedLeaveFromDb?.memo ?? payload.memo ?? ""
-      };
-
-      if (editingLeaveId) {
-        state.leaves = state.leaves.map(l => l.id === editingLeaveId ? savedLeave : l);
-      } else {
-        state.leaves.push(savedLeave);
-      }
-
-      warnIfMemoColumnMissing();
-      closeSheet();
-      editingLeaveId = null;
-      document.body.classList.remove("editing-leave");
-      renderAll();
-      showToast(existing ? "일정을 수정했어요." : "쉼을 등록했어요.");
-    }
-
-    async function deleteLeavesForCurrentRange() {
-      if (editingLeaveId) {
-        await runStorageAction(
-          () => storage.deleteLeave(editingLeaveId),
-          "휴가 삭제 중 오류가 발생했어요."
+      try {
+        const savedLeaveFromDb = await runStorageAction(
+          () => editingLeaveId ? storage.updateLeave(payload) : storage.createLeave(payload),
+          "휴가 저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
         );
 
-        state.leaves = state.leaves.filter(l => l.id !== editingLeaveId);
+        const savedLeave = {
+          ...payload,
+          ...savedLeaveFromDb,
+          memo: savedLeaveFromDb?.memo ?? payload.memo ?? ""
+        };
+
+        if (editingLeaveId) {
+          state.leaves = state.leaves.map(l => l.id === editingLeaveId ? savedLeave : l);
+        } else {
+          state.leaves.push(savedLeave);
+        }
+
+        warnIfMemoColumnMissing();
         closeSheet();
         editingLeaveId = null;
         document.body.classList.remove("editing-leave");
         renderAll();
-        showToast("일정을 삭제했어요.");
+        showToast(existing ? "일정을 수정했어요." : "쉼을 등록했어요.", "success");
+      } catch (error) {
+        // 오류 메시지는 runStorageAction에서 표시하고 입력창은 그대로 유지합니다.
+      } finally {
+        saveButton.disabled = false;
+        if ($("#sheet").classList.contains("active")) {
+          saveButton.textContent = existing ? "수정 완료" : "등록 완료";
+        }
+      }
+    }
+
+    function deleteLeavesForCurrentRange() {
+      if (editingLeaveId) {
+        const leave = state.leaves.find(item => item.id === editingLeaveId);
+        if (!leave) {
+          showToast("삭제할 기록을 찾지 못했어요.", "error");
+          return;
+        }
+
+        openDeleteConfirm({
+          ids: [editingLeaveId],
+          title: "수정 중인 기록을 삭제할까요?",
+          message: "삭제하면 캘린더와 리포트에서도 바로 사라져요.",
+          successMessage: "일정을 삭제했어요.",
+          closeSheetAfter: true
+        });
         return;
       }
 
@@ -11066,27 +11583,25 @@
       const endDate = $("#endDate").value || startDate;
       const [start, end] = clampDateRange(startDate, endDate);
 
-      const targetIds = state.leaves
-        .filter(l => {
-          const [ls, le] = clampDateRange(l.startDate, l.endDate);
-          return !(le < start || ls > end);
-        })
-        .map(l => l.id);
+      const targets = state.leaves.filter(leave => {
+        const [leaveStart, leaveEnd] = clampDateRange(leave.startDate, leave.endDate);
+        return !(leaveEnd < start || leaveStart > end);
+      });
 
-      if (!targetIds.length) {
-        showToast("삭제할 기록이 없어요.");
+      if (!targets.length) {
+        showToast("삭제할 기록이 없어요.", "info");
         return;
       }
 
-      await runStorageAction(
-        () => storage.deleteLeavesByIds(targetIds),
-        "선택한 날짜의 기록 삭제 중 오류가 발생했어요."
-      );
-
-      state.leaves = state.leaves.filter(l => !targetIds.includes(l.id));
-      closeSheet();
-      renderAll();
-      showToast("선택한 날짜의 기록을 삭제했어요.");
+      openDeleteConfirm({
+        ids: targets.map(leave => leave.id),
+        title: targets.length > 1 ? `${targets.length}개의 기록을 모두 삭제할까요?` : "이 날짜의 기록을 삭제할까요?",
+        message: targets.length > 1
+          ? "선택한 날짜 범위와 겹치는 기록이 모두 삭제돼요."
+          : "삭제한 기록은 다시 되돌릴 수 없어요.",
+        successMessage: targets.length > 1 ? `${targets.length}개의 기록을 삭제했어요.` : "선택한 날짜의 기록을 삭제했어요.",
+        closeSheetAfter: true
+      });
     }
 
 
@@ -11487,6 +12002,9 @@
         openSheet(targetDate);
       });
       $("#cancelEdit").addEventListener("click", cancelEdit);
+      $("#cancelDeleteConfirm").addEventListener("click", () => closeDeleteConfirm());
+      $("#confirmDelete").addEventListener("click", confirmPendingDelete);
+      $("#syncStatus")?.addEventListener("click", () => refreshFromCloud(true));
       $("#saveLeave").addEventListener("click", saveLeave);
       $("#deleteForDate").addEventListener("click", deleteLeavesForCurrentRange);
       $("#startDate").addEventListener("input", updateLeavePreview);
@@ -11526,6 +12044,10 @@
       });
 
       $("#overlay").addEventListener("click", () => {
+        if ($("#deleteConfirmModal").classList.contains("active")) {
+          closeDeleteConfirm();
+          return;
+        }
         closeSheet();
         closeSettingsModal();
         closeHolidayManager();
@@ -11569,6 +12091,7 @@
       }
 
       setAuthView(true);
+      setSyncStatus("syncing", "데이터 불러오는 중…");
 
       try {
         const saved = await storage.load();
@@ -11578,9 +12101,11 @@
             leaves: Array.isArray(saved.leaves) ? saved.leaves : []
           };
         }
+        setSyncStatus("idle", "동기화됨");
       } catch (error) {
         console.error(error);
-        showToast("데이터를 불러오지 못했어요. Supabase 설정을 확인해 주세요.");
+        setSyncStatus("error", "동기화 실패 · 확인하기");
+        showToast("데이터를 불러오지 못했어요. Supabase 설정을 확인해 주세요.", "error");
       }
 
       renderTypeButtons();
