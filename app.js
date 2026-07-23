@@ -2003,6 +2003,8 @@
       lastFocusedElement = document.activeElement;
       $("#overlay").classList.add("active");
       $("#sheet").classList.add("active");
+      document.body.classList.add("sheet-open");
+      $("#sheet").scrollTop = 0;
       activeDialog = $("#sheet");
       bindAllDatePickers();
       bindMemoField();
@@ -2099,6 +2101,7 @@
       }
 
       sheet.classList.remove("active");
+      document.body.classList.remove("sheet-open");
       sheetInitialSnapshot = null;
       draftLeaveId = null;
 

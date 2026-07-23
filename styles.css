@@ -9835,3 +9835,139 @@
     bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+
+/* ============================================================
+   Mobile final polish — compact bottom nav + visible sheet actions
+   ============================================================ */
+@media (max-width: 720px) {
+  html {
+    scroll-padding-bottom: calc(134px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .app {
+    padding-bottom: calc(134px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* 하단 탭의 세로 크기를 조금 줄여 콘텐츠 영역 확보 */
+  .view-tabs {
+    bottom: max(6px, env(safe-area-inset-bottom, 0px)) !important;
+    height: 58px !important;
+    padding: 5px !important;
+    border-radius: 22px !important;
+    gap: 5px !important;
+  }
+
+  .view-tab {
+    height: 46px !important;
+    min-height: 46px !important;
+    border-radius: 16px !important;
+    font-size: 12.5px !important;
+  }
+
+  /* 플로팅 등록 버튼도 낮아진 하단바 바로 위에 정렬 */
+  .fab {
+    right: max(16px, env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    min-height: 54px !important;
+    border-radius: 19px !important;
+    font-size: 29px !important;
+  }
+
+  .toast,
+  .toast.has-action {
+    bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* 등록창은 하단 내비게이션보다 위 레이어에서 전체 높이를 사용 */
+  .overlay {
+    z-index: 110 !important;
+  }
+
+  .bottom-sheet,
+  #sheet {
+    z-index: 120 !important;
+    bottom: 0 !important;
+    width: min(760px, calc(100% - 12px)) !important;
+    height: calc(var(--app-viewport-height, 100dvh) - 8px) !important;
+    max-height: calc(var(--app-viewport-height, 100dvh) - 8px) !important;
+    padding: 10px 14px 0 !important;
+    border-radius: 28px 28px 0 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    scroll-padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+    background: #fff !important;
+  }
+
+  /* 등록창이 열린 동안 배경 하단바와 FAB가 버튼을 가리지 않게 숨김 */
+  body.sheet-open {
+    overflow: hidden !important;
+  }
+
+  body.sheet-open .view-tabs,
+  body.sheet-open .fab {
+    display: none !important;
+  }
+
+  /* 저장 버튼 영역은 등록창 안쪽 하단에 고정 */
+  .bottom-sheet .sheet-actions,
+  body.editing-leave .bottom-sheet .sheet-actions {
+    position: sticky !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 20 !important;
+    margin: 20px -14px 0 !important;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    border-top: 1px solid rgba(228, 235, 238, .9) !important;
+    background: rgba(255,255,255,.98) !important;
+    box-shadow: 0 -12px 28px rgba(35, 50, 58, .08) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+  }
+
+  .bottom-sheet .save-btn,
+  .bottom-sheet .clear-btn,
+  .bottom-sheet .cancel-edit-btn {
+    min-height: 52px !important;
+    height: 52px !important;
+  }
+
+  .bottom-sheet .save-btn {
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .app {
+    padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .view-tabs {
+    height: 56px !important;
+  }
+
+  .view-tab {
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+
+  .fab {
+    right: max(13px, env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    border-radius: 18px !important;
+    font-size: 27px !important;
+  }
+
+  .toast,
+  .toast.has-action {
+    bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
