@@ -53,6 +53,8 @@
     let appEventsBound = false;
     let memoColumnAvailable = true;
     let statusColumnAvailable = true;
+    let workspaceLoadPromise = null;
+    let workspaceLoadUserId = null;
 
     function normalizeReasonLabel(reason) {
       if (reason === "🏡 늦잠/휴식") return "🌿 휴식/컨디션 관리";
@@ -652,7 +654,7 @@
       status.setAttribute("aria-label", text);
       status.title = stateName === "error"
         ? "클릭하면 서버의 최신 데이터를 다시 확인해요."
-        : "Supabase와 동기화된 상태예요. 클릭하면 최신 데이터를 다시 확인해요.";
+        : "계정과 동기화된 상태예요. 클릭하면 최신 데이터를 다시 확인해요.";
     }
 
     function markSyncComplete(text = "방금 저장됨") {
@@ -691,7 +693,7 @@
       }
     }
 
-    async function runStorageAction(action, errorMessage = "저장 중 오류가 발생했어요. Supabase 설정을 확인해 주세요.") {
+    async function runStorageAction(action, errorMessage = "저장 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.") {
       clearTimeout(syncStatusResetTimer);
 
       if (!navigator.onLine) {
@@ -1205,7 +1207,7 @@
 
     function renderReasonTags() {
       reasonTags.innerHTML = reasonOptions.map(reason => `
-        <button class="reason-tag ${selectedReason === reason ? "active" : ""}" data-reason="${reason}">
+        <button type="button" class="reason-tag ${selectedReason === reason ? "active" : ""}" data-reason="${reason}">
           ${reason}
         </button>
       `).join("");
@@ -1305,7 +1307,7 @@
       for (let i = 0; i < totalCells; i++) {
         const dayNum = i - startBlank + 1;
         if (dayNum < 1 || dayNum > last.getDate()) {
-          cells.push(`<button class="day empty"></button>`);
+          cells.push(`<button type="button" class="day empty"></button>`);
           continue;
         }
 
@@ -1325,7 +1327,7 @@
         ].filter(Boolean).join(" ");
 
         cells.push(`
-          <button class="${classes}" data-date="${iso}" aria-label="${iso} 휴가 등록" ${isTodayDate ? 'aria-current="date"' : ""}>
+          <button type="button" class="${classes}" data-date="${iso}" aria-label="${iso} 휴가 등록" ${isTodayDate ? 'aria-current="date"' : ""}>
             <span class="day-number">${dayNum}</span>
             ${holidayName ? `<span class="holiday-dot">♥</span><span class="holiday-name">${escapeHTML(holidayName)}</span>` : ""}
             <span class="events">
@@ -1407,8 +1409,8 @@
               <span>${escapeHTML(dateText)} · ${escapeHTML(reason)}</span>
             </div>
             <div class="leave-actions">
-              <button class="edit-btn" data-id="${escapeAttr(l.id)}" aria-label="수정">✎</button>
-              <button class="delete-btn" data-id="${escapeAttr(l.id)}" aria-label="삭제">×</button>
+              <button type="button" class="edit-btn" data-id="${escapeAttr(l.id)}" aria-label="수정">✎</button>
+              <button type="button" class="delete-btn" data-id="${escapeAttr(l.id)}" aria-label="삭제">×</button>
             </div>
           </div>
         `;
@@ -1479,8 +1481,8 @@
                 ${l.memo ? `<span class="leave-memo">메모: ${escapeHTML(l.memo)}</span>` : ""}
               </div>
               <div class="leave-actions">
-                <button class="edit-btn" data-id="${escapeAttr(l.id)}" aria-label="수정">✎</button>
-                <button class="delete-btn" data-id="${escapeAttr(l.id)}" aria-label="삭제">×</button>
+                <button type="button" class="edit-btn" data-id="${escapeAttr(l.id)}" aria-label="수정">✎</button>
+                <button type="button" class="delete-btn" data-id="${escapeAttr(l.id)}" aria-label="삭제">×</button>
               </div>
             </div>
           `;
@@ -1884,6 +1886,8 @@
     }
 
     function renderRecommendation() {
+      // 이전 추천 UI가 제거된 배포본에서도 남은 로직이 오류를 만들지 않도록 방어합니다.
+      if (!$("#recommendCount")) return;
       document.body.classList.toggle("has-recommendations", recommendations.length > 0);
       if (!recommendations.length) {
         $("#recommendCount").textContent = "추천 없음";
@@ -2754,30 +2758,53 @@
     async function loadUserWorkspace({ showSuccessToast = false } = {}) {
       if (!currentUser) return;
 
-      setAuthView(true);
-      setSyncStatus("syncing", "데이터 불러오는 중…");
+      const targetUserId = currentUser.id;
+      if (workspaceLoadPromise && workspaceLoadUserId === targetUserId) {
+        return workspaceLoadPromise;
+      }
+
+      workspaceLoadUserId = targetUserId;
+      workspaceLoadPromise = (async () => {
+        setAuthView(true);
+        setSyncStatus("syncing", "데이터 불러오는 중…");
+
+        try {
+          const saved = await storage.load();
+
+          // 계정이 바뀌는 도중 이전 요청이 끝난 경우, 이전 계정 데이터를 화면에 덮어쓰지 않습니다.
+          if (currentUser?.id !== targetUserId) return;
+
+          if (saved && typeof saved === "object") {
+            state = {
+              settings: Object.assign({ totalLeave: 15 }, saved.settings || {}),
+              leaves: Array.isArray(saved.leaves) ? saved.leaves : []
+            };
+          }
+          initializedUserId = targetUserId;
+          setSyncStatus(navigator.onLine ? "idle" : "offline", navigator.onLine ? "동기화됨" : "오프라인 · 저장되지 않음");
+          renderTypeButtons();
+          renderReasonTags();
+          renderAll();
+          setViewMode("calendar");
+          if (showSuccessToast) showToast("계정 데이터를 불러왔어요.", "success");
+        } catch (error) {
+          console.error(error);
+          if (currentUser?.id !== targetUserId) return;
+          setSyncStatus(navigator.onLine ? "error" : "offline", navigator.onLine ? "동기화 실패 · 확인하기" : "오프라인 · 저장되지 않음");
+          showToast("데이터를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.", "error");
+        }
+      })();
 
       try {
-        const saved = await storage.load();
-        if (saved && typeof saved === "object") {
-          state = {
-            settings: Object.assign({ totalLeave: 15 }, saved.settings || {}),
-            leaves: Array.isArray(saved.leaves) ? saved.leaves : []
-          };
+        return await workspaceLoadPromise;
+      } finally {
+        if (workspaceLoadUserId === targetUserId) {
+          workspaceLoadPromise = null;
+          workspaceLoadUserId = null;
         }
-        initializedUserId = currentUser.id;
-        setSyncStatus(navigator.onLine ? "idle" : "offline", navigator.onLine ? "동기화됨" : "오프라인 · 저장되지 않음");
-        renderTypeButtons();
-        renderReasonTags();
-        renderAll();
-        setViewMode("calendar");
-        if (showSuccessToast) showToast("계정 데이터를 불러왔어요.", "success");
-      } catch (error) {
-        console.error(error);
-        setSyncStatus(navigator.onLine ? "error" : "offline", navigator.onLine ? "동기화 실패 · 확인하기" : "오프라인 · 저장되지 않음");
-        showToast("데이터를 불러오지 못했어요. Supabase 설정을 확인해 주세요.", "error");
       }
     }
+
 
     function clearSignedOutState() {
       currentUser = null;
@@ -2864,7 +2891,7 @@
             console.error(error);
             googleBtn.disabled = false;
             googleBtn.querySelector("strong").textContent = "Google로 시작하기";
-            alert("Google 로그인 연결에 실패했어요. Supabase Redirect URL 설정을 확인해 주세요.");
+            alert("Google 로그인 연결에 실패했어요. 잠시 후 다시 시도해 주세요.");
           }
         });
       }

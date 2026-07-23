@@ -16,7 +16,6 @@
         <span>G</span>
         <strong>Google로 시작하기</strong>
       </button>
-      <div class="auth-note">로그인 후 등록한 연차와 설정은 Supabase에 사용자별로 저장돼요. 배포 전 함께 제공된 RLS SQL을 적용해 주세요.</div>
     </div>
   </section>
 
@@ -63,7 +62,7 @@
           </div>
           <p id="leaveUsageHint">아직 사용한 연차가 없어요.</p>
         </div>
-        <button class="settings-btn" id="openSettings" aria-label="연차 설정"><span class="settings-icon">⚙</span><span class="settings-label">연차 설정</span></button>
+        <button type="button" class="settings-btn" id="openSettings" aria-label="연차 설정"><span class="settings-icon">⚙</span><span class="settings-label">연차 설정</span></button>
       </div>
 
       <aside class="mini-panel" id="miniPanel">
@@ -102,9 +101,9 @@
             <span id="monthCount">0건</span>
           </div>
           <div class="nav-btns">
-            <button class="nav-btn" id="prevMonth" aria-label="이전 달">‹</button>
-            <button class="today-btn" id="goToday">오늘</button>
-            <button class="nav-btn" id="nextMonth" aria-label="다음 달">›</button>
+            <button type="button" class="nav-btn" id="prevMonth" aria-label="이전 달">‹</button>
+            <button type="button" class="today-btn" id="goToday">오늘</button>
+            <button type="button" class="nav-btn" id="nextMonth" aria-label="다음 달">›</button>
           </div>
         </div>
 
@@ -243,7 +242,7 @@
     </main>
   </div>
 
-  <button class="fab" id="fab" aria-label="휴가 등록">+</button>
+  <button type="button" class="fab" id="fab" aria-label="휴가 등록">+</button>
 
   <div class="overlay" id="overlay"></div>
 
@@ -272,7 +271,7 @@
         </div>
       </div>
       <span class="edit-mode-chip">수정 중</span>
-      <button class="close-btn" id="closeSheet" aria-label="닫기">×</button>
+      <button type="button" class="close-btn" id="closeSheet" aria-label="닫기">×</button>
     </div>
 
     <div class="form-section">
@@ -350,8 +349,8 @@
     <button class="holiday-manage-open" id="openHolidayManager" type="button">공휴일 관리</button>
     <button class="leave-export-btn" id="exportLeavesCsv" type="button">연차 기록 내보내기 CSV</button>
     <div class="modal-actions">
-      <button class="ghost" id="closeSettings">닫기</button>
-      <button class="solid" id="saveSettings">저장</button>
+      <button type="button" class="ghost" id="closeSettings">닫기</button>
+      <button type="button" class="solid" id="saveSettings">저장</button>
     </div>
   </section>
 
