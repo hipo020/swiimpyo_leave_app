@@ -2949,7 +2949,9 @@
         $("#donutWrap").classList.toggle("show-tooltip");
       });
 
-      $("#fab").addEventListener("click", () => openSheet(toISO(today)));
+      document.querySelectorAll("#fab, #mobileNavAdd").forEach(button => {
+        button.addEventListener("click", () => openSheet(toISO(today)));
+      });
       $("#closeSheet").addEventListener("click", () => closeSheet());
       $("#toggleMiniPanel")?.addEventListener("click", () => {
         const panel = $("#miniPanel");

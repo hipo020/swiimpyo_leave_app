@@ -9543,3 +9543,149 @@
       }
     }
 
+
+
+    /************************************************************
+     * Mobile bottom navigation v2
+     * - 등록 버튼을 하단 바 안으로 완전히 포함
+     * - 반투명 겹침 제거
+     * - 콘텐츠가 바 뒤에서 비쳐 보이지 않도록 하단 마스크 추가
+     ************************************************************/
+    .mobile-nav-add,
+    .mobile-nav-backdrop {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      html {
+        scroll-padding-bottom: calc(116px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      .app {
+        padding-bottom: calc(116px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      .mobile-nav-backdrop {
+        display: block !important;
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: calc(102px + env(safe-area-inset-bottom, 0px)) !important;
+        background: linear-gradient(
+          to top,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(255, 255, 255, 1) 66%,
+          rgba(255, 255, 255, .92) 78%,
+          rgba(255, 255, 255, 0) 100%
+        ) !important;
+        pointer-events: none !important;
+        z-index: 34 !important;
+      }
+
+      .view-tabs {
+        position: fixed !important;
+        left: 50% !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+        transform: translateX(-50%) !important;
+        width: min(430px, calc(100vw - 20px)) !important;
+        max-width: calc(100vw - 20px) !important;
+        height: 68px !important;
+        padding: 6px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr) !important;
+        align-items: center !important;
+        gap: 5px !important;
+        overflow: hidden !important;
+        isolation: isolate !important;
+        border-radius: 25px !important;
+        background: #FFFFFF !important;
+        border: 1px solid #E6ECEE !important;
+        box-shadow: 0 10px 28px rgba(36, 46, 52, .13) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        z-index: 35 !important;
+      }
+
+      .view-tabs::before,
+      .view-tabs::after {
+        content: none !important;
+        display: none !important;
+      }
+
+      #calendarTab {
+        grid-column: 1 !important;
+      }
+
+      #reportTab {
+        grid-column: 3 !important;
+      }
+
+      .view-tab {
+        position: relative !important;
+        z-index: 1 !important;
+        width: 100% !important;
+        height: 54px !important;
+        min-height: 54px !important;
+        margin: 0 !important;
+        border-radius: 18px !important;
+        font-size: 12px !important;
+        box-shadow: none !important;
+      }
+
+      .mobile-nav-add {
+        grid-column: 2 !important;
+        display: grid !important;
+        place-items: center !important;
+        width: 52px !important;
+        height: 52px !important;
+        min-width: 52px !important;
+        min-height: 52px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        border-radius: 18px !important;
+        border: 1px solid #CDE5ED !important;
+        background: linear-gradient(180deg, #E7F5F9 0%, #D8EDF4 100%) !important;
+        color: #2C2A28 !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 6px 14px rgba(76, 134, 151, .13) !important;
+        font-size: 28px !important;
+        font-weight: 900 !important;
+        line-height: 1 !important;
+        touch-action: manipulation !important;
+        cursor: pointer !important;
+        z-index: 2 !important;
+      }
+
+      .mobile-nav-add:active {
+        transform: scale(.96) !important;
+      }
+
+      /* 데스크톱용 플로팅 버튼은 모바일에서 숨김 */
+      .fab {
+        display: none !important;
+      }
+
+      .toast,
+      .toast.has-action {
+        bottom: calc(94px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .view-tabs {
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr) !important;
+      }
+
+      .mobile-nav-add {
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px !important;
+        min-height: 48px !important;
+        border-radius: 17px !important;
+        font-size: 26px !important;
+      }
+    }
