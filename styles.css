@@ -9689,3 +9689,149 @@
         font-size: 26px !important;
       }
     }
+
+/* ============================================================
+   Mobile navigation — two tabs + independent floating add button
+   ============================================================ */
+.mobile-nav-add,
+.mobile-nav-backdrop {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  html {
+    scroll-padding-bottom: calc(156px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .app {
+    padding-bottom: calc(156px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .view-tabs {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+    transform: translateX(-50%) !important;
+    width: min(430px, calc(100vw - 16px)) !important;
+    max-width: calc(100vw - 16px) !important;
+    height: 68px !important;
+    padding: 6px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: center !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+    border-radius: 25px !important;
+    background: #ffffff !important;
+    border: 1px solid #e6ecee !important;
+    box-shadow: 0 8px 24px rgba(36, 46, 52, .12) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 70 !important;
+  }
+
+  .view-tabs::before,
+  .view-tabs::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  #calendarTab,
+  #reportTab {
+    grid-column: auto !important;
+  }
+
+  .view-tab {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    margin: 0 !important;
+    border-radius: 19px !important;
+    font-size: 13px !important;
+    box-shadow: none !important;
+  }
+
+  .fab {
+    display: grid !important;
+    place-items: center !important;
+    position: fixed !important;
+    left: auto !important;
+    right: max(18px, env(safe-area-inset-right, 0px)) !important;
+    top: auto !important;
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 20px !important;
+    border: 1px solid #cde5ed !important;
+    background: linear-gradient(180deg, #e7f5f9 0%, #d8edf4 100%) !important;
+    color: #2c2a28 !important;
+    box-shadow: 0 10px 24px rgba(76, 134, 151, .22), inset 0 1px 0 rgba(255,255,255,.85) !important;
+    font-size: 30px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    transform: none !important;
+    opacity: 1 !important;
+    z-index: 72 !important;
+  }
+
+  .fab:hover {
+    transform: translateY(-2px) !important;
+  }
+
+  .fab:active,
+  body.fab-scrolling .fab {
+    transform: scale(.96) !important;
+  }
+
+  .toast,
+  .toast.has-action {
+    bottom: calc(154px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .mobile-upcoming-card,
+  .side-card:last-child,
+  .report-view:last-child {
+    scroll-margin-bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .app {
+    padding-bottom: calc(148px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .view-tabs {
+    width: calc(100vw - 12px) !important;
+    max-width: calc(100vw - 12px) !important;
+    height: 66px !important;
+  }
+
+  .view-tab {
+    height: 54px !important;
+    min-height: 54px !important;
+  }
+
+  .fab {
+    right: max(14px, env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+    border-radius: 18px !important;
+    font-size: 28px !important;
+  }
+
+  .toast,
+  .toast.has-action {
+    bottom: calc(146px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

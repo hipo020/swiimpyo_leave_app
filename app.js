@@ -2949,7 +2949,7 @@
         $("#donutWrap").classList.toggle("show-tooltip");
       });
 
-      document.querySelectorAll("#fab, #mobileNavAdd").forEach(button => {
+      document.querySelectorAll("#fab").forEach(button => {
         button.addEventListener("click", () => openSheet(toISO(today)));
       });
       $("#closeSheet").addEventListener("click", () => closeSheet());
