@@ -8966,6 +8966,69 @@
       }
     }
 
+
+    /************************************************************
+     * 안전성 강화 UI
+     ************************************************************/
+    .toast {
+      flex-wrap: wrap !important;
+      pointer-events: none;
+    }
+
+    .toast-message {
+      min-width: 0;
+    }
+
+    .toast-action {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.16);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.28);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+      pointer-events: auto;
+    }
+
+    .toast-action:hover,
+    .toast-action:focus-visible {
+      background: rgba(255,255,255,.25);
+      outline: none;
+    }
+
+    .toast.has-action {
+      pointer-events: auto;
+    }
+
+    .sync-status[data-state="offline"] .sync-dot {
+      background: #E1A85D !important;
+      box-shadow: 0 0 0 5px rgba(225,168,93,.14) !important;
+    }
+
+    body.is-offline .sync-status {
+      border-color: rgba(225,168,93,.4) !important;
+      background: #FFF9EF !important;
+    }
+
+    body.is-offline .save-btn,
+    body.is-offline .solid,
+    body.is-offline .holiday-save-btn {
+      box-shadow: inset 0 0 0 1px rgba(225,168,93,.2) !important;
+    }
+
+    @media (max-width: 720px) {
+      .toast.has-action {
+        justify-content: space-between !important;
+        text-align: left !important;
+      }
+
+      .toast-action {
+        flex: 0 0 auto;
+      }
+    }
+
 </style>
 </head>
 <body class="auth-mode">
@@ -8978,7 +9041,7 @@
         <span>G</span>
         <strong>Google로 시작하기</strong>
       </button>
-      <div class="auth-note">로그인 후 등록한 연차와 설정은 Supabase에 사용자별로 안전하게 저장돼요.</div>
+      <div class="auth-note">로그인 후 등록한 연차와 설정은 Supabase에 사용자별로 저장돼요. 배포 전 함께 제공된 RLS SQL을 적용해 주세요.</div>
     </div>
   </section>
 
@@ -9267,7 +9330,7 @@
       <div class="reason-tags" id="reasonTags"></div>
       <div class="custom-reason-wrap" id="customReasonWrap">
         <div class="custom-reason-inner">
-          <input class="text-field" id="customReason" type="text" placeholder="사유를 직접 입력해 주세요" />
+          <input class="text-field" id="customReason" type="text" maxlength="120" autocomplete="off" placeholder="사유를 직접 입력해 주세요" />
         </div>
       </div>
     </div>
@@ -9344,7 +9407,7 @@
       </label>
       <label>
         <span>이름</span>
-        <input class="date-field" id="holidayNameInput" type="text" placeholder="예: 임시공휴일" />
+        <input class="date-field" id="holidayNameInput" type="text" maxlength="80" autocomplete="off" placeholder="예: 임시공휴일" />
       </label>
       <button class="solid holiday-save-btn" id="saveHoliday" type="button">추가하기</button>
     </div>
@@ -9372,9 +9435,11 @@
     <div class="holiday-list" id="holidayAdminList"></div>
   </section>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-message" id="toastMessage"></span><button class="toast-action" id="toastAction" type="button" hidden></button></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7"></script>
+
+  <script>
     (function bindFabScrollInteraction() {
       if (window.__shimPyoFabScrollBound) return;
       window.__shimPyoFabScrollBound = true;
@@ -9456,6 +9521,42 @@
         .replaceAll("'", "&#039;");
     }
 
+    const escapeAttr = escapeHTML;
+
+    function sanitizePlainText(value, maxLength = 200) {
+      return String(value ?? "")
+        .normalize("NFC")
+        .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+        .trim()
+        .slice(0, maxLength);
+    }
+
+    function isValidISODate(value) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return false;
+      const date = parseISO(String(value));
+      return !Number.isNaN(date.getTime()) && toISO(date) === value;
+    }
+
+    function generateStableId(prefix = "leave") {
+      if (window.crypto?.randomUUID) return `${prefix}_${window.crypto.randomUUID()}`;
+      return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    }
+
+    function validateLeavePayload(leave) {
+      if (!leave || !isValidISODate(leave.startDate) || !isValidISODate(leave.endDate || leave.startDate)) {
+        throw new Error("올바른 휴가 날짜가 필요합니다.");
+      }
+
+      const allowedTypes = new Set(leaveTypes.map(type => type.id));
+      if (!allowedTypes.has(leave.type)) throw new Error("올바른 휴가 종류가 필요합니다.");
+      if (!new Set(["confirmed", "planned"]).has(normalizeLeaveStatus(leave.status))) {
+        throw new Error("올바른 등록 상태가 필요합니다.");
+      }
+
+      const [start, end] = clampDateRange(leave.startDate, leave.endDate || leave.startDate);
+      if (start > end) throw new Error("종료일은 시작일보다 빠를 수 없어요.");
+    }
+
     function isMemoColumnError(error) {
       const message = String(error?.message || error?.details || "").toLowerCase();
       return message.includes("memo") && (
@@ -9484,30 +9585,31 @@
 
     function normalizeLeaveFromRow(row) {
       return {
-        id: row.id,
+        id: sanitizePlainText(row.id, 120),
         startDate: row.start_date,
-        endDate: row.end_date,
-        type: row.type,
-        reason: normalizeReasonLabel(row.reason || ""),
-        memo: row.memo ?? "",
+        endDate: row.end_date || row.start_date,
+        type: leaveTypes.some(type => type.id === row.type) ? row.type : "annual",
+        reason: normalizeReasonLabel(sanitizePlainText(row.reason || "", 120)),
+        memo: sanitizePlainText(row.memo ?? "", 200),
         status: normalizeLeaveStatus(row.status),
         createdAt: row.created_at || new Date().toISOString()
       };
     }
 
     function normalizeLeaveToRow(leave) {
+      validateLeavePayload(leave);
       const row = {
-        id: leave.id,
+        id: sanitizePlainText(leave.id, 120),
         user_id: currentUser.id,
         start_date: leave.startDate,
         end_date: leave.endDate || leave.startDate,
         type: leave.type,
-        reason: normalizeReasonLabel(leave.reason || ""),
+        reason: normalizeReasonLabel(sanitizePlainText(leave.reason || "", 120)),
         created_at: leave.createdAt || new Date().toISOString()
       };
 
       if (memoColumnAvailable) {
-        row.memo = leave.memo || "";
+        row.memo = sanitizePlainText(leave.memo || "", 200);
       }
 
       if (statusColumnAvailable) {
@@ -9640,20 +9742,16 @@
       async createLeave(leave) {
         if (!currentUser) throw new Error("로그인이 필요합니다.");
 
-        // 등록 성공 뒤 결과 행을 다시 조회하지 않습니다.
-        // insert는 성공했지만 select 응답 단계에서 오류가 발생해
-        // 입력창과 현재 화면이 갱신되지 않는 상황을 방지합니다.
+        // 같은 입력창에서 재시도해도 동일 id를 사용합니다.
+        // 응답이 끊겼지만 DB 저장은 완료된 경우에도 중복 행이 생기지 않습니다.
         let { error } = await supabaseClient
           .from("annual_leaves")
-          .insert(normalizeLeaveToRow(leave));
+          .upsert(normalizeLeaveToRow(leave), { onConflict: "id" });
 
         if (error && applyOptionalLeaveColumnFallback(error)) {
-          // 첫 요청이 어느 단계까지 처리됐는지 불명확해도 중복 생성되지 않도록
-          // 같은 id를 기준으로 upsert해 안전하게 마무리합니다.
           const retry = await supabaseClient
             .from("annual_leaves")
             .upsert(normalizeLeaveToRow(leave), { onConflict: "id" });
-
           error = retry.error;
         }
 
@@ -9723,6 +9821,24 @@
           .delete()
           .eq("user_id", currentUser.id)
           .in("id", ids);
+
+        if (error) throw error;
+      },
+
+      async restoreLeaves(leaves) {
+        if (!currentUser) throw new Error("로그인이 필요합니다.");
+        if (!Array.isArray(leaves) || !leaves.length) return;
+
+        let { error } = await supabaseClient
+          .from("annual_leaves")
+          .upsert(leaves.map(normalizeLeaveToRow), { onConflict: "id" });
+
+        if (error && applyOptionalLeaveColumnFallback(error)) {
+          const retry = await supabaseClient
+            .from("annual_leaves")
+            .upsert(leaves.map(normalizeLeaveToRow), { onConflict: "id" });
+          error = retry.error;
+        }
 
         if (error) throw error;
       },
@@ -9902,6 +10018,12 @@
     let deleteDialogPrevious = null;
     let deleteDialogFocus = null;
     let syncStatusResetTimer = null;
+    let draftLeaveId = null;
+    let sheetInitialSnapshot = null;
+    let sheetHistoryPushed = false;
+    let authListenerBound = false;
+    let initializedUserId = null;
+    let pendingUndoToken = 0;
 
     const $ = sel => document.querySelector(sel);
     const calendarEl = $("#calendar");
@@ -9909,7 +10031,7 @@
     const reasonTags = $("#reasonTags");
 
     function isHolidayAdmin() {
-      return currentUser?.email === HOLIDAY_ADMIN_EMAIL;
+      return String(currentUser?.email || "").toLowerCase() === HOLIDAY_ADMIN_EMAIL.toLowerCase();
     }
 
     function syncAdminUI() {
@@ -9988,6 +10110,10 @@
 
     async function refreshFromCloud(showSuccessToast = true) {
       if (!currentUser) return;
+      if (!navigator.onLine) {
+        updateOnlineStatus({ announce: true });
+        return;
+      }
 
       clearTimeout(syncStatusResetTimer);
       setSyncStatus("syncing", "최신 데이터 확인 중…");
@@ -10012,6 +10138,14 @@
 
     async function runStorageAction(action, errorMessage = "저장 중 오류가 발생했어요. Supabase 설정을 확인해 주세요.") {
       clearTimeout(syncStatusResetTimer);
+
+      if (!navigator.onLine) {
+        const offlineError = new Error("OFFLINE");
+        setSyncStatus("offline", "오프라인 · 아직 저장되지 않음");
+        showToast("인터넷 연결이 없어 아직 저장되지 않았어요. 연결 후 다시 눌러 주세요.", "info");
+        throw offlineError;
+      }
+
       setSyncStatus("syncing", "저장 중…");
 
       try {
@@ -10020,10 +10154,29 @@
         return result;
       } catch (error) {
         console.error(error);
-        setSyncStatus("error", "동기화 실패 · 확인하기");
-        showToast(errorMessage, "error");
+        if (!navigator.onLine || error?.message === "OFFLINE") {
+          setSyncStatus("offline", "오프라인 · 아직 저장되지 않음");
+        } else {
+          setSyncStatus("error", "동기화 실패 · 확인하기");
+          showToast(errorMessage, "error");
+        }
         throw error;
       }
+    }
+
+    function updateOnlineStatus({ announce = false } = {}) {
+      const online = navigator.onLine;
+      document.body.classList.toggle("is-offline", !online);
+
+      if (!online) {
+        clearTimeout(syncStatusResetTimer);
+        setSyncStatus("offline", "오프라인 · 저장되지 않음");
+        if (announce) showToast("인터넷 연결이 끊겼어요. 작성 중인 내용은 화면에 유지돼요.", "info");
+        return;
+      }
+
+      if (currentUser) markSyncComplete("인터넷 연결됨");
+      if (announce) showToast("인터넷 연결이 복구됐어요. 저장 버튼을 다시 눌러 주세요.", "success");
     }
 
     function getSheetPreviewPayload() {
@@ -10401,7 +10554,7 @@
         return `
           <div class="reason-bar-item">
             <div class="reason-bar-top">
-              <span>${item.reason}</span>
+              <span>${escapeHTML(item.reason)}</span>
               <span>${formatDays(item.amount)}</span>
             </div>
             <div class="reason-track">
@@ -10608,10 +10761,10 @@
         cells.push(`
           <button class="${classes}" data-date="${iso}" aria-label="${iso} 휴가 등록" ${isTodayDate ? 'aria-current="date"' : ""}>
             <span class="day-number">${dayNum}</span>
-            ${holidayName ? `<span class="holiday-dot">♥</span><span class="holiday-name">${holidayName}</span>` : ""}
+            ${holidayName ? `<span class="holiday-dot">♥</span><span class="holiday-name">${escapeHTML(holidayName)}</span>` : ""}
             <span class="events">
               ${list.slice(0, 2).map(l => {
-                return `<span class="${calendarEventClass(l, iso)}" data-edit-id="${l.id}">${calendarEventLabel(l, iso)}</span>`;
+                return `<span class="${calendarEventClass(l, iso)}" data-edit-id="${escapeAttr(l.id)}">${escapeHTML(calendarEventLabel(l, iso))}</span>`;
               }).join("")}
               ${list.length > 2 ? `<span class="event-pill">+${list.length - 2}</span>` : ""}
             </span>
@@ -10685,11 +10838,11 @@
             <div class="leave-date">${parseISO(l.startDate).getDate()}</div>
             <div class="leave-meta">
               <strong>${type.icon} ${type.label}</strong>
-              <span>${dateText} · ${reason}</span>
+              <span>${escapeHTML(dateText)} · ${escapeHTML(reason)}</span>
             </div>
             <div class="leave-actions">
-              <button class="edit-btn" data-id="${l.id}" aria-label="수정">✎</button>
-              <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
+              <button class="edit-btn" data-id="${escapeAttr(l.id)}" aria-label="수정">✎</button>
+              <button class="delete-btn" data-id="${escapeAttr(l.id)}" aria-label="삭제">×</button>
             </div>
           </div>
         `;
@@ -10760,8 +10913,8 @@
                 ${l.memo ? `<span class="leave-memo">메모: ${escapeHTML(l.memo)}</span>` : ""}
               </div>
               <div class="leave-actions">
-                <button class="edit-btn" data-id="${l.id}" aria-label="수정">✎</button>
-                <button class="delete-btn" data-id="${l.id}" aria-label="삭제">×</button>
+                <button class="edit-btn" data-id="${escapeAttr(l.id)}" aria-label="수정">✎</button>
+                <button class="delete-btn" data-id="${escapeAttr(l.id)}" aria-label="삭제">×</button>
               </div>
             </div>
           `;
@@ -10834,8 +10987,8 @@
                 ${leave.memo ? `<span class="leave-memo">메모: ${escapeHTML(leave.memo)}</span>` : ""}
               </div>
               <div class="planned-actions">
-                <button class="confirm-planned-btn" data-id="${leave.id}" type="button">확정하기</button>
-                <button class="planned-edit-btn" data-id="${leave.id}" type="button">수정</button>
+                <button class="confirm-planned-btn" data-id="${escapeAttr(leave.id)}" type="button">확정하기</button>
+                <button class="planned-edit-btn" data-id="${escapeAttr(leave.id)}" type="button">수정</button>
               </div>
             </div>
           `;
@@ -11207,6 +11360,45 @@
       }
     }
 
+    function pushSheetHistoryState() {
+      try {
+        history.pushState({ ...(history.state || {}), shimPyoDialog: "sheet" }, "", window.location.href);
+        sheetHistoryPushed = true;
+        return true;
+      } catch (error) {
+        console.warn("입력창 뒤로가기 상태를 만들지 못했어요.", error);
+        sheetHistoryPushed = false;
+        return false;
+      }
+    }
+
+    function captureSheetSnapshot() {
+      return JSON.stringify({
+        startDate: $("#startDate")?.value || "",
+        endDate: $("#endDate")?.value || "",
+        type: selectedType,
+        status: selectedStatus,
+        reasonChoice: selectedReason,
+        customReason: $("#customReason")?.value || "",
+        memo: $("#leaveMemo")?.value || ""
+      });
+    }
+
+    function markSheetClean() {
+      sheetInitialSnapshot = captureSheetSnapshot();
+    }
+
+    function isSheetDirty() {
+      return $("#sheet")?.classList.contains("active")
+        && sheetInitialSnapshot !== null
+        && captureSheetSnapshot() !== sheetInitialSnapshot;
+    }
+
+    function confirmDiscardSheetChanges() {
+      if (!isSheetDirty()) return true;
+      return window.confirm("작성 중인 내용이 있어요. 저장하지 않고 닫을까요?");
+    }
+
     function updateEditRecordSummary(leave = null) {
       const main = $("#editSummaryMain");
       const reason = $("#editSummaryReason");
@@ -11237,6 +11429,7 @@
 
     function showSheet() {
       closeDaySummary();
+      const wasActive = $("#sheet").classList.contains("active");
       lastFocusedElement = document.activeElement;
       $("#overlay").classList.add("active");
       $("#sheet").classList.add("active");
@@ -11244,11 +11437,18 @@
       bindAllDatePickers();
       bindMemoField();
       updateLeavePreview();
+      markSheetClean();
+
+      if (!wasActive && !sheetHistoryPushed) {
+        pushSheetHistoryState();
+      }
+
       focusFirstField(activeDialog, "#startDate");
     }
 
     function resetSheetState(dateISO = toISO(today)) {
       editingLeaveId = null;
+      draftLeaveId = generateStableId("leave");
       selectedDateISO = dateISO;
       selectedType = "annual";
       selectedStatus = "confirmed";
@@ -11283,6 +11483,7 @@
       }
 
       editingLeaveId = leave.id;
+      draftLeaveId = null;
       selectedDateISO = leave.startDate;
       selectedType = leave.type || "annual";
       selectedStatus = normalizeLeaveStatus(leave.status);
@@ -11313,19 +11514,45 @@
       }, 0);
     }
 
-    function closeSheet() {
-      $("#sheet").classList.remove("active");
+    function closeSheet(options = {}) {
+      const settings = typeof options === "object" && options !== null ? options : {};
+      const force = Boolean(settings.force);
+      const fromHistory = Boolean(settings.fromHistory);
+      const sheet = $("#sheet");
+      if (!sheet?.classList.contains("active")) return true;
+
+      if (!force && !confirmDiscardSheetChanges()) {
+        if (fromHistory && !sheetHistoryPushed) {
+          pushSheetHistoryState();
+        }
+        return false;
+      }
+
+      sheet.classList.remove("active");
+      sheetInitialSnapshot = null;
+      draftLeaveId = null;
+
       if (!$("#settingsModal").classList.contains("active")) {
         $("#overlay").classList.remove("active");
         activeDialog = null;
       }
+
+      if (sheetHistoryPushed && !fromHistory) {
+        sheetHistoryPushed = false;
+        history.back();
+      } else if (fromHistory) {
+        sheetHistoryPushed = false;
+      }
+
       if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
         lastFocusedElement.focus();
       }
+      return true;
     }
 
     function cancelEdit() {
-      closeSheet();
+      const closed = closeSheet();
+      if (!closed) return;
       editingLeaveId = null;
       document.body.classList.remove("editing-leave");
     }
@@ -11350,9 +11577,24 @@
       }
     }
 
-    function showToast(text, type = "auto") {
+    function hideToast() {
       const toast = $("#toast");
+      const action = $("#toastAction");
+      clearTimeout(showToast.timer);
       if (!toast) return;
+      toast.classList.remove("active", "has-action");
+      if (action) {
+        action.hidden = true;
+        action.onclick = null;
+        action.disabled = false;
+      }
+    }
+
+    function showToast(text, type = "auto", options = {}) {
+      const toast = $("#toast");
+      const messageEl = $("#toastMessage");
+      const action = $("#toastAction");
+      if (!toast || !messageEl || !action) return;
 
       const message = String(text || "");
       let resolvedType = type;
@@ -11360,22 +11602,39 @@
       if (resolvedType === "auto") {
         if (/오류|못했|찾지 못|필요합니다|선택해 주세요|입력해 주세요|확인해 주세요|올바른/.test(message)) {
           resolvedType = "error";
-        } else if (/없어요|관리자 계정/.test(message)) {
+        } else if (/없어요|관리자 계정|오프라인/.test(message)) {
           resolvedType = "info";
         } else {
           resolvedType = "success";
         }
       }
 
-      toast.textContent = message;
-      toast.classList.remove("success", "info", "error", "active");
+      messageEl.textContent = message;
+      toast.classList.remove("success", "info", "error", "active", "has-action");
+      action.hidden = true;
+      action.onclick = null;
+      action.disabled = false;
+
+      if (options.actionLabel && typeof options.onAction === "function") {
+        action.textContent = options.actionLabel;
+        action.hidden = false;
+        toast.classList.add("has-action");
+        action.onclick = async () => {
+          action.disabled = true;
+          hideToast();
+          try {
+            await options.onAction();
+          } catch (error) {
+            console.error(error);
+          }
+        };
+      }
+
       void toast.offsetWidth;
       toast.classList.add(resolvedType, "active");
 
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => {
-        toast.classList.remove("active");
-      }, 2600);
+      showToast.timer = setTimeout(hideToast, Number(options.duration || 2600));
     }
 
     function formatLeaveDeleteDetail(leaves) {
@@ -11413,7 +11672,7 @@
       deleteDialogPrevious = activeDialog;
       deleteDialogFocus = document.activeElement;
       $("#deleteConfirmTitle").textContent = title || (uniqueIds.length > 1 ? `${uniqueIds.length}개의 기록을 삭제할까요?` : "이 기록을 삭제할까요?");
-      $("#deleteConfirmMessage").textContent = message || "삭제한 기록은 다시 되돌릴 수 없어요.";
+      $("#deleteConfirmMessage").textContent = message || "삭제 후 8초 동안 되돌릴 수 있어요.";
       $("#deleteConfirmDetail").textContent = formatLeaveDeleteDetail(leaves);
       $("#confirmDelete").textContent = uniqueIds.length > 1 ? `${uniqueIds.length}건 삭제` : "삭제하기";
       $("#confirmDelete").disabled = false;
@@ -11452,6 +11711,10 @@
       button.textContent = "삭제 중…";
 
       try {
+        const deletedLeaves = state.leaves
+          .filter(leave => request.ids.includes(leave.id))
+          .map(leave => ({ ...leave }));
+
         await runStorageAction(
           () => request.ids.length === 1
             ? storage.deleteLeave(request.ids[0])
@@ -11467,14 +11730,32 @@
         closeDeleteConfirm(false);
 
         if (closeSheetAfter) {
-          closeSheet();
+          closeSheet({ force: true });
           editingLeaveId = null;
           document.body.classList.remove("editing-leave");
         }
 
         renderAll();
         if (typeof afterDelete === "function") afterDelete();
-        showToast(successMessage, "success");
+
+        const undoToken = ++pendingUndoToken;
+        showToast(successMessage, "success", {
+          actionLabel: "되돌리기",
+          duration: 8000,
+          onAction: async () => {
+            if (undoToken !== pendingUndoToken || !deletedLeaves.length) return;
+            await runStorageAction(
+              () => storage.restoreLeaves(deletedLeaves),
+              "삭제한 기록을 복구하지 못했어요."
+            );
+            state.leaves = [
+              ...state.leaves.filter(item => !deletedLeaves.some(deleted => deleted.id === item.id)),
+              ...deletedLeaves
+            ].sort((a, b) => String(a.startDate).localeCompare(String(b.startDate)));
+            renderAll();
+            showToast("삭제한 일정을 되돌렸어요.", "success");
+          }
+        });
       } catch (error) {
         button.disabled = false;
         button.textContent = request.ids.length > 1 ? `${request.ids.length}건 삭제` : "삭제하기";
@@ -11500,11 +11781,11 @@
         ? state.leaves.find(l => l.id === saveTargetId)
         : null;
 
-      reason = normalizeReasonLabel(reason);
-      const memo = $("#leaveMemo").value.trim();
+      reason = normalizeReasonLabel(sanitizePlainText(reason, 120));
+      const memo = sanitizePlainText($("#leaveMemo").value, 200);
 
       const payload = {
-        id: saveTargetId || `leave_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        id: saveTargetId || draftLeaveId || (draftLeaveId = generateStableId("leave")),
         startDate: toISO(start),
         endDate: toISO(end),
         type: selectedType,
@@ -11548,7 +11829,7 @@
 
         // 화면 렌더링보다 먼저 창을 닫아, 이후 부가 렌더링에서 문제가 생겨도
         // 저장 완료 동작이 사용자에게 확실히 전달되도록 합니다.
-        closeSheet();
+        closeSheet({ force: true });
         editingLeaveId = null;
         document.body.classList.remove("editing-leave");
 
@@ -11609,7 +11890,7 @@
         title: targets.length > 1 ? `${targets.length}개의 기록을 모두 삭제할까요?` : "이 날짜의 기록을 삭제할까요?",
         message: targets.length > 1
           ? "선택한 날짜 범위와 겹치는 기록이 모두 삭제돼요."
-          : "삭제한 기록은 다시 되돌릴 수 없어요.",
+          : "삭제 후 잠시 동안 되돌릴 수 있어요.",
         successMessage: targets.length > 1 ? `${targets.length}개의 기록을 삭제했어요.` : "선택한 날짜의 기록을 삭제했어요.",
         closeSheetAfter: true
       });
@@ -11670,8 +11951,9 @@
     }
 
     function csvEscape(value) {
-      const text = String(value ?? "");
-      return `"${text.replace(/"/g, '""')}"`;
+      const raw = String(value ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
+      const safeText = /^[=+\-@]/.test(raw) ? `'${raw}` : raw;
+      return `"${safeText.replace(/"/g, '""')}"`;
     }
 
     function exportLeavesCsv() {
@@ -11744,18 +12026,22 @@
           return;
         }
 
-        list.innerHTML = filteredRows.map(row => `
-          <div class="holiday-row">
-            <span class="holiday-row-date">${row.date}</span>
-            <span class="holiday-row-name">${row.name}${row.is_holiday ? "" : " · 비활성"}</span>
-            ${isHolidayAdmin() ? `
-              <span class="holiday-row-actions">
-                <button class="holiday-edit-btn" data-date="${row.date}" data-name="${row.name}" type="button" aria-label="공휴일 수정">✎</button>
-                <button class="holiday-delete-btn" data-date="${row.date}" type="button" aria-label="공휴일 삭제">×</button>
-              </span>
-            ` : ""}
-          </div>
-        `).join("");
+        list.innerHTML = filteredRows.map(row => {
+          const safeDate = escapeHTML(row.date);
+          const safeName = escapeHTML(row.name);
+          return `
+            <div class="holiday-row">
+              <span class="holiday-row-date">${safeDate}</span>
+              <span class="holiday-row-name">${safeName}${row.is_holiday ? "" : " · 비활성"}</span>
+              ${isHolidayAdmin() ? `
+                <span class="holiday-row-actions">
+                  <button class="holiday-edit-btn" data-date="${escapeAttr(row.date)}" data-name="${escapeAttr(row.name)}" type="button" aria-label="공휴일 수정">✎</button>
+                  <button class="holiday-delete-btn" data-date="${escapeAttr(row.date)}" type="button" aria-label="공휴일 삭제">×</button>
+                </span>
+              ` : ""}
+            </div>
+          `;
+        }).join("");
 
         list.querySelectorAll(".holiday-edit-btn").forEach(btn => {
           btn.addEventListener("click", () => {
@@ -11833,10 +12119,10 @@
       }
 
       const date = $("#holidayDateInput").value;
-      const name = $("#holidayNameInput").value.trim();
+      const name = sanitizePlainText($("#holidayNameInput").value, 80);
 
-      if (!date) {
-        showToast("공휴일 날짜를 선택해 주세요.");
+      if (!date || !isValidISODate(date)) {
+        showToast("올바른 공휴일 날짜를 선택해 주세요.", "error");
         return;
       }
 
@@ -11899,6 +12185,71 @@
     }
 
 
+    async function loadUserWorkspace({ showSuccessToast = false } = {}) {
+      if (!currentUser) return;
+
+      setAuthView(true);
+      setSyncStatus("syncing", "데이터 불러오는 중…");
+
+      try {
+        const saved = await storage.load();
+        if (saved && typeof saved === "object") {
+          state = {
+            settings: Object.assign({ totalLeave: 15 }, saved.settings || {}),
+            leaves: Array.isArray(saved.leaves) ? saved.leaves : []
+          };
+        }
+        initializedUserId = currentUser.id;
+        setSyncStatus(navigator.onLine ? "idle" : "offline", navigator.onLine ? "동기화됨" : "오프라인 · 저장되지 않음");
+        renderTypeButtons();
+        renderReasonTags();
+        renderAll();
+        setViewMode("calendar");
+        if (showSuccessToast) showToast("계정 데이터를 불러왔어요.", "success");
+      } catch (error) {
+        console.error(error);
+        setSyncStatus(navigator.onLine ? "error" : "offline", navigator.onLine ? "동기화 실패 · 확인하기" : "오프라인 · 저장되지 않음");
+        showToast("데이터를 불러오지 못했어요. Supabase 설정을 확인해 주세요.", "error");
+      }
+    }
+
+    function clearSignedOutState() {
+      currentUser = null;
+      initializedUserId = null;
+      state = { settings: { totalLeave: 15 }, leaves: [] };
+      closeDaySummary();
+      if ($("#sheet")?.classList.contains("active")) closeSheet({ force: true });
+      syncAdminUI();
+      setAuthView(false);
+    }
+
+    function bindAuthStateListener() {
+      if (authListenerBound) return;
+      authListenerBound = true;
+
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        window.setTimeout(async () => {
+          const nextUser = session?.user || null;
+
+          if (!nextUser) {
+            if (event === "SIGNED_OUT" || currentUser) clearSignedOutState();
+            return;
+          }
+
+          const userChanged = currentUser?.id !== nextUser.id;
+          currentUser = nextUser;
+          setAuthView(true);
+          syncAdminUI();
+
+          if (userChanged || initializedUserId !== nextUser.id) {
+            await loadUserWorkspace({ showSuccessToast: event === "SIGNED_IN" });
+          } else if (event === "USER_UPDATED" || event === "TOKEN_REFRESHED") {
+            $("#userEmail").textContent = currentUser.email || "Google 계정";
+          }
+        }, 0);
+      });
+    }
+
     function bindAllDatePickers() {
       document.querySelectorAll('input[type="date"]').forEach(input => {
         input.readOnly = false;
@@ -11939,7 +12290,7 @@
           const { error } = await supabaseClient.auth.signInWithOAuth({
             provider: "google",
             options: {
-              redirectTo: window.location.origin
+              redirectTo: `${window.location.origin}${window.location.pathname}`
             }
           });
 
@@ -11955,11 +12306,26 @@
       const logoutBtn = $("#logoutBtn");
       if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
-          await supabaseClient.auth.signOut();
+          logoutBtn.disabled = true;
+          const originalText = logoutBtn.textContent;
+          logoutBtn.textContent = "로그아웃 중…";
+
+          const { error } = await supabaseClient.auth.signOut();
+          if (error) {
+            console.error(error);
+            logoutBtn.disabled = false;
+            logoutBtn.textContent = originalText;
+            showToast("로그아웃하지 못했어요. 연결 상태를 확인해 주세요.", "error");
+            return;
+          }
+
           currentUser = null;
+          initializedUserId = null;
           state = { settings: { totalLeave: 15 }, leaves: [] };
           syncAdminUI();
           setAuthView(false);
+          logoutBtn.disabled = false;
+          logoutBtn.textContent = originalText;
         });
       }
     }
@@ -11991,7 +12357,7 @@
       });
 
       $("#fab").addEventListener("click", () => openSheet(toISO(today)));
-      $("#closeSheet").addEventListener("click", closeSheet);
+      $("#closeSheet").addEventListener("click", () => closeSheet());
       $("#toggleMiniPanel")?.addEventListener("click", () => {
         const panel = $("#miniPanel");
         setMiniPanelExpanded(panel.classList.contains("mobile-collapsed"));
@@ -12044,14 +12410,18 @@
           return;
         }
         const nextTotalLeave = Math.round(value * 100) / 100;
-        await runStorageAction(
-          () => storage.saveSettings(nextTotalLeave),
-          "연차 설정 저장 중 오류가 발생했어요."
-        );
-        state.settings.totalLeave = nextTotalLeave;
-        closeSettingsModal();
-        renderAll();
-        showToast("연차 설정을 저장했어요.");
+        try {
+          await runStorageAction(
+            () => storage.saveSettings(nextTotalLeave),
+            "연차 설정 저장 중 오류가 발생했어요."
+          );
+          state.settings.totalLeave = nextTotalLeave;
+          closeSettingsModal();
+          renderAll();
+          showToast("연차 설정을 저장했어요.");
+        } catch (error) {
+          // 입력창을 유지해 다시 저장할 수 있게 합니다.
+        }
       });
 
       $("#overlay").addEventListener("click", () => {
@@ -12059,7 +12429,10 @@
           closeDeleteConfirm();
           return;
         }
-        closeSheet();
+        if ($("#sheet").classList.contains("active")) {
+          const closed = closeSheet();
+          if (!closed) return;
+        }
         closeSettingsModal();
         closeHolidayManager();
       });
@@ -12085,11 +12458,17 @@
 
     async function init() {
       bindAuthEvents();
+      bindAuthStateListener();
+      bindAppEventsOnce();
+      bindAllDatePickers();
+      bindMemoField();
+      updateOnlineStatus();
 
       const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
       if (sessionError) {
         console.error(sessionError);
         setAuthView(false);
+        showToast("로그인 상태를 확인하지 못했어요.", "error");
         return;
       }
 
@@ -12101,31 +12480,9 @@
         return;
       }
 
-      setAuthView(true);
-      setSyncStatus("syncing", "데이터 불러오는 중…");
-
-      try {
-        const saved = await storage.load();
-        if (saved && typeof saved === "object") {
-          state = {
-            settings: Object.assign({ totalLeave: 15 }, saved.settings || {}),
-            leaves: Array.isArray(saved.leaves) ? saved.leaves : []
-          };
-        }
-        setSyncStatus("idle", "동기화됨");
-      } catch (error) {
-        console.error(error);
-        setSyncStatus("error", "동기화 실패 · 확인하기");
-        showToast("데이터를 불러오지 못했어요. Supabase 설정을 확인해 주세요.", "error");
+      if (initializedUserId !== currentUser.id) {
+        await loadUserWorkspace();
       }
-
-      renderTypeButtons();
-      renderReasonTags();
-      renderAll();
-      setViewMode("calendar");
-      bindAppEventsOnce();
-      bindAllDatePickers();
-      bindMemoField();
     }
 
 
@@ -12134,6 +12491,21 @@
       syncMobilePanels();
       if (!isMobileViewport()) closeDaySummary();
       renderCalendar();
+    });
+
+    window.addEventListener("online", () => updateOnlineStatus({ announce: true }));
+    window.addEventListener("offline", () => updateOnlineStatus({ announce: true }));
+
+    window.addEventListener("beforeunload", (event) => {
+      if (!isSheetDirty()) return;
+      event.preventDefault();
+      event.returnValue = "";
+    });
+
+    window.addEventListener("popstate", () => {
+      if (!$("#sheet")?.classList.contains("active")) return;
+      sheetHistoryPushed = false;
+      closeSheet({ fromHistory: true });
     });
 
     init();
