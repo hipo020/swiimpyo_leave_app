@@ -9404,3 +9404,142 @@
         max-width: calc(100vw - 16px) !important;
       }
     }
+
+    /************************************************************
+     * Mobile bottom navigation final cleanup
+     * - 콘텐츠가 하단 바에 가려지지 않도록 여백 확보
+     * - 가운데 등록 버튼을 하단 바의 일부처럼 정렬
+     * - 달력 세로 여백과 하단 그림자 정돈
+     ************************************************************/
+    @media (max-width: 720px) {
+      html {
+        scroll-padding-bottom: calc(142px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      .app {
+        padding-bottom: calc(142px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      .main-grid {
+        margin-bottom: 0 !important;
+      }
+
+      .calendar-card {
+        padding-bottom: 10px !important;
+      }
+
+      .calendar {
+        align-content: start !important;
+      }
+
+      .day {
+        min-height: 60px !important;
+        padding: 5px 2px !important;
+        gap: 4px !important;
+      }
+
+      .event-pill {
+        line-height: 1.15 !important;
+      }
+
+      /* 하단 메뉴: 가운데 등록 버튼 자리를 명확하게 확보 */
+      .view-tabs {
+        bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+        width: min(430px, calc(100vw - 16px)) !important;
+        max-width: calc(100vw - 16px) !important;
+        height: 68px !important;
+        padding: 6px !important;
+        grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr) !important;
+        gap: 4px !important;
+        border-radius: 25px !important;
+        overflow: visible !important;
+        box-shadow: 0 8px 24px rgba(54, 62, 66, .12) !important;
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(18px) !important;
+      }
+
+      .view-tabs::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 64px;
+        height: 64px;
+        border-radius: 22px;
+        transform: translate(-50%, -50%);
+        background: rgba(222, 241, 247, .94);
+        border: 1px solid rgba(205, 229, 237, .95);
+        pointer-events: none;
+      }
+
+      .view-tab {
+        position: relative !important;
+        z-index: 1 !important;
+        height: 56px !important;
+        min-height: 56px !important;
+        border-radius: 19px !important;
+      }
+
+      /* 가운데 + 버튼을 바 안쪽 중앙에 고정 */
+      .fab {
+        left: 50% !important;
+        right: auto !important;
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 20px !important;
+        font-size: 29px !important;
+        line-height: 1 !important;
+        transform: translateX(-50%) !important;
+        box-shadow: 0 7px 16px rgba(93, 169, 188, .20) !important;
+        z-index: 72 !important;
+      }
+
+      body.fab-scrolling .fab {
+        transform: translateX(-50%) scale(.96) !important;
+      }
+
+      /* 토스트도 하단 메뉴에 가리지 않게 */
+      .toast,
+      .toast.has-action {
+        bottom: calc(94px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      /* 마지막 카드/문장이 하단 메뉴 위까지 완전히 스크롤되도록 */
+      .mobile-upcoming-card,
+      .side-card:last-child,
+      .report-view:last-child {
+        scroll-margin-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding-bottom: calc(136px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      .view-tabs {
+        width: calc(100vw - 12px) !important;
+        max-width: calc(100vw - 12px) !important;
+        grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1fr) !important;
+      }
+
+      .view-tabs::before {
+        width: 60px;
+        height: 60px;
+        border-radius: 20px;
+      }
+
+      .fab {
+        width: 52px !important;
+        height: 52px !important;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+        border-radius: 18px !important;
+        font-size: 27px !important;
+      }
+
+      .day {
+        min-height: 57px !important;
+      }
+    }
+
